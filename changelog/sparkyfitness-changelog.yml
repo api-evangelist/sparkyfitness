@@ -1,0 +1,64 @@
+generated: '2026-08-27'
+method: searched
+source: https://github.com/CodeWithCJ/SparkyFitness/releases
+scheme: semver, tagged vMAJOR.MINOR.PATCH; GitHub Releases with hand-written notes
+current_version: v1.6.4
+current_version_date: '2026-08-27'
+note: >-
+  The changelog is GitHub Releases — there is no separate changelog page and no
+  API-specific changelog. Release notes are substantial (1.8KB-14.5KB of body
+  per release) and cover the whole application, so API changes are described
+  alongside UI changes rather than isolated. Server, frontend and shared
+  packages all carry the same version number (1.6.4) and the Docker tags track
+  it exactly. Cadence over the recent window is roughly every 1-3 weeks.
+  Note the numbering discontinuity: v0.17.3 (2026-07-06) is followed by v1.6.0
+  (2026-07-24) — a 1.0 declaration, not a gap in the record.
+entries:
+  - version: v1.6.4
+    date: '2026-08-27'
+    prerelease: false
+    url: https://github.com/CodeWithCJ/SparkyFitness/releases/tag/v1.6.4
+  - version: v1.6.3
+    date: '2026-08-24'
+    prerelease: false
+    note: >-
+      Published as Docker tags (codewithcj/sparkyfitness:v1.6.3, 2026-08-24) but
+      not returned in the first page of the GitHub Releases API, so no release
+      body was read for it.
+  - version: v1.6.2
+    date: '2026-08-14'
+    prerelease: false
+    url: https://github.com/CodeWithCJ/SparkyFitness/releases/tag/v1.6.2
+  - version: v1.6.1
+    date: '2026-08-03'
+    prerelease: false
+    url: https://github.com/CodeWithCJ/SparkyFitness/releases/tag/v1.6.1
+  - version: v1.6.0
+    date: '2026-07-24'
+    prerelease: false
+    url: https://github.com/CodeWithCJ/SparkyFitness/releases/tag/v1.6.0
+  - version: v0.17.3
+    date: '2026-07-06'
+    prerelease: false
+    url: https://github.com/CodeWithCJ/SparkyFitness/releases/tag/v0.17.3
+  - version: v0.17.2
+    date: '2026-06-23'
+    prerelease: false
+  - version: v0.17.1
+    date: '2026-06-23'
+    prerelease: false
+  - version: v0.17.0
+    date: '2026-06-22'
+    prerelease: false
+breaking_changes_documented:
+  - change: >-
+      POST /health-data no longer returns 400 when SOME records in a batch fail.
+      It returns 200 with a non-empty errors[] array; the remaining records are
+      still saved. Automations that keyed on the 400 to detect partial failure
+      must inspect errors[] instead.
+    since: v0.18+ (as stated in the API reference)
+    source: https://codewithcj.github.io/SparkyFitness/developer/api-reference
+    note: >-
+      The version string in the docs ("v0.18+") does not match any published tag
+      — releases went v0.17.3 -> v1.6.0. The behaviour change is real and
+      documented; the version it landed in is ambiguous from the public record.

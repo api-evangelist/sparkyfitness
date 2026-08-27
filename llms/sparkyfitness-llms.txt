@@ -1,0 +1,97 @@
+# SparkyFitness
+
+> Self-hosted, open-source health and fitness tracker for food, exercise, water,
+> sleep, mood, body measurements and medications — built for families and
+> designed around an AI assistant. It ships a 423-operation REST API described by
+> an OpenAPI 3.0 document the server generates and serves itself, plus a
+> first-party Model Context Protocol server running in-process with 56 tools.
+> There is no vendor API host: you run the containers and the API is yours.
+
+Generated 2026-08-27 by API Evangelist (apievangelist.com) from the project's own
+public documentation, repository and container registries. Method: generated.
+The project does not publish an llms.txt of its own; /llms.txt on the
+documentation host returns 404.
+
+## What you need to know first
+
+- **Self-hosted.** The base URL is your own deployment: `https://{host}/api` for
+  REST, `https://{host}/mcp` for MCP. The upstream spec declares only the
+  relative base `/api`. There is no hosted edition, no signup and no pricing.
+- **Licence is non-commercial.** A custom source-available licence: use, copy,
+  modify and distribute for non-commercial purposes only. GitHub reports
+  NOASSERTION. Read it before building anything commercial on it.
+- **Auth is an API key**, generated in Settings → Developer & Integrations → API
+  Key Management, sent as `Authorization: Bearer <key>` or `x-api-key: <key>`.
+  Browser sessions use an HTTP-only `token` cookie; end-user login can be
+  federated through OIDC.
+- **Row-level security** in PostgreSQL scopes every read to the key's user.
+  A 404 may mean "exists but is not yours".
+- **The API states its own instability.** `info.description` says it "is subject
+  to change without notice due to heavy development" and warns that improper
+  direct use "may lead to data loss or corruption".
+
+## API
+
+- [API reference](https://codewithcj.github.io/SparkyFitness/developer/api-reference): Prose reference; the authoritative source for the bulk health-data ingest.
+- [OpenAPI (captured)](openapi/sparkyfitness-openapi.yml): 328 paths, 423 operations, 45 schemas, 9 declared tags. A running instance serves the same document at `GET /api/api-docs/json`, Swagger UI at `/api/api-docs/swagger`, ReDoc at `/api/api-docs/redoc`.
+- [Authentication](authentication/sparkyfitness-authentication.yml): API key, session cookie, OIDC federation, MFA, passkeys, per-key permissions.
+- [Errors](errors/sparkyfitness-problem-types.yml): Flat `{"error": "message"}` envelope. Not RFC 9457. No error codes.
+- [Conventions](conventions/sparkyfitness-conventions.yml): Pagination, units, idempotency, versioning, reversibility.
+- [Rate limits](rate-limits/sparkyfitness-rate-limits.yml): 5r/s per IP on auth endpoints (nginx); 100 requests/minute per API key (application). `Retry-After` on the latter only.
+- [Data model](data-model/sparkyfitness-data-model.yml): 45 entities, UUID identifiers, `user_id` ownership.
+- [Overlay](overlays/sparkyfitness-openapi-overlay.yaml): API Evangelist enhancements — repairs the dangling `bearerAuth` reference and declares the 11 undeclared tags.
+
+## MCP
+
+- [MCP server docs](https://codewithcj.github.io/SparkyFitness/features/mcp-server): In-process at `POST /mcp`. Stateless streamable HTTP. Bearer API key.
+- [MCP manifest](mcp/sparkyfitness-mcp.yml): 56 tools across food, exercise, check-ins, goals, coaching, vision, profile, reports, medications — plus five admin-only tools that bypass row-level security and are off unless `DEV_TOOLS_ENABLED=true`.
+- [Tool crosswalk](mcp/sparkyfitness-tool-crosswalk.yml): Each MCP tool bound to the REST operations behind it, and the 302 REST operations with no tool.
+
+## Agent skills
+
+- [Skill index](skills/_index.yml)
+- [Log daily nutrition](skills/sparkyfitness-log-daily-nutrition.md)
+- [Ingest a wearable workout](skills/sparkyfitness-ingest-wearable-workout.md)
+- [Daily check-in](skills/sparkyfitness-daily-checkin.md)
+- [Connect an agent over MCP](skills/sparkyfitness-connect-mcp-agent.md)
+
+## Install and operate
+
+- [Docker Compose install](https://codewithcj.github.io/SparkyFitness/install/docker-compose)
+- [Environment variables](https://codewithcj.github.io/SparkyFitness/install/environment-variables)
+- [Kubernetes / Helm](https://codewithcj.github.io/SparkyFitness/install/kubernetes): Community-contributed; the maintainers do not use Kubernetes.
+- [Reverse proxy](https://codewithcj.github.io/SparkyFitness/administration/reverse-proxy)
+- [OIDC / OAuth authentication](https://codewithcj.github.io/SparkyFitness/administration/oauth-authentication)
+- [Backup and restore](https://codewithcj.github.io/SparkyFitness/administration/manual_backup_restore)
+- [Packages](packages/sparkyfitness-packages.yml): Three first-party Docker images (`codewithcj/sparkyfitness`, `_server`, `_garmin`), each at v1.6.4. No client SDK on any language registry.
+
+## Integrations
+
+Wearables and health platforms: Garmin (including FIT file import), Fitbit,
+Withings, Strava, Polar, Oura, Hevy, Apple HealthKit and Google Health Connect.
+Food databases: OpenFoodFacts, USDA, FatSecret, Nutritionix. Recipe managers:
+Mealie, Tandoor. Exercise: wger, Free Exercise DB.
+
+## Project
+
+- [Documentation](https://codewithcj.github.io/SparkyFitness/)
+- [Source](https://github.com/CodeWithCJ/SparkyFitness)
+- [Releases / changelog](https://github.com/CodeWithCJ/SparkyFitness/releases): v1.6.4 (2026-08-27). Roughly every one to three weeks.
+- [FAQ](https://codewithcj.github.io/SparkyFitness/faq)
+- [Discord](https://discord.gg/vcnMT5cPEA)
+- [Privacy policy](https://codewithcj.github.io/SparkyFitness/privacy_policy)
+- [Licence](https://github.com/CodeWithCJ/SparkyFitness/blob/main/LICENSE)
+
+## Known gaps
+
+- No `operationId` on any operation — bind tools by method and path.
+- `POST /api/health-data`, the ingest the reference documents in most detail, is
+  absent from the OpenAPI: it is mounted outside the swagger scan paths. So is
+  the whole `SparkyFitnessServer/integrations/` tree.
+- 15 operations reference an undefined `bearerAuth` security scheme.
+- 21 tag values are used, 9 declared; 6 operations are untagged.
+- `429` is returned by two live limiters and declared on no operation.
+- No `/.well-known/` documents, no security.txt, no SECURITY.md, no coordinated
+  vulnerability disclosure route, no A2A agent card.
+- No deprecation policy, no Sunset/Deprecation headers, no status page.
+- No RFC 9457 problem details, no request/correlation id, no in-spec examples.

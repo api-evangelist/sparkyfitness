@@ -1,0 +1,58 @@
+generated: '2026-08-27'
+method: probed
+source: https://codewithcj.github.io/SparkyFitness/
+note: >-
+  Nothing was served. SparkyFitness has no vendor-operated API host to probe —
+  it is a self-hosted application, so the only host the project itself controls
+  is the GitHub Pages documentation site. Every /.well-known/ path there returns
+  404 with the Pages HTML 404 body (both at the user-site root and under the
+  project path), so no document was saved and NO WellKnown or SecurityTxt
+  pointer is emitted. A served surface would have to come from each operator's
+  own deployment, which is outside the project's control.
+hosts:
+  - host: https://codewithcj.github.io
+    documents:
+      - path: /.well-known/security.txt
+        status: 404
+        file: null
+      - path: /.well-known/openid-configuration
+        status: 404
+        file: null
+      - path: /.well-known/oauth-authorization-server
+        status: 404
+        file: null
+      - path: /.well-known/api-catalog
+        status: 404
+        file: null
+      - path: /.well-known/ai-plugin.json
+        status: 404
+        file: null
+      - path: /.well-known/agent-card.json
+        status: 404
+        file: null
+      - path: /.well-known/agent.json
+        status: 404
+        file: null
+  - host: https://codewithcj.github.io/SparkyFitness
+    documents:
+      - path: /.well-known/security.txt
+        status: 404
+        file: null
+      - path: /.well-known/openid-configuration
+        status: 404
+        file: null
+      - path: /.well-known/oauth-authorization-server
+        status: 404
+        file: null
+      - path: /.well-known/api-catalog
+        status: 404
+        file: null
+      - path: /.well-known/ai-plugin.json
+        status: 404
+        file: null
+      - path: /.well-known/agent-card.json
+        status: 404
+        file: null
+      - path: /.well-known/agent.json
+        status: 404
+        file: null

@@ -1,0 +1,129 @@
+generated: '2026-08-27'
+method: derived
+source: openapi/sparkyfitness-openapi.yml + https://codewithcj.github.io/SparkyFitness/developer/api-reference
+format: proprietary
+rfc9457: false
+content_type: application/json
+envelope:
+  shape: '{"error": "<human-readable message>"}'
+  fields:
+    - name: error
+      type: string
+      description: >-
+        A single human-readable sentence. There is no machine-readable code,
+        no type URI, no field pointer and no correlation id anywhere in the
+        error envelope.
+  note: >-
+    Not RFC 9457. Nothing in the contract emits application/problem+json, and
+    no operation declares a typed error schema — every 4xx/5xx response in the
+    spec is documented with a prose description only. An agent cannot branch on
+    an error programmatically; it has to string-match the message or branch on
+    the status code alone.
+batch_envelope:
+  applies_to: POST /health-data
+  shape: '{"message": string, "processed": [...], "errors": [...], "skipped": [...]}'
+  description: >-
+    The bulk health-data ingest is the one endpoint with a structured error
+    surface, and it is a PARTIAL-SUCCESS envelope rather than an error type. A
+    well-formed body returns 200 even when individual records fail; errors[]
+    carries {error, entry} per rejected record and skipped[] carries records
+    intentionally not written (e.g. Nutrition records with no source_id, which
+    cannot be deduplicated). Both arrays are always present and may be empty.
+  agent_rule: >-
+    A 200 from POST /health-data does NOT mean everything was saved. Always read
+    errors[] and skipped[]. Keying on the HTTP status alone will silently drop
+    records.
+status_codes:
+  - status: 400
+    occurrences: 170
+    title: Bad Request
+    meaning: Invalid input, missing required field, or a malformed body.
+    examples:
+      - '{"error": "Invalid JSON array format."}'
+      - '{"error": "Invalid health data format. All entries must be non-null objects."}'
+      - '{"error": "Entry date is required."}'
+    remediation: Fix the request body or parameters; do not retry unchanged.
+  - status: 401
+    occurrences: 98
+    title: Unauthorized
+    meaning: Authentication credentials missing or invalid.
+    examples:
+      - '{"error": "Unauthorized: Missing API Key"}'
+      - '{"error": "Unauthorized: Invalid or inactive API Key"}'
+    remediation: >-
+      Supply a valid API key (Authorization Bearer or x-api-key). "Inactive"
+      and "invalid" are not distinguished in the message, so a revoked key looks
+      like a wrong one.
+  - status: 403
+    occurrences: 142
+    title: Forbidden
+    meaning: >-
+      Authenticated but not permitted — either the API key lacks the required
+      permission, or Row Level Security scopes the row to a different user.
+    examples:
+      - '{"error": "Forbidden: API Key does not have health_data_write permission"}'
+    remediation: Grant the permission on the key in Settings -> Developer & Integrations.
+  - status: 404
+    occurrences: 117
+    title: Not Found
+    meaning: >-
+      Resource absent OR present but owned by another user — RLS makes these
+      indistinguishable to the caller, which is deliberate.
+    remediation: Do not retry; verify the id and the owning user.
+  - status: 409
+    occurrences: 8
+    title: Conflict
+    meaning: Uniqueness violation.
+    examples:
+      - '{"error": "Email already in use by another account."}'
+    remediation: Choose a different value.
+  - status: 422
+    occurrences: 1
+    title: Unprocessable Entity
+    meaning: >-
+      AI response unusable — refused, truncated, empty, invalid JSON, or an
+      unsupported provider. Only on the AI/chat surface.
+    remediation: Retry with a different prompt or switch the configured AI provider.
+  - status: 429
+    occurrences: 0
+    title: Too Many Requests
+    meaning: Rate limit exceeded.
+    examples:
+      - '{"error": "Rate limit exceeded."}'
+    remediation: Honour Retry-After (per-key limiter) or back off (nginx auth limiter).
+    note: >-
+      NOT declared on a single operation in the contract, yet both documented
+      limiters return it. Any agent generated from this spec alone will be
+      unprepared for the one status it is most likely to meet. See
+      rate-limits/sparkyfitness-rate-limits.yml.
+  - status: 500
+    occurrences: 134
+    title: Internal Server Error
+    meaning: Unexpected server-side failure.
+    examples:
+      - '{"error": "Server error."}'
+    remediation: Retryable with backoff.
+  - status: 502
+    occurrences: 2
+    title: Bad Gateway
+    meaning: AI provider error or malformed response.
+    remediation: Retryable; check the configured AI service settings.
+  - status: 504
+    occurrences: 1
+    title: Gateway Timeout
+    meaning: AI service timed out.
+    remediation: Retryable with backoff.
+mcp_errors:
+  - code: -32602
+    meaning: Invalid params — the MCP JSON-RPC error for a tool call that fails input validation.
+    note: >-
+      The server pre-normalises null arguments to undefined before validation
+      (stripNulls in mcpRoutes.ts) specifically because LLM clients send
+      "start_date": null for omitted optional fields, which would otherwise fail
+      Zod .optional() and produce a -32602.
+gaps:
+  - No error code registry, machine-readable or otherwise.
+  - No RFC 9457 problem+json anywhere.
+  - No request/correlation id in any error body or documented response header.
+  - 429 undocumented in the contract despite two active limiters.
+  - No error response schema on any operation; all 4xx/5xx are prose-only.

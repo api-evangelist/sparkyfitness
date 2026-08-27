@@ -1,0 +1,37 @@
+generated: '2026-08-27'
+method: searched
+source: https://github.com/CodeWithCJ/SparkyFitness/blob/main/LICENSE
+plan_count: 0
+model: self-hosted open-source; no vendor-operated service and no paid tiers
+note: >-
+  SparkyFitness publishes no plans, no pricing page and no paid tier, because
+  there is nothing to buy: the project ships container images and a Helm chart
+  and you run it on your own infrastructure. The API, the MCP server and every
+  feature come with the software. There is no hosted edition, no free/pro split,
+  no per-seat or per-call metering, and no "contact sales" gate either — the
+  absence here is a licensing model, not a commercial wall.
+license:
+  spdx: NOASSERTION
+  summary: >-
+    Custom source-available licence. "Permission is hereby granted, free of
+    charge ... to use, copy, modify, and distribute the Software for
+    NON-COMMERCIAL purposes only." GitHub's licence detector returns
+    NOASSERTION, i.e. it is not an OSI-recognised template.
+  url: https://github.com/CodeWithCJ/SparkyFitness/blob/main/LICENSE
+  implication: >-
+    Commercial redistribution or resale is not permitted by the licence. This
+    is the term a buyer evaluating SparkyFitness as a component needs to read
+    first, and it is what stands in for pricing.
+funding:
+  - type: donations
+    url: https://codewithcj.github.io/SparkyFitness/support-the-project
+    note: Voluntary project support, not a plan or entitlement.
+third_party_hosting:
+  - name: PikaPods
+    url: https://www.pikapods.com/pods?run=sparkyfitness
+    note: >-
+      A one-click hosting button in the project README. The pricing is PikaPods',
+      not SparkyFitness'; nothing about it is a SparkyFitness plan.
+  - name: Zenith
+    url: https://zenith.hosting/host/sparkyfitness?ref=gh
+    note: Same shape — a third-party host, priced by that host.

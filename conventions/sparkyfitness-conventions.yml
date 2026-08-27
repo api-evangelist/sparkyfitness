@@ -1,0 +1,214 @@
+generated: '2026-08-27'
+method: derived
+source: >-
+  openapi/sparkyfitness-openapi.yml +
+  https://codewithcj.github.io/SparkyFitness/developer/api-reference +
+  https://codewithcj.github.io/SparkyFitness/developer/advanced/rate-limiting
+authentication:
+  style: API key (Authorization Bearer, or x-api-key header)
+  detail: authentication/sparkyfitness-authentication.yml
+base_path:
+  value: /api
+  note: >-
+    The spec declares the relative base "/api". A self-hosted product has no
+    vendor host, so the captured spec templates it as https://{host}/api. The
+    project warns in info.description that, because of the Vite/nginx internal
+    proxy, the path a client reaches through the frontend URL can differ from
+    the path served directly on the server port.
+versioning:
+  style: path-prefix, partial
+  detail: >-
+    Most operations sit unversioned under /api. Nine resource families were
+    added or rewritten under /api/v2 — foods, exercises, exercise-entries,
+    goal-presets, medications, symptoms, cycle, pregnancy, water intake — and
+    both generations are served simultaneously. There is no version header, no
+    Accept-version negotiation and no default-version rule stated. An agent has
+    to know per-resource which generation to call; the spec does not say which
+    is preferred.
+  release_versioning: semver on the application (v1.6.4), not on the API
+  detail_artifact: lifecycle/sparkyfitness-lifecycle.yml
+idempotency:
+  header_based: false
+  supported: true
+  mechanism: natural-key deduplication and upsert, not an Idempotency-Key header
+  detail: >-
+    There is no Idempotency-Key header anywhere in the API. What SparkyFitness
+    ships instead is per-surface deduplication keyed on caller-supplied natural
+    keys, which is documented and is what makes the ingest paths safe to retry:
+  surfaces:
+    - surface: POST /health-data (workout / ExerciseSession records)
+      key: source_id
+      required: true
+      semantics: >-
+        "source_id (required for deduplication)". A re-POST of the same
+        source_id updates the existing exercise_entry rather than creating a
+        second one. Records WITHOUT a source_id are not deduplicated — for
+        Nutrition records the server refuses to write them at all and reports
+        them in skipped[].
+      retry_safe: true
+    - surface: POST /measurements/check-in
+      key: entry_date (one check-in per user per day)
+      required: true
+      semantics: >-
+        Documented as an upsert — "Upserts (inserts or updates) daily check-in
+        measurements ... Only one check-in entry is allowed per day". Re-sending
+        the same entry_date overwrites rather than duplicates. Sending null for
+        a field CLEARS a previously recorded value for that day, so a partial
+        re-send is not a no-op for omitted-as-null fields.
+      retry_safe: true
+    - surface: hr_samples[] on POST /health-data
+      key: workout linkage + timestamp
+      semantics: >-
+        Heart-rate samples are MERGED into the day's existing samples rather
+        than replacing them, so a retry that resends the same series will not
+        wipe earlier data — but neither is it stated to be duplicate-free.
+      retry_safe: partial
+    - surface: general CRUD (POST /foods, POST /exercise-entries, POST /mood, ...)
+      key: null
+      semantics: >-
+        No idempotency mechanism. A retried POST after an ambiguous failure
+        creates a second row. An agent must read back before retrying a create.
+      retry_safe: false
+  agent_rule: >-
+    Retries are safe on the two ingest surfaces above when you supply the natural
+    key, and unsafe on ordinary creates. There is no universal retry token.
+pagination:
+  style: limit/offset with a total count
+  parameters: [limit, offset]
+  response_fields:
+    - totalCount
+    - hasMore
+  examples:
+    - 'GET /foods/foods-paginated -> {foods: [...], totalCount: n}'
+    - 'GET /exercises -> {exercises: [...], totalCount: n}'
+  note: >-
+    Not universal — many list operations return a bare array with no envelope
+    and no way to page. There is no cursor pagination, no Link header, and no
+    stated default or maximum page size.
+field_expansion:
+  supported: false
+  note: >-
+    No expand/fields/include parameter. Related objects are either embedded by
+    the endpoint (Food carries default_variant inline) or fetched separately.
+metadata:
+  supported: false
+  note: No customer-defined metadata bag on any resource.
+request_id_tracing:
+  supported: false
+  note: >-
+    No request id or correlation id is returned in any documented response or
+    error body. A failure cannot be quoted back to a maintainer by id.
+date_and_units:
+  dates: 'YYYY-MM-DD for entry dates; ISO 8601 for timestamps'
+  timezone: >-
+    Per-user timezone loaded server-side (loadUserTimezone) and applied to MCP
+    tool calls, so "today" resolves in the user's zone, not UTC.
+  canonical_units:
+    - Masses in kilograms
+    - Circumferences and height in centimetres
+    - Water in millilitres
+    - distance on a workout in KILOMETRES
+    - dist on a gps_point in METRES (cumulative)
+    - body_fat_percentage / body_water_percentage as percentages
+  trap: >-
+    distance and dist use different units within the SAME request body. This is
+    the single most likely unit error an agent will make against this API.
+  derived_not_accepted:
+    - BMI is neither accepted nor stored; it is computed from weight and height where displayed.
+    - Heart-rate zones are always derived server-side; there is no field to supply them.
+  unit_conversion: >-
+    MCP tools automatically honour the user's display preferences (lbs<->kg,
+    kcal<->kJ). The REST API does not — it takes and returns canonical units.
+versioned_request_headers:
+  - header: X-Workout-Model-Version
+    values: '2, 3'
+    semantics: >-
+      2 or higher means per-set durations are in SECONDS; when the header is
+      absent they are read as MINUTES. 3 additionally signals that optional
+      wearable-telemetry objects may be present. A missing header therefore
+      changes the meaning of the data by a factor of 60 — an agent posting sets
+      must send this header.
+  - header: MCP-Protocol-Version
+    semantics: >-
+      On POST /mcp. A well-formed version that post-dates the bundled SDK is
+      clamped down rather than rejected; an unrecognised older version or a
+      non-date value still gets a 400.
+error_envelope:
+  shape: '{"error": "<message>"}'
+  detail: errors/sparkyfitness-problem-types.yml
+rate_limit_signaling:
+  headers: [Retry-After]
+  missing: [X-RateLimit-*, 'RateLimit-* (RFC 9331)']
+  detail: rate-limits/sparkyfitness-rate-limits.yml
+dry_run_mode:
+  supported: false
+  grade: absent
+  note: >-
+    No preview, validate-only or simulate parameter on any write operation. An
+    agent cannot rehearse a write.
+reversibility:
+  grade: documented
+  summary: >-
+    Every user-facing resource family has a DELETE, and the two riskiest bulk
+    surfaces (import and provider sync) have an explicit undo. What is missing
+    everywhere is a WINDOW: the docs state that a thing can be undone, never
+    for how long, so this grades `documented` and not `verified`. No window is
+    asserted here because the project states none.
+  write_surfaces:
+    - surface: Check-in measurements
+      write: POST /measurements/check-in
+      reversal: DELETE /measurements/check-in/{id}
+      window: null
+      window_source: null
+      note: >-
+        Also reversible by re-upserting the same entry_date, and a field can be
+        individually cleared by sending null for it.
+    - surface: Food diary entries
+      write: POST /food-entries
+      reversal: DELETE /food-entries/{id}
+      window: null
+      window_source: null
+    - surface: Exercise diary entries
+      write: POST /exercise-entries
+      reversal: DELETE /exercise-entries/{id}
+      window: null
+      window_source: null
+    - surface: Foods and exercises in the catalog
+      write: 'POST /foods, POST /exercises/'
+      reversal: 'DELETE /foods/{id}, DELETE /exercises/{id}'
+      window: null
+      window_source: null
+      pre_check: >-
+        GET /foods/{id}/deletion-impact and GET /exercises/{id}/deletion-impact
+        report what a delete would break BEFORE it is issued. This is the closest
+        thing in the API to a dry run, and it is exactly the signal an agent
+        needs before removing a catalog item other diary entries reference.
+    - surface: Provider-synced data
+      write: provider sync (Garmin, Fitbit, Withings, Strava, Polar, Oura, Google Health)
+      reversal: DELETE /synced-data/sources/{source}
+      window: null
+      window_source: null
+      note: Removes the data synced from one named source.
+    - surface: Whole instance
+      write: any
+      reversal: 'POST /admin/backup/restore (with /admin/backup/manual, /admin/backup/list, /admin/backup/download/{fileName})'
+      window: null
+      window_source: null
+      note: >-
+        Operator-level restore from a manual or scheduled backup. Admin-only,
+        and its effective window is whatever retention the operator configured
+        in /admin/backup/settings — the project states no default here.
+    - surface: Fasting session
+      write: POST /fasting/start
+      reversal: 'POST /fasting/end, DELETE /fasting/{id}'
+      window: null
+      window_source: null
+  irreversible:
+    - operation: POST /chat/clear-all-history
+      note: Clears AI chat history outright; no undo is documented.
+    - operation: POST /chat/clear-old-history
+      note: Same shape, age-bounded.
+  agent_rule: >-
+    Before deleting anything from the food or exercise CATALOG, call the
+    matching /deletion-impact operation first — catalog rows are referenced by
+    diary entries, and the API does not warn you at delete time.

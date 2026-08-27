@@ -1,0 +1,42 @@
+generated: '2026-08-27'
+method: generated
+source: >-
+  openapi/sparkyfitness-openapi.yml, mcp/sparkyfitness-mcp.yml,
+  conventions/sparkyfitness-conventions.yml and the project's own developer
+  documentation. Every operation named in every skill was checked to exist in
+  the captured contract, except POST /api/health-data, which is documented in
+  the API reference but deliberately absent from the spec — that discrepancy is
+  called out inside the skill that uses it.
+note: >-
+  SparkyFitness publishes an AGENTS.md at the repository root, but it is a
+  CONTRIBUTOR guide for coding agents working on the codebase (monorepo layout,
+  which package guide to read, test patterns) — not an API operating guide. It
+  is not reproduced here and does not substitute for these skills.
+skills:
+  - name: sparkyfitness-log-daily-nutrition
+    file: sparkyfitness-log-daily-nutrition.md
+    api: SparkyFitness API
+    summary: >-
+      Log food and water for a day and read back the nutrition totals, without
+      creating duplicate diary rows or duplicate catalog foods.
+  - name: sparkyfitness-ingest-wearable-workout
+    file: sparkyfitness-ingest-wearable-workout.md
+    api: SparkyFitness API
+    summary: >-
+      Push a workout with GPS, heart-rate and lap telemetry from a wearable or
+      health platform. Covers the source_id dedupe key, the
+      X-Workout-Model-Version seconds-vs-minutes trap, the km-vs-m distance
+      trap, and the 200-with-errors[] partial-success envelope.
+  - name: sparkyfitness-daily-checkin
+    file: sparkyfitness-daily-checkin.md
+    api: SparkyFitness API
+    summary: >-
+      Record and read a daily check-in using the entry_date upsert correctly,
+      including that null clears rather than skips and that BMI is never stored.
+  - name: sparkyfitness-connect-mcp-agent
+    file: sparkyfitness-connect-mcp-agent.md
+    api: SparkyFitness MCP Server
+    summary: >-
+      Connect an agent to the in-process MCP server at POST /mcp, choose the
+      core vs full tool profile, and stay clear of the five admin tools that
+      bypass row-level security.

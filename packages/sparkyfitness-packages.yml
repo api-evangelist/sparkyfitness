@@ -1,0 +1,85 @@
+generated: '2026-08-27'
+method: searched
+source: https://hub.docker.com/u/codewithcj + https://github.com/CodeWithCJ/SparkyFitness/tree/main/helm
+note: >-
+  SparkyFitness publishes no client SDK on any language registry. npm
+  (sparkyfitness, sparky-fitness, @sparkyfitness/sdk) and PyPI (sparkyfitness)
+  all return 404, and the docs point integrators at the raw REST API and the MCP
+  server rather than at a library. What it does distribute is the SELF-HOSTED
+  APPLICATION itself: three first-party Docker images on Docker Hub (with a
+  fourth non-root frontend variant referenced by the Helm chart) and a Helm
+  chart in-repo. These are deployment artifacts, not client libraries, so no
+  `SDKs` pointer is emitted for them — the ergonomics SDK checks would be
+  credited for something the project does not ship.
+sdk_count: 0
+packages:
+  - language: n/a
+    kind: container-image
+    registry: dockerhub
+    name: codewithcj/sparkyfitness
+    url: https://hub.docker.com/r/codewithcj/sparkyfitness
+    install: docker pull codewithcj/sparkyfitness:v1.6.4
+    official: true
+    version: v1.6.4
+    published: '2026-08-27'
+    note: Frontend / web app image. 1,206,098 pulls as of 2026-08-27.
+  - language: n/a
+    kind: container-image
+    registry: dockerhub
+    name: codewithcj/sparkyfitness_server
+    url: https://hub.docker.com/r/codewithcj/sparkyfitness_server
+    install: docker pull codewithcj/sparkyfitness_server:v1.6.4
+    official: true
+    version: v1.6.4
+    published: '2026-08-27'
+    note: >-
+      Express 5 + PostgreSQL API server — this is the image that serves the REST
+      API at /api and the MCP endpoint at /mcp. 1,212,619 pulls as of 2026-08-27.
+  - language: n/a
+    kind: container-image
+    registry: dockerhub
+    name: codewithcj/sparkyfitness_garmin
+    url: https://hub.docker.com/r/codewithcj/sparkyfitness_garmin
+    install: docker pull codewithcj/sparkyfitness_garmin:v1.6.4
+    official: true
+    version: v1.6.4
+    published: '2026-08-27'
+    note: >-
+      Optional standalone Python Garmin integration microservice
+      (SparkyFitnessGarmin/). 180,122 pulls as of 2026-08-27.
+  - language: n/a
+    kind: container-image
+    registry: dockerhub
+    name: codewithcj/sparkyfitness_frontend_nonroot
+    url: https://hub.docker.com/r/codewithcj/sparkyfitness_frontend_nonroot
+    install: docker pull codewithcj/sparkyfitness_frontend_nonroot
+    official: true
+    version: null
+    published: null
+    note: >-
+      Non-root frontend variant named as the frontend image by helm/README.md.
+      Not probed against the Docker Hub metadata endpoint in this pass, so the
+      current tag and its date are unrecorded rather than guessed.
+  - language: n/a
+    kind: helm-chart
+    registry: none
+    name: sparkyfitness
+    url: https://github.com/CodeWithCJ/SparkyFitness/tree/main/helm/chart
+    install: helm install sparkyfitness ./chart
+    official: false
+    version: 0.3.1
+    published: null
+    note: >-
+      Chart.yaml declares version 0.3.1 / appVersion v0.16.6.1 — the app version
+      it targets is eleven minor releases behind the current v1.6.4 server. It
+      is installed from the checked-out repo path, not from a chart repository,
+      so there is no registry metadata endpoint and no publish date to read.
+      helm/README.md labels Kubernetes support a COMMUNITY contribution the
+      maintainers do not use or fully review, which is why official is false.
+registries_probed:
+  - registry: npm
+    queries: [sparkyfitness, sparky-fitness, '@sparkyfitness/sdk']
+    result: 404 on every query
+  - registry: pypi
+    queries: [sparkyfitness]
+    result: 404

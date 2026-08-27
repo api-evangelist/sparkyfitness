@@ -1,0 +1,492 @@
+generated: '2026-08-27'
+method: derived
+source: openapi/sparkyfitness-openapi.yml
+note: 'Derived from components.schemas: $ref links and *_id reference fields. The contract declares 45
+  schemas but 423 operations, so most operations return an inline/undeclared shape — this graph covers
+  the modelled core, not the whole surface. Some real relationships are therefore invisible here; the
+  authoritative model is the PostgreSQL schema in the repo (db_schema_backup.sql).'
+entity_count: 45
+relationship_count: 35
+identifier_convention:
+  format: 'UUID (type: string, format: uuid)'
+  ownership_field: user_id on nearly every user-owned entity, enforced by PostgreSQL row level security
+  prefixes: none — SparkyFitness uses bare UUIDs, not typed/prefixed identifiers, so an id does not tell
+    an agent what kind of thing it points at
+most_referenced:
+- entity: User
+  inbound_references: 25
+- entity: Food
+  inbound_references: 2
+- entity: MealType
+  inbound_references: 2
+- entity: Exercise
+  inbound_references: 1
+- entity: ExercisePersonalRecordItem
+  inbound_references: 1
+- entity: WorkoutPreset
+  inbound_references: 1
+- entity: FoodVariant
+  inbound_references: 1
+- entity: FoodEntryMeal
+  inbound_references: 1
+entities:
+- name: AppReview
+  required:
+  - rating
+  field_count: 3
+  description: null
+- name: BackupSettings
+  required: []
+  field_count: 7
+  description: null
+- name: CheckInMeasurement
+  required:
+  - entry_date
+  field_count: 15
+  description: null
+- name: CustomMeasurementCategory
+  required:
+  - name
+  - frequency
+  field_count: 9
+  description: null
+- name: CustomMeasurementEntry
+  required:
+  - category_id
+  - value
+  - entry_date
+  field_count: 11
+  description: null
+- name: CustomNutrient
+  required:
+  - id
+  - user_id
+  - name
+  - unit
+  field_count: 7
+  description: null
+- name: DashboardLayout
+  required: []
+  field_count: 3
+  description: null
+- name: Exercise
+  required:
+  - id
+  - user_id
+  - name
+  - category
+  field_count: 13
+  description: null
+- name: ExerciseEntry
+  required:
+  - user_id
+  - exercise_id
+  - entry_date
+  field_count: 18
+  description: null
+- name: ExercisePRMatrixResponse
+  required: []
+  field_count: 2
+  description: null
+- name: ExercisePersonalRecordItem
+  required: []
+  field_count: 14
+  description: One best effort. sportGroup is the record boundary — efforts compete only within the same
+    group, so a hike and a walk contend for the same walk record — while sport classifies the winning
+    activity itself.
+- name: ExercisePresetEntry
+  required:
+  - user_id
+  - workout_preset_id
+  - name
+  - entry_date
+  field_count: 10
+  description: null
+- name: ExternalProvider
+  required:
+  - user_id
+  - provider_name
+  - provider_type
+  field_count: 12
+  description: null
+- name: FastingLog
+  required:
+  - id
+  - user_id
+  - start_time
+  - fasting_type
+  - status
+  field_count: 10
+  description: null
+- name: FitbitStatus
+  required: []
+  field_count: 3
+  description: null
+- name: Food
+  required:
+  - id
+  - user_id
+  - name
+  field_count: 14
+  description: null
+- name: FoodEntry
+  required:
+  - user_id
+  - meal_type_id
+  - quantity
+  - unit
+  - entry_date
+  - food_name
+  - calories
+  field_count: 34
+  description: null
+- name: FoodEntryMeal
+  required:
+  - user_id
+  - meal_type
+  - entry_date
+  - name
+  - foods
+  - quantity
+  - unit
+  field_count: 13
+  description: null
+- name: FoodVariant
+  required:
+  - id
+  - food_id
+  - serving_size
+  - data
+  field_count: 4
+  description: null
+- name: GarminStatus
+  required: []
+  field_count: 2
+  description: null
+- name: GlobalSettings
+  required: []
+  field_count: 4
+  description: null
+- name: GoalPreset
+  required:
+  - preset_name
+  - calories
+  field_count: 11
+  description: null
+- name: MatchedCourseGroup
+  required: []
+  field_count: 10
+  description: A repeated route, grouped by activity name, with its recent runs of that course.
+- name: MatchedCoursesResponse
+  required: []
+  field_count: 1
+  description: null
+- name: MealDayPreset
+  required:
+  - user_id
+  - name
+  - meals
+  field_count: 7
+  description: null
+- name: MealPlanTemplate
+  required:
+  - user_id
+  - name
+  - day_presets
+  field_count: 7
+  description: null
+- name: MealType
+  required:
+  - id
+  - name
+  - sort_order
+  - is_system_default
+  field_count: 7
+  description: null
+- name: MoodEntry
+  required:
+  - mood_value
+  - entry_date
+  field_count: 7
+  description: null
+- name: NutrientDisplayPreference
+  required:
+  - user_id
+  - view_group
+  - platform
+  - visible_nutrients
+  field_count: 6
+  description: null
+- name: NutrientGoalPreference
+  required: []
+  field_count: 3
+  description: null
+- name: NutritionSummary
+  required: []
+  field_count: 6
+  description: null
+- name: OidcProvider
+  required:
+  - provider_name
+  - issuer
+  - client_id
+  - client_secret
+  - redirect_uri
+  field_count: 9
+  description: null
+- name: OnboardingStatus
+  required: []
+  field_count: 2
+  description: null
+- name: SleepAnalytics
+  required: []
+  field_count: 11
+  description: null
+- name: SleepEntry
+  required:
+  - entry_date
+  - bedtime
+  - wake_time
+  - duration_in_seconds
+  field_count: 12
+  description: null
+- name: User
+  required:
+  - id
+  - email
+  - role
+  - is_active
+  field_count: 7
+  description: null
+- name: UserGoal
+  required: []
+  field_count: 11
+  description: null
+- name: UserPreferences
+  required: []
+  field_count: 8
+  description: null
+- name: WaterContainer
+  required:
+  - name
+  - volume
+  - unit
+  field_count: 9
+  description: null
+- name: WaterIntake
+  required:
+  - entry_date
+  - water_ml
+  field_count: 9
+  description: null
+- name: WeeklyGoalPlan
+  required:
+  - id
+  - user_id
+  - plan_name
+  - start_date
+  - is_active
+  field_count: 15
+  description: null
+- name: WithingsStatus
+  required: []
+  field_count: 2
+  description: null
+- name: WorkoutPlanTemplate
+  required:
+  - id
+  - user_id
+  - plan_name
+  - start_date
+  - is_active
+  field_count: 10
+  description: null
+- name: WorkoutPreset
+  required:
+  - id
+  - user_id
+  - name
+  field_count: 8
+  description: null
+- name: WorkoutSet
+  required:
+  - set_number
+  - set_type
+  field_count: 9
+  description: null
+relationships:
+- from: CheckInMeasurement
+  to: User
+  type: belongs_to
+  via: user_id
+  evidence: id-reference field
+- from: CustomMeasurementCategory
+  to: User
+  type: belongs_to
+  via: user_id
+  evidence: id-reference field
+- from: CustomMeasurementEntry
+  to: User
+  type: belongs_to
+  via: user_id
+  evidence: id-reference field
+- from: CustomNutrient
+  to: User
+  type: belongs_to
+  via: user_id
+  evidence: id-reference field
+- from: Exercise
+  to: User
+  type: belongs_to
+  via: user_id
+  evidence: id-reference field
+- from: ExerciseEntry
+  to: Exercise
+  type: belongs_to
+  via: exercise_id
+  evidence: id-reference field
+- from: ExerciseEntry
+  to: User
+  type: belongs_to
+  via: user_id
+  evidence: id-reference field
+- from: ExercisePRMatrixResponse
+  to: ExercisePersonalRecordItem
+  type: has_many
+  via: cardioPRs
+  evidence: $ref
+- from: ExercisePresetEntry
+  to: User
+  type: belongs_to
+  via: user_id
+  evidence: id-reference field
+- from: ExercisePresetEntry
+  to: WorkoutPreset
+  type: belongs_to
+  via: workout_preset_id
+  evidence: id-reference field
+- from: ExternalProvider
+  to: User
+  type: belongs_to
+  via: user_id
+  evidence: id-reference field
+- from: FastingLog
+  to: User
+  type: belongs_to
+  via: user_id
+  evidence: id-reference field
+- from: Food
+  to: FoodVariant
+  type: has_one
+  via: default_variant
+  evidence: $ref
+- from: Food
+  to: User
+  type: belongs_to
+  via: user_id
+  evidence: id-reference field
+- from: FoodEntry
+  to: FoodEntryMeal
+  type: belongs_to
+  via: food_entry_meal_id
+  evidence: id-reference field
+- from: FoodEntry
+  to: Food
+  type: belongs_to
+  via: food_id
+  evidence: id-reference field
+- from: FoodEntry
+  to: MealType
+  type: belongs_to
+  via: meal_type_id
+  evidence: id-reference field
+- from: FoodEntry
+  to: User
+  type: belongs_to
+  via: user_id
+  evidence: id-reference field
+- from: FoodEntryMeal
+  to: MealType
+  type: belongs_to
+  via: meal_type_id
+  evidence: id-reference field
+- from: FoodEntryMeal
+  to: User
+  type: belongs_to
+  via: user_id
+  evidence: id-reference field
+- from: FoodVariant
+  to: Food
+  type: belongs_to
+  via: food_id
+  evidence: id-reference field
+- from: GoalPreset
+  to: User
+  type: belongs_to
+  via: user_id
+  evidence: id-reference field
+- from: MatchedCoursesResponse
+  to: MatchedCourseGroup
+  type: has_many
+  via: courses
+  evidence: $ref
+- from: MealDayPreset
+  to: User
+  type: belongs_to
+  via: user_id
+  evidence: id-reference field
+- from: MealPlanTemplate
+  to: User
+  type: belongs_to
+  via: user_id
+  evidence: id-reference field
+- from: MealType
+  to: User
+  type: belongs_to
+  via: user_id
+  evidence: id-reference field
+- from: MoodEntry
+  to: User
+  type: belongs_to
+  via: user_id
+  evidence: id-reference field
+- from: NutrientDisplayPreference
+  to: User
+  type: belongs_to
+  via: user_id
+  evidence: id-reference field
+- from: SleepEntry
+  to: User
+  type: belongs_to
+  via: user_id
+  evidence: id-reference field
+- from: UserPreferences
+  to: User
+  type: belongs_to
+  via: user_id
+  evidence: id-reference field
+- from: WaterContainer
+  to: User
+  type: belongs_to
+  via: user_id
+  evidence: id-reference field
+- from: WaterIntake
+  to: User
+  type: belongs_to
+  via: user_id
+  evidence: id-reference field
+- from: WeeklyGoalPlan
+  to: User
+  type: belongs_to
+  via: user_id
+  evidence: id-reference field
+- from: WorkoutPlanTemplate
+  to: User
+  type: belongs_to
+  via: user_id
+  evidence: id-reference field
+- from: WorkoutPreset
+  to: User
+  type: belongs_to
+  via: user_id
+  evidence: id-reference field

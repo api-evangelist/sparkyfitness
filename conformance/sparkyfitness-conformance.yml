@@ -1,0 +1,147 @@
+generated: '2026-08-27'
+method: derived
+source: openapi/sparkyfitness-openapi.yml + https://codewithcj.github.io/SparkyFitness/
+standards:
+- id: openapi
+  name: OpenAPI Specification
+  version: 3.0.0
+  conforms: true
+  evidence: The project generates its contract with swagger-jsdoc from 419 @swagger JSDoc blocks and serves
+    it at GET /api/api-docs/json, with Swagger UI at /api/api-docs/swagger and ReDoc at /api/api-docs/redoc.
+    328 paths, 423 operations, 45 component schemas, 9 declared tags.
+- id: mcp
+  name: Model Context Protocol
+  version: null
+  conforms: true
+  evidence: First-party in-process MCP server at POST /mcp built on @modelcontextprotocol/sdk with StreamableHTTPServerTransport,
+    negotiating protocol versions through the SDK's SUPPORTED_PROTOCOL_VERSIONS. This is the strongest
+    standards signal the project has, and it is real implementation rather than a claim.
+- id: oidc
+  name: OpenID Connect
+  version: null
+  conforms: true
+  role: relying-party
+  evidence: 'OIDC login via the openid-client library, configured per-instance with an Issuer URL and
+    discovered IdP metadata; multiple providers supported; scope openid profile email; admin CRUD at /admin/oidc-settings.
+    Note the role: SparkyFitness CONSUMES OIDC, it does not issue it, and serves no /.well-known/openid-configuration
+    of its own.'
+- id: oauth2
+  name: OAuth 2.0
+  conforms: true
+  role: client
+  evidence: 'Authorization-code flows against seven third-party health platforms — Garmin, Fitbit, Withings,
+    Strava, Polar, Oura and Google Health — each with its own /{provider}/callback, /status and /disconnect
+    operations. Again as a CLIENT: SparkyFitness itself does not issue OAuth tokens and its own API is
+    API-key authenticated.'
+- id: webauthn
+  name: W3C Web Authentication (passkeys)
+  conforms: true
+  evidence: Passkey registration and login templates ship with the server (routes/auth/templates/passkey-{login,register}.html)
+    bundling @simplewebauthn/browser.
+- id: rfc9457
+  name: RFC 9457 Problem Details for HTTP APIs
+  conforms: false
+  evidence: 'No operation produces application/problem+json. Errors are a flat {"error": "message"} string
+    envelope with no type, code or pointer.'
+- id: rfc9331
+  name: RateLimit header fields for HTTP
+  conforms: false
+  evidence: No RateLimit-* or X-RateLimit-* headers. Retry-After is returned on the per-API-key 429 only;
+    the nginx auth limiter returns a bare 429.
+- id: rfc8594
+  name: RFC 8594 The Sunset HTTP Header Field
+  conforms: false
+  evidence: No Sunset or Deprecation headers; no operation marked deprecated.
+- id: rfc9116
+  name: RFC 9116 security.txt
+  conforms: false
+  evidence: /.well-known/security.txt returns 404 on the documentation host.
+- id: idempotency-key
+  name: IETF Idempotency-Key header (draft)
+  conforms: false
+  evidence: No Idempotency-Key header. Idempotency is provided instead by natural-key deduplication (source_id)
+    and date-keyed upsert — see conventions/sparkyfitness-conventions.yml.
+- id: pagination
+  name: Paginated collection responses
+  conforms: partial
+  evidence: limit/offset with totalCount and hasMore on the paginated food, exercise and stats endpoints;
+    many other list operations return a bare array with no envelope and no paging.
+- id: a2a
+  name: A2A Agent Card
+  conforms: false
+  evidence: /.well-known/agent-card.json and /.well-known/agent.json both 404 on codewithcj.github.io
+    and on the project path.
+domain_standards:
+  probed: true
+  found: false
+  note: REWARD-ONLY check, and this contract earns nothing here — correctly. Consumer fitness and nutrition
+    tracking has interoperability CONVENTIONS but no contract-level standard of the kind this check reads.
+    SparkyFitness integrates broadly (Apple HealthKit, Google Health Connect, Garmin, Fitbit, Withings,
+    Strava, Polar, Oura, Hevy, OpenFoodFacts, USDA, FatSecret, Nutritionix, Mealie, Tandoor, wger, YAZIO)
+    but each of those is a VENDOR API or database, not a published standard, and the contract declares
+    no standard identifier, schema URN or message type of its own.
+  probed_for:
+  - FHIR resources or a /fhir base path — absent. SparkyFitness handles consumer wellness data, not clinical
+    records, and makes no FHIR claim.
+  - SCIM schema URNs (urn:ietf:params:scim:schemas:*) — absent.
+  - OData $metadata — absent.
+  - ActivityPub actor — absent.
+  - HL7v2 / X12 message types — absent.
+  adjacent_formats_supported:
+  - format: FIT
+    evidence: POST /exercise-entries/import-fit and SparkyFitnessServer/services/ fitImportService.ts.
+      The Garmin FIT activity-file format is a de facto interchange format in this market; supporting
+      import is a real interoperability signal, but FIT is a proprietary Garmin format, not a standard
+      the contract can declare conformance to.
+  - format: CSV
+    evidence: Import and export on both diaries — POST /foods/import-from-csv, POST /food-entries/import-from-csv,
+      GET /food-entries/export/csv, POST /exercise-entries/import-history-csv. Data portability, not a
+      standard.
+compliance_certifications:
+  published: false
+  note: 'None, and none would be expected: there is no vendor-operated service to certify. SOC 2, ISO
+    27001, HIPAA and GDPR processor obligations all attach to whoever RUNS a deployment, not to the project.
+    No `Compliance` pointer is emitted — asserting one would credit the project with an audit posture
+    it has never claimed and cannot hold.'
+  privacy_policy:
+    url: https://codewithcj.github.io/SparkyFitness/privacy_policy
+    note: A privacy policy IS published, covering the project's own surfaces. The health data itself lives
+      in the operator's own PostgreSQL.
+contract_quality_observations:
+- issue: No operationIds
+  detail: 0 of 423 operations declare an operationId. Every generated SDK, every agent tool binding and
+    every crosswalk has to key on METHOD + path instead. This is the single highest-leverage fix available
+    to the project.
+  severity: high
+- issue: Dangling securityScheme reference
+  detail: '15 operations declare `security: [{bearerAuth: []}]`, but bearerAuth is not defined under components.securitySchemes
+    — the swagger post-processing deletes cookieAuth and leaves apiKeyAuth as the only definition. Strict
+    validators reject this; lenient generators silently emit unauthenticated clients for those 15 operations.'
+  severity: high
+- issue: The most-documented endpoint is missing from the contract
+  detail: POST /api/health-data — the bulk ingest the public API reference documents in the most detail,
+    and the endpoint iOS Shortcuts and the Android app post to — does not appear in the OpenAPI at all.
+    It is mounted from SparkyFitnessServer/integrations/healthData/healthDataRoutes.ts, which carries
+    zero @swagger annotations and lies OUTSIDE the swagger-jsdoc scan paths (routes/**, models/**, and
+    the server entrypoint). A near-namesake, POST /api/measurements/health-data, IS in the contract and
+    is a different route in a different file. The whole SparkyFitnessServer/integrations/ tree — twenty
+    provider directories including fitbit, garminconnect, googlehealth, oura, polar, strava and withings
+    — sits outside the scan paths for the same reason, so any operation defined there is invisible to
+    the spec. Adding integrations/**/*.ts to swaggerScanPaths in config/swagger.ts would surface them.
+  severity: high
+- issue: Undeclared tags
+  detail: 9 tags are declared in the spec but 21 distinct tag values are used across operations. SleepScience,
+    Authentication, Exercise Stats, Dashboard, Dashboard Layouts, Allergen Preferences, Synced Data, Utility,
+    AI, Exercise Entries and "Exercise & Workouts" (a near-duplicate of the declared "Fitness & Workouts")
+    appear on operations without a tags[] entry, and 6 operations carry no tag at all.
+  severity: medium
+- issue: Thin operation descriptions
+  detail: 423 of 423 operations have a summary — full coverage — but only 183 (43%) have a description.
+  severity: low
+- issue: 429 undocumented
+  detail: Two active rate limiters both return 429, and not one operation in the contract declares it.
+  severity: medium
+- issue: No examples in-spec
+  detail: Request/response examples exist in the prose API reference but not as OpenAPI `examples`, so
+    nothing machine-readable carries them.
+  severity: medium

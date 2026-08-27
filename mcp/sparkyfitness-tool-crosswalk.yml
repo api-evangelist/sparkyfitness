@@ -1,0 +1,763 @@
+generated: '2026-08-27'
+method: derived
+source: mcp/sparkyfitness-mcp.yml + openapi/sparkyfitness-openapi.yml
+note: The published OpenAPI sets NO operationIds anywhere (0 of 423 operations), so every binding is keyed
+  on "METHOD /path" instead. Bindings were made from the tool registry source and the spec paths; the
+  live MCP tools/list could not be introspected (SparkyFitness runs no public instance), so confidence
+  is stated per row rather than implied.
+surfaces:
+  openapi:
+    file: openapi/sparkyfitness-openapi.yml
+    base: https://{host}/api
+    gated: false
+    note: Derived from the project source; a running instance serves it at GET /api/api-docs/json.
+  mcp:
+    url: https://{your-host}/mcp
+    gated: true
+    note: 'Requires an Authorization: Bearer <API key> from the operator''s own instance.'
+  graphql: null
+coverage:
+  mcp_tools_total: 56
+  mcp_tools_bound: 37
+  mcp_only: 19
+  rest_operations_total: 423
+  rest_operations_bound: 121
+  rest_only: 302
+crosswalk:
+- tool: sparky_get_sleep_science
+  category: checkin
+  rest:
+  - GET /sleep-science/chronotype
+  - GET /sleep-science/daily-need
+  - GET /sleep-science/data-sufficiency
+  - GET /sleep-science/energy-curve
+  - GET /sleep-science/mctq-stats
+  - GET /sleep-science/sleep-debt
+  binding: method+path
+  confidence: high
+  note: Direct 1:1 with the sleep-science family.
+- tool: sparky_manage_checkin
+  category: checkin
+  rest:
+  - DELETE /measurements/check-in/{id}
+  - GET /measurements/check-in/{date}
+  - GET /mood
+  - POST /fasting/end
+  - POST /fasting/start
+  - POST /measurements/check-in
+  - POST /measurements/custom-entries
+  - POST /mood
+  - POST /sleep/manual_entry
+  - PUT /measurements/check-in/{id}
+  binding: method+path
+  confidence: high
+  note: Composite over check-in measurements, custom metrics, mood, sleep and fasting.
+- tool: sparky_manage_progress_photos
+  category: checkin
+  rest:
+  - GET /measurements/check-in-photos/dates
+  - GET /measurements/check-in-photos/file/{id}
+  - GET /measurements/check-in-photos/{date}
+  binding: method+path
+  confidence: high
+  note: Direct 1:1 with the check-in photo family.
+- tool: sparky_get_daily_exercise_totals
+  category: exercise
+  rest:
+  - GET /reports/exercise-dashboard
+  binding: method+path
+  confidence: medium
+  note: Daily exercise totals for a date/range.
+- tool: sparky_get_exercise_details
+  category: exercise
+  rest:
+  - GET /exercises/{id}
+  binding: method+path
+  confidence: high
+  note: Exercise detail by id.
+- tool: sparky_get_exercise_diary
+  category: exercise
+  rest:
+  - GET /exercise-entries/by-date
+  binding: method+path
+  confidence: high
+  note: Entry-level exercise diary by date/range.
+- tool: sparky_get_exercise_progress
+  category: exercise
+  rest:
+  - GET /exercise-entries/history/{exerciseId}
+  - GET /exercise-entries/progress/{exerciseId}
+  binding: method+path
+  confidence: high
+  note: Paginated performance history for one exercise.
+- tool: sparky_get_exercise_stats
+  category: exercise
+  rest:
+  - GET /exercise-stats/matched-courses
+  - GET /exercise-stats/prs
+  - GET /exercise-stats/summary
+  - POST /exercise-stats/query
+  binding: method+path
+  confidence: high
+  note: Direct 1:1 with the exercise-stats family.
+- tool: sparky_get_exercise_usage
+  category: exercise
+  rest:
+  - GET /exercise-entries/history/{exerciseId}
+  binding: method+path
+  confidence: medium
+  note: Where an exercise_id appears in the diary.
+- tool: sparky_get_recent_exercise_entries
+  category: exercise
+  rest:
+  - GET /exercises/recent
+  binding: method+path
+  confidence: medium
+  note: Recent exercise diary rows.
+- tool: sparky_list_exercises
+  category: exercise
+  rest:
+  - GET /exercises
+  binding: method+path
+  confidence: high
+  note: Paginated exercise catalog.
+- tool: sparky_manage_exercise
+  category: exercise
+  rest:
+  - DELETE /exercise-entries/{id}
+  - DELETE /exercises/{id}
+  - GET /exercise-preset-entries/{id}
+  - POST /exercise-entries
+  - POST /exercise-preset-entries
+  - POST /exercises/
+  - PUT /exercise-entries/{id}
+  - PUT /exercises/{id}
+  binding: method+path
+  confidence: high
+  note: Composite over exercises, entries and presets.
+- tool: sparky_manage_workout_plans
+  category: exercise
+  rest:
+  - DELETE /workout-plan-templates/{id}
+  - GET /workout-plan-templates
+  - GET /workout-plan-templates/{id}
+  binding: method+path
+  confidence: high
+  note: List/inspect/delete workout plan templates.
+- tool: sparky_search_exercises
+  category: exercise
+  rest:
+  - GET /exercises/search
+  binding: method+path
+  confidence: high
+  note: Exercise search by name with filters.
+- tool: sparky_get_barcode
+  category: food
+  rest:
+  - GET /foods/barcode/{barcode}
+  - GET /foods/fatsecret/barcode/{barcode}
+  binding: method+path
+  confidence: high
+  note: 'Barcode lookup: saved foods first, then a configured provider.'
+- tool: sparky_get_food_details
+  category: food
+  rest:
+  - GET /foods/food-variants/{id}
+  - GET /foods/{foodId}
+  binding: method+path
+  confidence: medium
+  note: Food detail plus its variants; the REST split is per-resource.
+- tool: sparky_get_food_diary
+  category: food
+  rest:
+  - GET /food-entries/by-date/{date}
+  - GET /food-entries/range/{startDate}/{endDate}
+  binding: method+path
+  confidence: high
+  note: Entry-level diary by date or range.
+- tool: sparky_get_food_usage
+  category: food
+  rest:
+  - GET /foods/needs-review
+  binding: method+path
+  confidence: low
+  note: No dedicated REST "where was this food used" operation; mapped only by semantics.
+- tool: sparky_get_nutrition_summary
+  category: food
+  rest:
+  - GET /food-entries/nutrition/today
+  - GET /reports/nutrition-trends-with-goals
+  binding: method+path
+  confidence: medium
+  note: Nutrition summary rows for a date or range.
+- tool: sparky_get_recent_food_entries
+  category: food
+  rest:
+  - GET /food-entries
+  binding: method+path
+  confidence: medium
+  note: Recent entry-level diary rows.
+- tool: sparky_list_foods
+  category: food
+  rest:
+  - GET /foods/foods-paginated
+  binding: method+path
+  confidence: high
+  note: Paginated food catalog including variants.
+- tool: sparky_manage_allergens
+  category: food
+  rest:
+  - DELETE /allergen-preferences/{id}
+  - GET /allergen-preferences
+  - POST /allergen-preferences
+  binding: method+path
+  confidence: high
+  note: Direct 1:1 with allergen preferences.
+- tool: sparky_manage_custom_nutrients
+  category: food
+  rest:
+  - DELETE /custom-nutrients/{id}
+  - GET /custom-nutrients
+  - POST /custom-nutrients
+  - PUT /custom-nutrients/{id}
+  binding: method+path
+  confidence: high
+  note: Direct 1:1 with the custom nutrients resource.
+- tool: sparky_manage_favorites
+  category: food
+  rest:
+  - DELETE /favorites/{type}/{id}
+  - GET /favorites
+  - POST /favorites/{type}/{id}
+  binding: method+path
+  confidence: high
+  note: Direct 1:1 with the favorites resource.
+- tool: sparky_manage_food
+  category: food
+  rest:
+  - DELETE /food-entries/{id}
+  - DELETE /foods/{id}
+  - POST /food-entries
+  - POST /foods
+  - PUT /food-entries/{id}
+  - PUT /foods/{id}
+  binding: method+path
+  confidence: high
+  note: Composite create/update/delete over foods and food entries.
+- tool: sparky_manage_meal_plans
+  category: food
+  rest:
+  - DELETE /meal-plan-templates/{id}
+  - GET /meal-plan-templates
+  - POST /meal-plan-templates/{id}/duplicate
+  binding: method+path
+  confidence: high
+  note: List/create/update/duplicate/delete meal plan templates. The spec exposes no GET /meal-plan-templates/{id};
+    per-plan inspection is served from the list response.
+- tool: sparky_manage_water_containers
+  category: food
+  rest:
+  - DELETE /water-containers/{id}
+  - GET /water-containers
+  - POST /water-containers
+  - PUT /water-containers/{id}
+  - PUT /water-containers/{id}/set-primary
+  binding: method+path
+  confidence: high
+  note: Direct 1:1 including set-primary.
+- tool: sparky_search_foods
+  category: food
+  rest:
+  - GET /foods
+  - GET /foods/foods-paginated
+  binding: method+path
+  confidence: high
+  note: Both tools and the REST catalog search the user-scoped food list by name.
+- tool: sparky_get_goal_snapshot
+  category: goals
+  rest:
+  - GET /goals/by-date/{date}
+  binding: method+path
+  confidence: high
+  note: Goals active on a date.
+- tool: sparky_manage_goals
+  category: goals
+  rest:
+  - GET /goals/by-date/{date}
+  - GET /goals/for-date
+  - POST /goals/manage-timeline
+  binding: method+path
+  confidence: high
+  note: Read and set the goal timeline.
+- tool: sparky_manage_medications
+  category: medications
+  rest:
+  - DELETE /v2/medications/display-preferences/{viewGroup}/{platform}
+  - DELETE /v2/medications/entries/{id}
+  - DELETE /v2/medications/injections/{id}
+  - DELETE /v2/medications/pens/{id}
+  - DELETE /v2/medications/schedules/{id}
+  - DELETE /v2/medications/titration/{id}
+  - DELETE /v2/medications/{id}
+  - GET /v2/medications
+  - GET /v2/medications/display-preferences
+  - GET /v2/medications/entries
+  - GET /v2/medications/{id}
+  - GET /v2/medications/{medicationId}/glp1/serum-curve
+  - GET /v2/medications/{medicationId}/glp1/site-suggestion
+  - GET /v2/medications/{medicationId}/injections
+  - GET /v2/medications/{medicationId}/pens
+  - GET /v2/medications/{medicationId}/titration
+  - POST /v2/medications
+  - POST /v2/medications/entries
+  - POST /v2/medications/injections
+  - POST /v2/medications/{medicationId}/pens
+  - POST /v2/medications/{medicationId}/schedules
+  - POST /v2/medications/{medicationId}/titration
+  - PUT /v2/medications/display-preferences/{viewGroup}/{platform}
+  - PUT /v2/medications/entries/{id}
+  - PUT /v2/medications/injections/{id}
+  - PUT /v2/medications/pens/{id}
+  - PUT /v2/medications/schedules/{id}
+  - PUT /v2/medications/titration/{id}
+  - PUT /v2/medications/{id}
+  binding: method+path
+  confidence: high
+  note: Direct 1:1 with the v2 medication family (medications, schedules, pens, injections, titration,
+    entries).
+- tool: sparky_get_integrations
+  category: profile
+  rest:
+  - DELETE /external-providers/{id}
+  - GET /external-providers
+  - POST /external-providers
+  binding: method+path
+  confidence: high
+  note: Connected external providers and available types.
+- tool: sparky_get_synced_data
+  category: profile
+  rest:
+  - DELETE /synced-data/sources/{source}
+  - GET /synced-data/sources
+  binding: method+path
+  confidence: high
+  note: Entry data synced from external providers.
+- tool: sparky_manage_profile
+  category: profile
+  rest:
+  - GET /preferences/nutrient-display
+  - GET /user-preferences
+  - PUT /user-preferences
+  binding: method+path
+  confidence: high
+  note: Display name, timezone and measurement units.
+- tool: sparky_get_daily_report
+  category: reports
+  rest:
+  - GET /reports
+  binding: method+path
+  confidence: medium
+  note: Daily nutrition/exercise/water report for a date or range.
+- tool: sparky_get_dashboard
+  category: reports
+  rest:
+  - GET /dashboard/stats
+  binding: method+path
+  confidence: high
+  note: Daily calorie-balance dashboard summary.
+- tool: sparky_get_report
+  category: reports
+  rest:
+  - GET /reports
+  - GET /reports/exercise-dashboard
+  - GET /reports/mini-nutrition-trends
+  - GET /reports/nutrition-trends-with-goals
+  binding: method+path
+  confidence: high
+  note: Consolidated reports.
+mcp_only:
+- tool: sparky_execute_read_only_sql
+  category: admin-dev
+  reason: Admin-only database/debug tool. Runs on the owner pool bypassing Row Level Security; there is
+    deliberately no public REST equivalent.
+- tool: sparky_get_db_stats
+  category: admin-dev
+  reason: Admin-only database/debug tool. Runs on the owner pool bypassing Row Level Security; there is
+    deliberately no public REST equivalent.
+- tool: sparky_get_user_info
+  category: admin-dev
+  reason: Admin-only database/debug tool. Runs on the owner pool bypassing Row Level Security; there is
+    deliberately no public REST equivalent.
+- tool: sparky_inspect_schema
+  category: admin-dev
+  reason: Admin-only database/debug tool. Runs on the owner pool bypassing Row Level Security; there is
+    deliberately no public REST equivalent.
+- tool: sparky_query_table
+  category: admin-dev
+  reason: Admin-only database/debug tool. Runs on the owner pool bypassing Row Level Security; there is
+    deliberately no public REST equivalent.
+- tool: sparky_analyze_trends
+  category: coaching
+  reason: Derived coaching/analytics computed inside the AI layer over data the REST API exposes only
+    as raw rows. No single backing REST operation.
+- tool: sparky_check_engagement
+  category: coaching
+  reason: Derived coaching/analytics computed inside the AI layer over data the REST API exposes only
+    as raw rows. No single backing REST operation.
+- tool: sparky_daily_checkin_wizard
+  category: coaching
+  reason: Derived coaching/analytics computed inside the AI layer over data the REST API exposes only
+    as raw rows. No single backing REST operation.
+- tool: sparky_detect_patterns
+  category: coaching
+  reason: Derived coaching/analytics computed inside the AI layer over data the REST API exposes only
+    as raw rows. No single backing REST operation.
+- tool: sparky_generate_coaching_plan
+  category: coaching
+  reason: Derived coaching/analytics computed inside the AI layer over data the REST API exposes only
+    as raw rows. No single backing REST operation.
+- tool: sparky_get_30_day_trends
+  category: coaching
+  reason: Derived coaching/analytics computed inside the AI layer over data the REST API exposes only
+    as raw rows. No single backing REST operation.
+- tool: sparky_get_contextual_nudge
+  category: coaching
+  reason: Derived coaching/analytics computed inside the AI layer over data the REST API exposes only
+    as raw rows. No single backing REST operation.
+- tool: sparky_get_health_summary
+  category: coaching
+  reason: Derived coaching/analytics computed inside the AI layer over data the REST API exposes only
+    as raw rows. No single backing REST operation.
+- tool: sparky_get_logging_streak
+  category: coaching
+  reason: Derived coaching/analytics computed inside the AI layer over data the REST API exposes only
+    as raw rows. No single backing REST operation.
+- tool: sparky_ask_user
+  category: meta
+  reason: Conversation-control tool (ask the user a question / enable more tool categories). Purely an
+    agent-loop primitive, not a data operation.
+- tool: sparky_enable_tools
+  category: meta
+  reason: Conversation-control tool (ask the user a question / enable more tool categories). Purely an
+    agent-loop primitive, not a data operation.
+- tool: sparky_manage_habits
+  category: profile
+  reason: Habit tracking has no dedicated REST route family in the published spec; it is stored as boolean
+    custom-measurement categories.
+- tool: sparky_analyze_food_image
+  category: vision
+  reason: Image analysis routed to the configured vision model. The REST chat surface (/chat) drives the
+    same model but exposes no per-image operation.
+- tool: sparky_scan_label
+  category: vision
+  reason: Image analysis routed to the configured vision model. The REST chat surface (/chat) drives the
+    same model but exposes no per-image operation.
+rest_only_summary: '302 of 423 REST operations have no MCP tool. The tool surface is deliberately a narrow,
+  agent-shaped projection of the API: it covers logging and reading food, exercise, check-ins, goals,
+  medications and reports, and omits nearly the whole admin, OIDC/identity, backup, external-provider
+  OAuth, CSV/FIT import-export and per-provider integration surface.'
+rest_only:
+- DELETE /admin/ai-service-settings/global/{id}
+- DELETE /admin/external-data-providers/global/{id}
+- DELETE /admin/oidc-settings/{id}
+- DELETE /admin/users/{userId}
+- DELETE /chat/ai-service-settings/{id}
+- DELETE /chat/sparky-chat-history/{id}
+- DELETE /dashboard-layouts/{pageKey}
+- DELETE /exercise-preset-entries/{id}
+- DELETE /fasting/{id}
+- DELETE /food-entries/{id}/image
+- DELETE /food-entry-meals/{id}
+- DELETE /food-entry-meals/{id}/image
+- DELETE /foods/food-variants/{id}
+- DELETE /goal-presets/{id}
+- DELETE /identity/family-access/{id}
+- DELETE /identity/user/api-key/{apiKeyId}
+- DELETE /meal-types/{id}
+- DELETE /meals/plan/{id}
+- DELETE /meals/{id}
+- DELETE /measurements/check-in-photos/photo/{id}
+- DELETE /measurements/custom-categories/{id}
+- DELETE /measurements/custom-entries/{id}
+- DELETE /measurements/water-intake/{id}
+- DELETE /mood/{id}
+- DELETE /nutrient-goal-preferences/{nutrientKey}
+- DELETE /preferences/nutrient-display/{viewGroup}/{platform}
+- DELETE /sleep/{id}
+- DELETE /user-preferences
+- DELETE /v2/goal-presets/{id}
+- DELETE /v2/measurements/water-intake/log/{id}
+- DELETE /v2/measurements/water-intake/{id}
+- DELETE /weekly-goal-plans/{id}
+- DELETE /workout-presets/{id}
+- GET /adaptive-tdee
+- GET /admin/ai-service-settings/global
+- GET /admin/auth/settings/mfa-mandatory
+- GET /admin/backup/download/{fileName}
+- GET /admin/backup/list
+- GET /admin/backup/settings
+- GET /admin/external-data-providers/global
+- GET /admin/global-settings
+- GET /admin/oidc-settings
+- GET /admin/oidc-settings/{id}
+- GET /admin/users
+- GET /announcement/current
+- GET /auth/mfa-factors
+- GET /auth/settings
+- GET /chat/ai-service-settings
+- GET /chat/ai-service-settings/active
+- GET /chat/sparky-chat-history
+- GET /chat/sparky-chat-history/entry/{id}
+- GET /custom-nutrients/{id}
+- GET /daily-summary
+- GET /daily-summary/range
+- GET /dashboard-layouts/{pageKey}
+- GET /exercise-entries/{id}
+- GET /exercises/activity-details/{exerciseEntryId}/{providerName}
+- GET /exercises/equipment
+- GET /exercises/garmin-activity-details/{exerciseEntryId}
+- GET /exercises/muscle-groups
+- GET /exercises/names
+- GET /exercises/needs-review
+- GET /exercises/search-external
+- GET /exercises/suggested
+- GET /exercises/top
+- GET /exercises/wger-filters
+- GET /exercises/{id}/deletion-impact
+- GET /external-providers/user/{targetUserId}
+- GET /external-providers/{id}
+- GET /fasting/current
+- GET /fasting/history
+- GET /fasting/history/range/{startDate}/{endDate}
+- GET /fasting/stats
+- GET /food-entries/export/csv
+- GET /food-entry-meals/by-date/{date}
+- GET /food-entry-meals/{id}
+- GET /foods/fatsecret/nutrients
+- GET /foods/fatsecret/search
+- GET /foods/food-entries/{date}
+- GET /foods/food-variants
+- GET /foods/mealie/details
+- GET /foods/mealie/search
+- GET /foods/norish/details
+- GET /foods/norish/search
+- GET /foods/nutritionix/item
+- GET /foods/nutritionix/nutrients
+- GET /foods/nutritionix/search
+- GET /foods/openfoodfacts/barcode/{barcode}
+- GET /foods/openfoodfacts/search
+- GET /foods/search
+- GET /foods/tandoor/details
+- GET /foods/tandoor/search
+- GET /foods/usda/details
+- GET /foods/usda/search
+- GET /foods/{id}/deletion-impact
+- GET /global-settings/allow-user-ai-config
+- GET /goal-presets
+- GET /goal-presets/{id}
+- GET /health
+- GET /identity/access/can-access-user-data
+- GET /identity/access/check-family-access
+- GET /identity/family-access
+- GET /identity/profiles
+- GET /identity/profiles/avatar/{filename}
+- GET /identity/user
+- GET /identity/user-api-keys
+- GET /identity/users/accessible-users
+- GET /identity/users/find-by-email
+- GET /integrations/fitbit/authorize
+- GET /integrations/fitbit/status
+- GET /integrations/garmin/status
+- GET /integrations/googlehealth/authorize
+- GET /integrations/googlehealth/status
+- GET /integrations/hevy/status
+- GET /integrations/oura/authorize
+- GET /integrations/oura/status
+- GET /integrations/polar/authorize
+- GET /integrations/polar/status
+- GET /integrations/withings/data
+- GET /meal-types
+- GET /meal-types/{id}
+- GET /meals
+- GET /meals/needs-review
+- GET /meals/plan
+- GET /meals/recent
+- GET /meals/search
+- GET /meals/top
+- GET /meals/{id}
+- GET /meals/{id}/deletion-impact
+- GET /measurements/check-in-measurements-range/{startDate}/{endDate}
+- GET /measurements/check-in/latest-on-or-before-date
+- GET /measurements/custom-categories
+- GET /measurements/custom-entries
+- GET /measurements/custom-entries/{date}
+- GET /measurements/custom-measurements-range/{categoryId}/{startDate}/{endDate}
+- GET /measurements/most-recent/{measurementType}
+- GET /measurements/water-intake/entry/{id}
+- GET /measurements/water-intake/{date}
+- GET /mood/date/{entryDate}
+- GET /mood/{id}
+- GET /nutrient-goal-preferences
+- GET /onboarding/status
+- GET /review/needs-review
+- GET /review/needs-review-count
+- GET /sleep
+- GET /sleep/analytics
+- GET /sleep/details
+- GET /uploads/exercises/{exerciseId}/{imageFileName}
+- GET /v2/exercise-entries/by-date
+- GET /v2/exercise-entries/history
+- GET /v2/exercises/search
+- GET /v2/exercises/{exerciseId}/stats
+- GET /v2/goal-presets
+- GET /v2/goal-presets/{id}
+- GET /v2/measurements/water-intake/entry/{id}
+- GET /v2/measurements/water-intake/{date}
+- GET /v2/measurements/water-intake/{date}/log
+- GET /version/current
+- GET /version/latest-github
+- GET /water-containers/primary
+- GET /weekly-goal-plans
+- GET /weekly-goal-plans/active
+- GET /withings/authorize
+- GET /withings/status
+- GET /workout-plan-templates/active/{date}
+- GET /workout-presets
+- GET /workout-presets/search
+- GET /workout-presets/{id}
+- POST /admin/ai-service-settings/global
+- POST /admin/auth/users/{userId}/mfa/reset
+- POST /admin/backup/manual
+- POST /admin/backup/restore
+- POST /admin/backup/settings
+- POST /admin/external-data-providers/global
+- POST /admin/oidc-settings
+- POST /admin/oidc-settings/{id}/logo
+- POST /admin/users/{userId}/mfa/reset
+- POST /admin/users/{userId}/reset-password
+- POST /ai/convert-unit
+- POST /auth/web-login/redeem-ticket
+- POST /auth/web-login/register-ticket
+- POST /chat
+- POST /chat/ai-service-settings/test
+- POST /chat/clear-all-history
+- POST /chat/clear-old-history
+- POST /chat/food-options
+- POST /chat/save-history
+- POST /custom-nutrients/from-catalog
+- POST /exercise-entries/from-plan
+- POST /exercise-entries/import-fit
+- POST /exercise-entries/import-history-csv
+- POST /exercises/add-external
+- POST /exercises/add-nutritionix-exercise
+- POST /exercises/import
+- POST /exercises/import-json
+- POST /exercises/update-snapshot
+- POST /external-providers/garmin/activities-and-workouts
+- POST /food-entries/copy
+- POST /food-entries/copy-all
+- POST /food-entries/copy-all-yesterday
+- POST /food-entries/copy-from-user
+- POST /food-entries/copy-reviewed-from-user
+- POST /food-entries/copy-selected-from-user
+- POST /food-entries/copy-to-user
+- POST /food-entries/copy-yesterday
+- POST /food-entries/import-from-csv
+- POST /food-entries/{id}/image
+- POST /food-entry-meals
+- POST /food-entry-meals/{id}/image
+- POST /foods/food-variants
+- POST /foods/food-variants/bulk
+- POST /foods/import-from-csv
+- POST /foods/update-snapshot
+- POST /freeexercisedb/add
+- POST /goal-presets
+- POST /identity/family-access
+- POST /identity/mfa/email-toggle
+- POST /identity/profiles/avatar
+- POST /identity/switch-context
+- POST /identity/update-email
+- POST /identity/update-password
+- POST /identity/user/generate-api-key
+- POST /integrations/fitbit/callback
+- POST /integrations/fitbit/disconnect
+- POST /integrations/fitbit/sync
+- POST /integrations/garmin/login
+- POST /integrations/garmin/resume_login
+- POST /integrations/garmin/sleep_data
+- POST /integrations/garmin/sync
+- POST /integrations/garmin/sync/activities_and_workouts
+- POST /integrations/garmin/sync/health_and_wellness
+- POST /integrations/garmin/sync/nutrition_diary
+- POST /integrations/garmin/unlink
+- POST /integrations/googlehealth/callback
+- POST /integrations/googlehealth/disconnect
+- POST /integrations/googlehealth/sync
+- POST /integrations/hevy/sync
+- POST /integrations/oura/callback
+- POST /integrations/oura/disconnect
+- POST /integrations/oura/sync
+- POST /integrations/polar/callback
+- POST /integrations/polar/disconnect
+- POST /integrations/polar/sync
+- POST /meal-plan-templates
+- POST /meal-types
+- POST /meals
+- POST /meals/create-meal-from-diary
+- POST /meals/plan
+- POST /meals/plan/log-day-to-diary
+- POST /meals/plan/{id}/log-to-diary
+- POST /meals/update-snapshot
+- POST /measurements/check-in-photos/{date}/{type}
+- POST /measurements/custom-categories
+- POST /measurements/health-data
+- POST /measurements/import-health-data
+- POST /measurements/water-intake
+- POST /onboarding
+- POST /onboarding/reset
+- POST /onboarding/skip
+- POST /sleep-science/calculate-baseline
+- POST /user-preferences
+- POST /v2/goal-presets
+- POST /v2/measurements/water-intake
+- POST /weekly-goal-plans
+- POST /withings/callback
+- POST /withings/disconnect
+- POST /withings/sync
+- POST /workout-plan-templates
+- POST /workout-presets
+- PUT /admin/ai-service-settings/global/{id}
+- PUT /admin/auth/settings/mfa-mandatory
+- PUT /admin/external-data-providers/global/{id}
+- PUT /admin/global-settings
+- PUT /admin/oidc-settings/{id}
+- PUT /admin/users/{userId}/full-name
+- PUT /admin/users/{userId}/role
+- PUT /admin/users/{userId}/status
+- PUT /chat/sparky-chat-history/{id}
+- PUT /dashboard-layouts/{pageKey}
+- PUT /exercise-preset-entries/{id}
+- PUT /external-providers/{id}
+- PUT /fasting/{id}
+- PUT /food-entry-meals/{id}
+- PUT /foods/food-variants/{id}
+- PUT /goal-presets/{id}
+- PUT /identity/family-access/{id}
+- PUT /identity/profiles
+- PUT /meal-plan-templates/{id}
+- PUT /meal-types/{id}
+- PUT /meals/plan/{id}
+- PUT /meals/{id}
+- PUT /measurements/custom-categories/{id}
+- PUT /measurements/water-intake/{id}
+- PUT /mood/{id}
+- PUT /nutrient-goal-preferences/{nutrientKey}
+- PUT /preferences/nutrient-display/{viewGroup}/{platform}
+- PUT /sleep/{id}
+- PUT /v2/goal-presets/{id}
+- PUT /v2/measurements/water-intake/{id}
+- PUT /weekly-goal-plans/{id}
+- PUT /workout-plan-templates/{id}
+- PUT /workout-presets/{id}
+validation: Every operation named in crosswalk[].rest was checked to exist in openapi/sparkyfitness-openapi.yml.
+  Dropped rows moved to mcp_only[].

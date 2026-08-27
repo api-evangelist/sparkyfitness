@@ -1,18 +1,93 @@
 aid: sparkyfitness
 name: SparkyFitness
-description: 'SparkyFitness is a company surfaced via the API Evangelist harvest backlog (source: health-device-stack)
-  and added to the network as a stub for full-pipeline profiling.'
+description: >-
+  SparkyFitness is a self-hosted, open-source health and fitness tracker for
+  food, exercise, water, sleep, mood, body measurements and medications, built
+  for families and designed around an AI assistant. It ships a full Express 5 +
+  PostgreSQL REST API (423 operations across 328 paths, described by an
+  OpenAPI 3.0 document the server generates and serves at /api/api-docs/json)
+  and — unusually for a project this size — a first-party Model Context Protocol
+  server running in-process at POST /mcp, exposing 56 tools for logging and
+  reading a user's own health data under PostgreSQL row-level security. It
+  synchronises with Garmin, Fitbit, Withings, Strava, Polar, Oura, Hevy, Apple
+  HealthKit and Google Health Connect, and looks food up against OpenFoodFacts,
+  USDA, FatSecret and Nutritionix. Because it is self-hosted, there is no vendor
+  API host, no pricing and no signup: you run the containers and the API is
+  yours. Distributed under a source-available non-commercial licence.
 url: https://raw.githubusercontent.com/api-evangelist/sparkyfitness/refs/heads/main/apis.yml
 x-type: company
 x-source: harvest:health-device-stack
-x-tier: stub
-x-tier-reason: harvest
+image: https://codewithcj.github.io/SparkyFitness/logo.png
 specificationVersion: '0.20'
 created: '2026-08-27'
 modified: '2026-08-27'
 tags:
 - Company
-apis: []
+- Health
+- Fitness
+- Nutrition
+- Self-Hosted
+- Open Source
+- Wearables
+- MCP
+- AI Assistant
+- Quantified Self
+apis:
+- name: SparkyFitness API
+  description: >-
+    The REST API served by the SparkyFitness server on your own deployment.
+    423 operations across nine functional areas — nutrition and meals, fitness
+    and workouts, wellness and metrics, goals and personalization, medications
+    and GLP-1, external integrations, identity and security, AI and insights,
+    and system administration. API-key authenticated, scoped by PostgreSQL row
+    level security to the key's user.
+  humanURL: https://codewithcj.github.io/SparkyFitness/developer/api-reference
+  baseURL: https://{host}/api
+  tags:
+  - Health
+  - Fitness
+  - Nutrition
+  - REST
+  properties:
+  - type: OpenAPI
+    url: openapi/sparkyfitness-openapi.yml
+  - type: Documentation
+    url: https://codewithcj.github.io/SparkyFitness/developer/api-reference
+  - type: Authentication
+    url: authentication/sparkyfitness-authentication.yml
+  - type: ErrorCatalog
+    url: errors/sparkyfitness-problem-types.yml
+  - type: Conventions
+    url: conventions/sparkyfitness-conventions.yml
+  - type: Idempotency
+    url: conventions/sparkyfitness-conventions.yml
+  - type: RateLimits
+    url: rate-limits/sparkyfitness-rate-limits.yml
+  - type: DataModel
+    url: data-model/sparkyfitness-data-model.yml
+  - type: Overlay
+    url: overlays/sparkyfitness-openapi-overlay.yaml
+- name: SparkyFitness MCP Server
+  description: >-
+    A first-party Model Context Protocol server running in-process inside the
+    SparkyFitness API server, mounted at POST /mcp over a stateless streamable
+    HTTP transport. 56 tools across food, exercise, check-ins, goals, coaching,
+    vision, profile, reports and medications, authenticated with a Bearer API
+    key and scoped to that key's user by row level security. Five admin-only
+    developer tools bypass RLS and are off unless DEV_TOOLS_ENABLED=true.
+  humanURL: https://codewithcj.github.io/SparkyFitness/features/mcp-server
+  baseURL: https://{host}/mcp
+  tags:
+  - MCP
+  - AI Assistant
+  - Agents
+  properties:
+  - type: MCPServer
+    url: mcp/sparkyfitness-mcp.yml
+  - type: ToolCrosswalk
+    url: mcp/sparkyfitness-tool-crosswalk.yml
+  - type: Documentation
+    url: https://codewithcj.github.io/SparkyFitness/features/mcp-server
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
@@ -21,3 +96,48 @@ maintainers:
 common:
 - type: Website
   url: https://codewithcj.github.io/SparkyFitness/
+- type: Documentation
+  url: https://codewithcj.github.io/SparkyFitness/
+- type: DeveloperPortal
+  url: https://codewithcj.github.io/SparkyFitness/developer/getting-started
+- type: APIReference
+  url: https://codewithcj.github.io/SparkyFitness/developer/api-reference
+- type: GettingStarted
+  url: https://codewithcj.github.io/SparkyFitness/install/docker-compose
+- type: Support
+  url: https://codewithcj.github.io/SparkyFitness/help-me
+- type: HelpCenter
+  url: https://discord.gg/vcnMT5cPEA
+- type: GitHubOrganization
+  url: https://github.com/CodeWithCJ
+- type: SourceCode
+  url: https://github.com/CodeWithCJ/SparkyFitness
+- type: PrivacyPolicy
+  url: https://codewithcj.github.io/SparkyFitness/privacy_policy
+- type: License
+  url: https://github.com/CodeWithCJ/SparkyFitness/blob/main/LICENSE
+- type: FAQ
+  url: https://codewithcj.github.io/SparkyFitness/faq
+- type: ChangeLog
+  url: https://github.com/CodeWithCJ/SparkyFitness/releases
+- type: ChangeLog
+  url: changelog/sparkyfitness-changelog.yml
+- type: Packages
+  url: packages/sparkyfitness-packages.yml
+- type: Conformance
+  url: conformance/sparkyfitness-conformance.yml
+- type: Lifecycle
+  url: lifecycle/sparkyfitness-lifecycle.yml
+- type: Plans
+  url: plans/sparkyfitness-plans-pricing.yml
+- type: LLMsTxt
+  url: llms/sparkyfitness-llms.txt
+- type: AgentSkill
+  url: skills/_index.yml
+- type: DomainSecurity
+  url: security/sparkyfitness-domain-security.yml
+x-enrichment:
+  date: '2026-08-27'
+  status: enriched
+  artifacts_added: 23
+  pass: local-v1

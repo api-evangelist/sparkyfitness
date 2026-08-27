@@ -1,0 +1,66 @@
+generated: '2026-08-27'
+method: probed
+source: probed 2026-08-27 against https://codewithcj.github.io/SparkyFitness/
+finding: >-
+  SparkyFitness controls no domain of its own. There is no vendor API host to
+  probe (the product is self-hosted, so every API host belongs to an operator)
+  and the only surface the project publishes is a GitHub Pages site under
+  codewithcj.github.io. The automated pipeline probe returned `no-hosts` for
+  exactly this reason — pipeline_util.provider_hosts deliberately excludes
+  github.io, because the TLS, HSTS and DNS posture of a Pages host measures
+  GitHub's infrastructure, not the project's. The results below are recorded
+  with that attribution made explicit, and MUST NOT be read as a security
+  posture SparkyFitness chose or maintains.
+provider_controlled_domain: null
+hosts:
+  - host: codewithcj.github.io
+    owner: GitHub (shared Pages wildcard) — not SparkyFitness
+    attribution: infrastructure-provider
+    https:
+      reachable: true
+      status: 200
+      tls_protocol: TLSv1.3
+      certificate:
+        subject: CN=*.github.io
+        issuer: "Let's Encrypt (CN=YR1)"
+        not_before: '2026-08-02'
+        not_after: '2026-10-31'
+        note: Shared wildcard certificate covering every GitHub Pages user site.
+    hsts:
+      present: true
+      max_age: 31556952
+      include_subdomains: false
+      preload: false
+      note: Set by GitHub Pages for all Pages sites.
+    server_header: GitHub.com
+dns:
+  registrable_domain: github.io
+  attribution: >-
+    github.io is GitHub's domain. These records are GitHub's and are recorded
+    only to make clear what was and was not observable.
+  dnssec:
+    dnskey_present: false
+    note: No DNSKEY returned for github.io.
+  caa:
+    present: true
+    records:
+      - '0 issuewild "sectigo.com"'
+      - '0 issue "digicert.com"'
+      - '0 issue "letsencrypt.org"'
+  spf:
+    present: true
+    record: v=spf1 a -all
+  dmarc:
+    present: false
+    note: No TXT record at _dmarc.github.io.
+interpretation: >-
+  For a self-hosted product the domain-security dimension is genuinely not the
+  project's to answer, and scoring it as a gap would misattribute GitHub's
+  configuration to SparkyFitness. What IS the project's to answer, and what it
+  does answer, is the security posture of the software an operator deploys:
+  PostgreSQL row-level security on every user-scoped read, admin-gated
+  developer tools that are off by default, MFA with an admin mandatory-MFA
+  switch, WebAuthn passkeys, OIDC federation, nginx rate limiting on every
+  authentication endpoint, and per-API-key rate limits. Those are recorded in
+  authentication/sparkyfitness-authentication.yml and
+  rate-limits/sparkyfitness-rate-limits.yml.

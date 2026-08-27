@@ -1,0 +1,72 @@
+generated: '2026-08-27'
+method: searched
+source: https://codewithcj.github.io/SparkyFitness/developer/advanced/rate-limiting
+limit_count: 2
+note: >-
+  Two independent limiters, enforced at different layers, both documented with
+  concrete numbers. Because SparkyFitness is self-hosted, every value is a
+  DEFAULT the operator can change through environment variables — the numbers
+  below are what an unmodified deployment enforces.
+rate_limits:
+  - name: Authentication endpoints (nginx)
+    scope: per-client-IP
+    layer: nginx reverse proxy (zone auth_zone, 10MB shared memory)
+    window: 1 second
+    limit: 5
+    unit: requests
+    burst: 5
+    burst_behavior: nodelay — requests past the burst are rejected immediately, not delayed
+    status_on_exhaustion: 429
+    configurable_via: NGINX_RATE_LIMIT environment variable (default 5r/s; 10000r/s effectively disables it)
+    client_ip_resolution:
+      - CF-Connecting-IP (Cloudflare)
+      - X-Real-IP (other proxies)
+      - direct connection IP ($binary_remote_addr)
+    applies_to:
+      - /api/auth/login
+      - /api/auth/register
+      - /api/auth/forgot-password
+      - /api/auth/reset-password
+      - /api/auth/request-magic-link
+      - /api/auth/magic-link-login
+      - /api/auth/mfa/*
+  - name: API key rate limit (application layer)
+    scope: per-api-key
+    layer: application (Better Auth)
+    window: 60000 ms (1 minute)
+    limit: 100
+    unit: requests
+    burst: null
+    status_on_exhaustion: 429
+    error_body: '{"error": "Rate limit exceeded."}'
+    configurable_via:
+      - SPARKY_FITNESS_API_KEY_RATELIMIT_WINDOW_MS (default 60000)
+      - SPARKY_FITNESS_API_KEY_RATELIMIT_MAX_REQUESTS (default 100)
+    applies_to: >-
+      Every request authenticated with an API key, including the MCP endpoint at
+      POST /mcp. Cookie-based browser sessions are explicitly NOT affected.
+response_headers:
+  - header: Retry-After
+    emitted_on: 429 from the per-API-key limiter
+    semantics: >-
+      Seconds until the window resets — at most 60s with the default 60000 ms
+      window.
+  - header: null
+    note: >-
+      No X-RateLimit-* or RFC 9331 RateLimit-* headers are documented or present
+      in the source. An agent therefore cannot read remaining quota ahead of
+      time; it learns the limit only by hitting 429 and reading Retry-After.
+  - header: null
+    note: >-
+      The nginx auth limiter returns a bare 429 (limit_req_status 429) with no
+      Retry-After, so login/register backoff has to be chosen blind.
+other_limits:
+  - name: Request body size
+    limit: 10 MB
+    scope: per-request
+    layer: reverse proxy
+    source: https://codewithcj.github.io/SparkyFitness/developer/api-reference
+    note: >-
+      Stated in the workout-ingest section: clients should downsample before
+      uploading; roughly 2000 GPS points and 1200 heart-rate samples per workout
+      keeps a session near 250 KB.

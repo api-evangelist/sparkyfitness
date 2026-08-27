@@ -1,0 +1,424 @@
+generated: '2026-08-27'
+method: searched
+source: https://codewithcj.github.io/SparkyFitness/features/mcp-server
+name: sparkyfitness-mcp-server
+status: published
+summary: SparkyFitness ships a first-party Model Context Protocol server IN-PROCESS inside the main API
+  server — there is no separate MCP service to run. It is a stateless StreamableHTTP transport mounted
+  at POST /mcp on the operator's own deployment, built on @modelcontextprotocol/sdk, and it exposes the
+  same tool registry the built-in AI assistant uses. Because SparkyFitness is self-hosted, the endpoint
+  host is the operator's, not a vendor's.
+deployment:
+  mode: remote
+  endpoint: https://{your-host}/mcp
+  install: null
+  package: null
+  auth: api-key
+  verified: searched
+  note: 'An https URL an MCP client POSTs to, so mode is remote — but it is remote on the OPERATOR''S
+    host: every SparkyFitness deployment serves its own /mcp. The project runs no public instance, so
+    the endpoint could not be probed and no concrete URL is asserted. The docs also describe driving it
+    from stdio-only clients through mcp-remote, but mcp-remote is a third-party bridge the project does
+    not publish, so this is NOT recorded as local-stdio or both.'
+transport: streamable-http (stateless; a fresh McpServer + transport per request)
+protocol:
+  sdk: '@modelcontextprotocol/sdk'
+  note: mcpRoutes.ts clamps an MCP-Protocol-Version header that post-dates the bundled SDK down to LATEST_PROTOCOL_VERSION
+    rather than 400ing the request — an explicit workaround for clients (the Claude.ai connector is named)
+    that send their own newest version instead of the negotiated one.
+authentication:
+  scheme: Bearer token in the Authorization header
+  credential: A SparkyFitness API key generated in Settings -> Developer & Integrations -> API Key Management
+  docs: https://codewithcj.github.io/SparkyFitness/features/mcp-server
+authorization:
+  model: PostgreSQL Row Level Security, scoped to the user the API key authenticates
+  note: MCP is scoped to authenticatedUserId (the logged-in actor), deliberately NOT to the delegation
+    cookie, so a family-sharing delegation cannot silently make MCP act as another user.
+  admin_dev_tools: Five developer/debugging tools run on the owner pool and BYPASS Row Level Security.
+    They are off unless DEV_TOOLS_ENABLED=true AND the caller is an admin, and they are gated at registration
+    so they never appear in a non-admin tools/list.
+tool_profiles:
+  full: Every chat-visible tool (the default).
+  core: food, exercise, checkin, goals only — for small local models with no prompt cache.
+  note: The user-selected profile is honored verbatim over MCP, unlike the in-app chat path.
+tool_count: 56
+tools:
+- name: sparky_execute_read_only_sql
+  category: admin-dev
+  profile: admin-dev
+  description: Execute a custom read-only SQL query (SELECT or WITH statements) against Postgres for troubleshooting.
+    Requires admin access and DEV_TOOLS_ENABLED=true.
+  input_schema_symbol: executeSqlInput
+  source: SparkyFitnessServer/ai/tools/devTools.ts
+- name: sparky_get_db_stats
+  category: admin-dev
+  profile: admin-dev
+  description: Get current database connection pool statistics. Requires admin access and DEV_TOOLS_ENABLED=true.
+  input_schema_symbol: emptyInput
+  source: SparkyFitnessServer/ai/tools/devTools.ts
+- name: sparky_get_user_info
+  category: admin-dev
+  profile: admin-dev
+  description: Get information about the current authenticated user. Requires admin access and DEV_TOOLS_ENABLED=true.
+  input_schema_symbol: emptyInput
+  source: SparkyFitnessServer/ai/tools/devTools.ts
+- name: sparky_inspect_schema
+  category: admin-dev
+  profile: admin-dev
+  description: Inspect the database schema to understand available tables and columns. Requires admin
+    access and DEV_TOOLS_ENABLED=true.
+  input_schema_symbol: inspectSchemaInput
+  source: SparkyFitnessServer/ai/tools/devTools.ts
+- name: sparky_query_table
+  category: admin-dev
+  profile: admin-dev
+  description: Execute a read-only query on a database table for troubleshooting. Requires admin access
+    and DEV_TOOLS_ENABLED=true.
+  input_schema_symbol: queryTableInput
+  source: SparkyFitnessServer/ai/tools/devTools.ts
+- name: sparky_get_sleep_science
+  category: checkin
+  profile: core
+  description: 'Read sleep-science analytics: sleep debt (sleep_debt), MCTQ chronotype stats (mctq_stats),
+    daily sleep need for a date (daily_need), circadian energy curve (energy_curve), chronotype summary
+    (chronotype), data sufficiency check (data_sufficiency), and recalculate the baseline sleep need (recalculate_baseline).
+    Mostly read-only; recalculate_baseline persists an updated baseline.'
+  input_schema_symbol: sleepScienceInput
+  source: SparkyFitnessServer/ai/tools/sleepScienceTools.ts
+- name: sparky_manage_checkin
+  category: checkin
+  profile: core
+  description: 'Health tracking: weight, steps, body measurements, mood, sleep, fasting, custom metrics.'
+  input_schema_symbol: manageCheckinInput
+  source: SparkyFitnessServer/ai/tools/checkinTools.ts
+- name: sparky_manage_progress_photos
+  category: checkin
+  profile: core
+  description: 'Progress (check-in) photos: list the days a user has progress photos, list the photos
+    for a specific day, and delete a photo.'
+  input_schema_symbol: manageProgressPhotosInput
+  source: SparkyFitnessServer/ai/tools/progressPhotoTools.ts
+- name: sparky_analyze_trends
+  category: coaching
+  profile: full
+  description: Analyze weight trends vs. calorie intake to identify plateaus or progress over a specified
+    number of days.
+  input_schema_symbol: AnalyzeTrendsSchema
+  source: SparkyFitnessServer/ai/tools/coachTools.ts
+- name: sparky_check_engagement
+  category: coaching
+  profile: full
+  description: Scans the user's data for moments that require a proactive nudge (e.g., missed workout,
+    plateau, achievement).
+  input_schema_symbol: CheckEngagementSchema
+  source: SparkyFitnessServer/ai/tools/engagementTools.ts
+- name: sparky_daily_checkin_wizard
+  category: coaching
+  profile: full
+  description: A guided, step-by-step interactive assistant for your daily health check-in. Use 'daily_checkin'
+    action and pass the current step.
+  input_schema_symbol: manageWizardInput
+  source: SparkyFitnessServer/ai/tools/wizardTools.ts
+- name: sparky_detect_patterns
+  category: coaching
+  profile: full
+  description: 'Health Detective: Scans historical data for correlations between nutrition, sleep, and
+    mood.'
+  input_schema_symbol: DetectPatternsSchema
+  source: SparkyFitnessServer/ai/tools/coachTools.ts
+- name: sparky_generate_coaching_plan
+  category: coaching
+  profile: full
+  description: 'Auto-Coach: Generates a 7-day macro plan and shopping list based on your goal and weight
+    trends.'
+  input_schema_symbol: GenerateCoachingPlanSchema
+  source: SparkyFitnessServer/ai/tools/coachTools.ts
+- name: sparky_get_30_day_trends
+  category: coaching
+  profile: full
+  description: Get comprehensive trends for the last 30 days including food, exercise, mood, sleep, and
+    biometrics.
+  input_schema_symbol: Get30DayTrendsSchema
+  source: SparkyFitnessServer/ai/tools/coachTools.ts
+- name: sparky_get_contextual_nudge
+  category: coaching
+  profile: full
+  description: Generates a context-aware nudge based on recent user activity or inactivity.
+  input_schema_symbol: GetContextualNudgeSchema
+  source: SparkyFitnessServer/ai/tools/engagementTools.ts
+- name: sparky_get_health_summary
+  category: coaching
+  profile: full
+  description: Get a summary of the user's health status (Nutrition, Fitness, Vitals, Hydration) for a
+    specific date range.
+  input_schema_symbol: GetHealthSummarySchema
+  source: SparkyFitnessServer/ai/tools/coachTools.ts
+- name: sparky_get_logging_streak
+  category: coaching
+  profile: full
+  description: Retrieves the user's current consecutive logging streak for any health or fitness data.
+  input_schema_symbol: GetLoggingStreakSchema
+  source: SparkyFitnessServer/ai/tools/engagementTools.ts
+- name: sparky_get_daily_exercise_totals
+  category: exercise
+  profile: core
+  description: Returns daily exercise totals for a date or range.
+  input_schema_symbol: exerciseDateRangeSchema
+  source: SparkyFitnessServer/ai/tools/exerciseTools.ts
+- name: sparky_get_exercise_details
+  category: exercise
+  profile: core
+  description: Returns full details for one exercise by exercise_id or exercise_name.
+  input_schema_symbol: getExerciseDetailsSchema
+  source: SparkyFitnessServer/ai/tools/exerciseTools.ts
+- name: sparky_get_exercise_diary
+  category: exercise
+  profile: core
+  description: Returns entry-level exercise diary data for a specific date or date range.
+  input_schema_symbol: exerciseDateRangeSchema
+  source: SparkyFitnessServer/ai/tools/exerciseTools.ts
+- name: sparky_get_exercise_progress
+  category: exercise
+  profile: core
+  description: Returns paginated performance history for an exercise.
+  input_schema_symbol: exerciseProgressSchema
+  source: SparkyFitnessServer/ai/tools/exerciseTools.ts
+- name: sparky_get_exercise_stats
+  category: exercise
+  profile: core
+  description: 'Read exercise analytics: aggregated stats over an interval (stats_summary), advanced activity
+    search (query_activities), personal records / best efforts (personal_records), and matched course
+    groupings (matched_courses). Read-only.'
+  input_schema_symbol: exerciseStatsInput
+  source: SparkyFitnessServer/ai/tools/exerciseStatsTools.ts
+- name: sparky_get_exercise_usage
+  category: exercise
+  profile: core
+  description: Shows where a specific exercise_id was used in the exercise diary.
+  input_schema_symbol: exerciseUsageSchema
+  source: SparkyFitnessServer/ai/tools/exerciseTools.ts
+- name: sparky_get_recent_exercise_entries
+  category: exercise
+  profile: core
+  description: Returns recent entry-level exercise diary rows for the authenticated user.
+  input_schema_symbol: recentExerciseEntriesSchema
+  source: SparkyFitnessServer/ai/tools/exerciseTools.ts
+- name: sparky_list_exercises
+  category: exercise
+  profile: core
+  description: Returns a paginated exercise catalog for the authenticated user.
+  input_schema_symbol: listExercisesSchema
+  source: SparkyFitnessServer/ai/tools/exerciseTools.ts
+- name: sparky_manage_exercise
+  category: exercise
+  profile: core
+  description: 'Fitness tracking: search exercises, log workouts with sets, manage presets.'
+  input_schema_symbol: manageExerciseInput
+  source: SparkyFitnessServer/ai/tools/exerciseTools.ts
+- name: sparky_manage_workout_plans
+  category: exercise
+  profile: core
+  description: 'Workout plan templates: list the user''s saved workout plans, inspect one in detail, or
+    delete a plan.'
+  input_schema_symbol: manageWorkoutPlansInput
+  source: SparkyFitnessServer/ai/tools/workoutPlanTools.ts
+- name: sparky_search_exercises
+  category: exercise
+  profile: core
+  description: Searches exercises by name and optional filters.
+  input_schema_symbol: searchExercisesSchema
+  source: SparkyFitnessServer/ai/tools/exerciseTools.ts
+- name: sparky_get_barcode
+  category: food
+  profile: core
+  description: Look up a food product by its barcode (lookup_barcode). Searches your saved foods first,
+    then configured external providers (OpenFoodFacts, FatSecret, etc.), and returns the matched food
+    with per-serving macros. Read-only.
+  input_schema_symbol: barcodeInput
+  source: SparkyFitnessServer/ai/tools/barcodeTools.ts
+- name: sparky_get_food_details
+  category: food
+  profile: core
+  description: Returns full details for one food by food_id, including available variants.
+  input_schema_symbol: getFoodDetailsSchema
+  source: SparkyFitnessServer/ai/tools/foodTools.ts
+- name: sparky_get_food_diary
+  category: food
+  profile: core
+  description: Returns entry-level food diary data for a specific date or date range.
+  input_schema_symbol: foodDateRangeSchema
+  source: SparkyFitnessServer/ai/tools/foodTools.ts
+- name: sparky_get_food_usage
+  category: food
+  profile: core
+  description: Shows where a specific food_id was used in the diary.
+  input_schema_symbol: foodUsageSchema
+  source: SparkyFitnessServer/ai/tools/foodTools.ts
+- name: sparky_get_nutrition_summary
+  category: food
+  profile: core
+  description: Returns nutrition summary rows for a specific date or date range.
+  input_schema_symbol: foodDateRangeSchema
+  source: SparkyFitnessServer/ai/tools/foodTools.ts
+- name: sparky_get_recent_food_entries
+  category: food
+  profile: core
+  description: Returns recent entry-level food diary rows for the authenticated user.
+  input_schema_symbol: recentFoodEntriesSchema
+  source: SparkyFitnessServer/ai/tools/foodTools.ts
+- name: sparky_list_foods
+  category: food
+  profile: core
+  description: Returns a paginated food catalog for the authenticated user, including variants.
+  input_schema_symbol: listFoodsSchema
+  source: SparkyFitnessServer/ai/tools/foodTools.ts
+- name: sparky_manage_allergens
+  category: food
+  profile: core
+  description: 'Allergen preferences: list, add, and remove the allergens a user tracks.'
+  input_schema_symbol: manageAllergensInput
+  source: SparkyFitnessServer/ai/tools/allergenTools.ts
+- name: sparky_manage_custom_nutrients
+  category: food
+  profile: core
+  description: 'Custom nutrients: list, view, create, update, and delete a user''s custom nutrient definitions
+    (name + unit + aliases) that layer on top of the built-in nutrient catalog.'
+  input_schema_symbol: manageCustomNutrientsInput
+  source: SparkyFitnessServer/ai/tools/customNutrientTools.ts
+- name: sparky_manage_favorites
+  category: food
+  profile: core
+  description: 'Favorites: list, add, and remove the foods and meals a user has saved as favorites for
+    quick logging.'
+  input_schema_symbol: manageFavoritesInput
+  source: SparkyFitnessServer/ai/tools/favoritesTools.ts
+- name: sparky_manage_food
+  category: food
+  profile: core
+  description: null
+  input_schema_symbol: null
+  source: SparkyFitnessServer/ai/tools/foodTools.ts
+- name: sparky_manage_meal_plans
+  category: food
+  profile: core
+  description: 'Meal plan templates: list the user''s saved plans, inspect one in detail, duplicate a
+    plan, or delete a plan.'
+  input_schema_symbol: manageMealPlansInput
+  source: SparkyFitnessServer/ai/tools/mealPlansTools.ts
+- name: sparky_manage_water_containers
+  category: food
+  profile: core
+  description: 'Water containers: list, view, create, update, delete, and set the primary reusable water
+    vessel (name + volume + unit) a user taps for quick water logging. Volume is stored in ml; provide
+    the unit (ml, oz, or liter) and it is converted automatically.'
+  input_schema_symbol: manageWaterContainersInput
+  source: SparkyFitnessServer/ai/tools/waterContainerTools.ts
+- name: sparky_search_foods
+  category: food
+  profile: core
+  description: Searches foods by name for the authenticated user.
+  input_schema_symbol: searchFoodsSchema
+  source: SparkyFitnessServer/ai/tools/foodTools.ts
+- name: sparky_get_goal_snapshot
+  category: goals
+  profile: core
+  description: Returns the goals active on a specific date.
+  input_schema_symbol: goalSnapshotSchema
+  source: SparkyFitnessServer/ai/tools/goalTools.ts
+- name: sparky_manage_goals
+  category: goals
+  profile: core
+  description: 'Target management: set and view calorie, macro, water, and weight goals.'
+  input_schema_symbol: manageGoalsInput
+  source: SparkyFitnessServer/ai/tools/goalTools.ts
+- name: sparky_manage_medications
+  category: medications
+  profile: full
+  description: 'Medication tracking: manage medications and schedules, log doses, and view history.'
+  input_schema_symbol: manageMedicationsInput
+  source: SparkyFitnessServer/ai/tools/medicationTools.ts
+- name: sparky_ask_user
+  category: meta
+  profile: full
+  description: Asks the user a clarifying question mid-turn before continuing (ASK_USER_TOOL_NAME).
+  input_schema_symbol: null
+  source: shared/src/constants/chatAskUser.ts
+- name: sparky_enable_tools
+  category: meta
+  profile: full
+  description: Turns additional tool categories on for the current session (ENABLE_TOOLS_TOOL_NAME).
+  input_schema_symbol: null
+  source: SparkyFitnessServer/ai/tools/metaTools.ts
+- name: sparky_get_integrations
+  category: profile
+  profile: full
+  description: 'Read connected external integrations and available integration types. Actions: list_providers
+    (connected external data providers for this user with status, visibility, and sync info — no credentials
+    exposed), list_provider_types (catalog of available integration types). Read-only; does not manage
+    credentials.'
+  input_schema_symbol: integrationsInput
+  source: SparkyFitnessServer/ai/tools/integrationsTools.ts
+- name: sparky_get_synced_data
+  category: profile
+  profile: full
+  description: 'Synced provider data: list the entry data a user has synced from external providers (e.g.
+    garmin, healthkit, health_connect). Read-only.'
+  input_schema_symbol: syncedDataInput
+  source: SparkyFitnessServer/ai/tools/syncedDataTools.ts
+- name: sparky_manage_habits
+  category: profile
+  profile: full
+  description: 'Habit tracking: list habits, log completions, and view history.'
+  input_schema_symbol: manageHabitsInput
+  source: SparkyFitnessServer/ai/tools/habitTools.ts
+- name: sparky_manage_profile
+  category: profile
+  profile: full
+  description: 'User settings: update display name, timezone, and measurement units.'
+  input_schema_symbol: manageProfileInput
+  source: SparkyFitnessServer/ai/tools/profileTools.ts
+- name: sparky_get_daily_report
+  category: reports
+  profile: full
+  description: Returns daily report data across nutrition, exercise, and water for a specific date or
+    range.
+  input_schema_symbol: dailyReportSchema
+  source: SparkyFitnessServer/ai/tools/reportTools.ts
+- name: sparky_get_dashboard
+  category: reports
+  profile: full
+  description: 'Read the daily dashboard calorie-balance summary for a date (daily_summary): calories
+    eaten, burned, remaining, goal, net, progress, steps, step calories, and BMR. Defaults to today. Read-only.'
+  input_schema_symbol: dashboardInput
+  source: SparkyFitnessServer/ai/tools/dashboardTools.ts
+- name: sparky_get_report
+  category: reports
+  profile: full
+  description: Generates consolidated health and fitness reports.
+  input_schema_symbol: manageReportInput
+  source: SparkyFitnessServer/ai/tools/reportTools.ts
+- name: sparky_analyze_food_image
+  category: vision
+  profile: full
+  description: Analyzes an image of food to estimate its nutritional content using advanced vision models.
+  input_schema_symbol: AnalyzeFoodImageSchema
+  source: SparkyFitnessServer/ai/tools/visionTools.ts
+- name: sparky_scan_label
+  category: vision
+  profile: full
+  description: Scans a nutrition label from an image to extract detailed nutritional information using
+    OCR.
+  input_schema_symbol: ScanLabelSchema
+  source: SparkyFitnessServer/ai/tools/visionTools.ts
+probe:
+  attempted: false
+  reason: 'tools/list was not POSTed: SparkyFitness operates no public instance, and the only reachable
+    first-party host is the GitHub Pages docs site, which has no /mcp. Probing a stranger''s deployment
+    would be probing a third party''s private server, not the provider''s. Tool names, descriptions and
+    input-schema symbols are read from the project''s own registry source instead.'
+  input_schemas: Recorded as Zod schema SYMBOLS, not expanded JSON Schema. The concrete inputSchema per
+    tool requires authenticated introspection against a running instance.
+clients_documented:
+- Cursor and other streamable-HTTP clients
+- Claude Desktop via the third-party mcp-remote bridge
+- Open WebUI (MCP Streamable HTTP integration)

@@ -1,0 +1,150 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist enhancements for the SparkyFitness API
+  version: 1.0.0
+extends: ../openapi/sparkyfitness-openapi.yml
+x-provenance:
+  generated: '2026-08-27'
+  method: generated
+  source: >-
+    Generated from this repository's derived artifacts (conformance, errors,
+    conventions, rate-limits, authentication, mcp). It records API Evangelist's
+    enhancements to the SparkyFitness contract WITHOUT mutating the original.
+    Every action below is additive documentation grounded in the project's own
+    published docs and source — no behaviour, path, parameter or schema is
+    invented, and no operation is renamed. Note the scoring caveat: apis.io
+    parses the ORIGINAL spec, so this overlay improves what a consumer reads,
+    not the raw contract-content score.
+actions:
+  - target: $.info
+    update:
+      x-api-evangelist-review:
+        contract_defects:
+          - No operationId on any of the 423 operations.
+          - 15 operations reference an undefined securityScheme `bearerAuth`.
+          - 21 distinct tag values are used but only 9 are declared; 6 operations are untagged.
+          - 429 is returned by two documented rate limiters but declared on no operation.
+          - No `examples` anywhere in the contract.
+        strengths:
+          - Every one of the 423 operations has a summary.
+          - 45 reusable component schemas.
+          - securitySchemes defined and applied as a global default.
+      x-agent-readiness:
+        auth: API key as Authorization Bearer or x-api-key
+        idempotency: natural-key (source_id / entry_date upsert), no Idempotency-Key header
+        reversibility: documented — DELETE on every user resource, no stated windows
+        dry_run: absent, except the /deletion-impact pre-checks
+        mcp_server: 'POST /mcp on the same host, 56 tools'
+  - target: $.info
+    update:
+      x-self-hosted: true
+      x-vendor-operated-host: false
+      x-deployment-note: >-
+        There is no vendor API host. `servers[]` in the captured spec templates
+        the operator's own host; the upstream document declares only the
+        relative base "/api".
+  - target: $.servers
+    update:
+      - url: https://{host}/api
+        description: >-
+          Self-hosted SparkyFitness instance. The upstream contract declares the
+          relative base "/api" only; this names the variable an operator must
+          supply.
+        variables:
+          host:
+            default: sparkyfitness.example.com
+            description: Hostname of your own SparkyFitness deployment.
+  - target: $.components.securitySchemes
+    update:
+      bearerAuth:
+        type: http
+        scheme: bearer
+        description: >-
+          ADDED BY OVERLAY to repair a dangling reference. 15 operations in the
+          upstream contract declare `security: [{bearerAuth: []}]` while
+          components.securitySchemes defines only apiKeyAuth — the swagger
+          post-processing in config/swagger.ts deletes cookieAuth and never adds
+          a bearer definition. Semantically this is the session JWT the API
+          reference documents as "Authorization: Bearer <JWT_TOKEN>"; the same
+          header also carries an API key. This addition makes the document
+          resolve; it does not change server behaviour.
+  - target: $.tags
+    update:
+      - name: SleepScience
+        description: Sleep debt, chronotype (MCTQ), daily need and energy-curve analytics. Used on operations but undeclared upstream.
+      - name: Exercise Stats
+        description: Aggregated exercise analytics, personal records and matched courses. Used on operations but undeclared upstream.
+      - name: Authentication
+        description: Login, registration, MFA and passkey flows. Used on operations but undeclared upstream.
+      - name: Dashboard
+        description: Daily calorie-balance summary. Used on operations but undeclared upstream.
+      - name: Dashboard Layouts
+        description: Per-page dashboard layout persistence. Used on operations but undeclared upstream.
+      - name: Allergen Preferences
+        description: The allergens a user tracks. Used on operations but undeclared upstream.
+      - name: Synced Data
+        description: Entry data synced from external health providers. Used on operations but undeclared upstream.
+      - name: Exercise Entries
+        description: Entry-level exercise diary rows. Used on operations but undeclared upstream.
+      - name: Utility
+        description: Version and miscellaneous service operations. Used on operations but undeclared upstream.
+      - name: AI
+        description: AI assistant operations. Used on operations but undeclared upstream. Near-duplicate of the declared "AI & Insights".
+      - name: Exercise & Workouts
+        description: >-
+          Used on 25 operations but undeclared upstream, and a near-duplicate of
+          the declared "Fitness & Workouts" (28 operations). Consolidating these
+          two would remove a real split in the API's own navigation.
+  - target: $.paths['/measurements/health-data'].post
+    update:
+      x-partial-success: true
+      x-agent-note: >-
+        A 200 does NOT mean every record was saved. Read `errors[]` and
+        `skipped[]` in the response body. Records without a `source_id` cannot be
+        deduplicated and Nutrition records without one are reported in
+        `skipped[]` rather than written. Behaviour changed here: earlier server
+        versions returned 400 when any record in the batch failed.
+      x-idempotency:
+        mechanism: natural-key
+        key: source_id
+        retry_safe: true
+      x-unit-trap: >-
+        `distance` on a workout is in KILOMETRES while `dist` on a gps_point is
+        cumulative METRES, in the same request body.
+      x-required-header:
+        name: X-Workout-Model-Version
+        note: >-
+          Absent, per-set durations are read as MINUTES; 2 or higher means
+          SECONDS; 3 signals optional wearable telemetry may be present.
+      x-sibling-endpoint-undocumented:
+        path: POST /api/health-data
+        note: >-
+          A SECOND, separately-mounted health-data ingest exists at
+          POST /api/health-data (SparkyFitnessServer/integrations/healthData/
+          healthDataRoutes.ts). It is the endpoint the public API reference
+          documents in full detail and the one iOS Shortcuts and the Android app
+          post to — and it is ABSENT from the machine-readable contract, because
+          it carries no @swagger annotation and sits outside the swagger-jsdoc
+          scan paths (routes/**, models/**). An agent generated from the spec
+          alone will never find it.
+  - target: $.paths['/measurements/check-in'].post
+    update:
+      x-idempotency:
+        mechanism: upsert-on-natural-key
+        key: entry_date
+        retry_safe: true
+      x-agent-note: >-
+        One check-in per user per day. Re-posting the same entry_date overwrites.
+        Sending null for a field CLEARS a previously recorded value — a partial
+        re-send is not a no-op. BMI is neither accepted nor stored.
+  - target: $.paths['/foods/{id}/deletion-impact'].get
+    update:
+      x-dry-run-for: DELETE /foods/{id}
+      x-agent-note: >-
+        Call this before deleting a catalog food. Diary entries reference catalog
+        rows and the delete operation itself gives no warning.
+  - target: $.paths['/exercises/{id}/deletion-impact'].get
+    update:
+      x-dry-run-for: DELETE /exercises/{id}
+      x-agent-note: >-
+        Call this before deleting a catalog exercise, for the same reason.

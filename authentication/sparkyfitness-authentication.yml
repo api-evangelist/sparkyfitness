@@ -1,0 +1,109 @@
+generated: '2026-08-27'
+method: searched
+source: https://codewithcj.github.io/SparkyFitness/developer/api-reference
+spec: openapi/sparkyfitness-openapi.yml
+summary: >-
+  Three credential types reach the API, and the published contract only declares
+  one of them. API keys (x-api-key header, or Authorization: Bearer) are the
+  machine credential and the only one usable by an agent. Browser sessions use
+  an HTTP-only cookie named "token". End-user login can additionally be federated
+  through OIDC to an operator-configured identity provider.
+security_schemes:
+  - name: apiKeyAuth
+    type: apiKey
+    in: header
+    parameter: x-api-key
+    declared_in_spec: true
+    applied_to_operations: 279
+    is_global_default: true
+    description: >-
+      API key authentication via the x-api-key header. Keys are created in the
+      web UI under Settings -> Developer & Integrations -> API Key Management.
+      The API reference states the same key is also accepted as
+      "Authorization: Bearer <API_KEY>", and the MCP docs use only the Bearer
+      form — so the header the spec declares is not the only one the server takes.
+  - name: cookieAuth
+    type: apiKey
+    in: cookie
+    parameter: token
+    declared_in_spec: false
+    description: >-
+      A secure, HTTP-only cookie named "token" carrying the session JWT. It IS
+      defined in the project's swagger source (config/swagger.ts) and then
+      deliberately STRIPPED before the spec is served: a post-processing step
+      deletes cookieAuth from components.securitySchemes and rewrites every
+      operation that required it to require apiKeyAuth instead, so Swagger UI
+      offers the key rather than a cookie the browser sets. The published
+      contract therefore understates the real auth surface by one scheme.
+  - name: bearerAuth
+    type: http
+    scheme: bearer
+    declared_in_spec: false
+    applied_to_operations: 15
+    defect: true
+    description: >-
+      Fifteen operations declare `security: [{bearerAuth: []}]` but bearerAuth
+      is never defined under components.securitySchemes. This is a real dangling
+      reference in the contract: a generator or validator will fail or silently
+      drop auth on those fifteen operations. Semantically it is the JWT the API
+      reference describes ("Authorization: Bearer <JWT_TOKEN>").
+permissions:
+  model: per-key permission strings, not OAuth scopes
+  examples:
+    - name: health_data_write
+      required_by: POST /health-data
+      failure: '403 — Forbidden: API Key does not have health_data_write permission'
+  note: >-
+    Permissions are attached to an API key at creation time in the UI. They are
+    NOT OAuth scopes, are not enumerated in the spec, and there is no
+    machine-readable permission catalogue — which is why no scopes/ artifact is
+    emitted for this provider.
+row_level_security:
+  enabled: true
+  description: >-
+    Data access is enforced in PostgreSQL with Row Level Security, scoped to the
+    user the API key authenticates. The MCP path deliberately scopes to
+    authenticatedUserId rather than the delegation cookie, so family-sharing
+    delegation cannot make an agent act as another user.
+  exception: >-
+    Five admin developer tools run on the owner pool and bypass RLS. They require
+    both DEV_TOOLS_ENABLED=true and an admin caller, and are gated at
+    registration so they never appear in a non-admin tools/list.
+federated_identity:
+  protocol: OpenID Connect
+  library: openid-client
+  docs: https://codewithcj.github.io/SparkyFitness/administration/oauth-authentication
+  multiple_providers: true
+  scope: openid profile email
+  discovery: >-
+    The operator supplies an Issuer URL and SparkyFitness discovers the IdP
+    configuration from it. SparkyFitness is the OIDC RELYING PARTY here, not a
+    provider — it publishes no /.well-known/openid-configuration of its own.
+  configurable:
+    - Issuer URL
+    - Client ID
+    - Client Secret
+    - Redirect URI
+    - Auto-register users
+    - Token endpoint auth method
+    - ID token signed response algorithm
+    - Userinfo signed response algorithm
+    - Request timeout (default 3500 ms)
+  admin_api: /admin/oidc-settings (GET, POST, PUT, DELETE)
+mfa:
+  supported: true
+  evidence: >-
+    /api/auth/mfa/* endpoints are rate-limited by name in the nginx config, and
+    an admin operation exists to reset a user's MFA
+    (POST /admin/auth/users/{userId}/mfa/reset) and to make MFA mandatory
+    (/admin/auth/settings/mfa-mandatory).
+passkeys:
+  supported: true
+  evidence: >-
+    SparkyFitnessServer/routes/auth/templates/passkey-login.html and
+    passkey-register.html ship with a bundled @simplewebauthn/browser build.
+agent_guidance: >-
+  An agent should use an API key. Generate it in the UI, send it as
+  "Authorization: Bearer <key>" (works for both REST and MCP) or as x-api-key,
+  and expect 401 for a missing/invalid key and 403 when the key lacks the
+  required permission.
