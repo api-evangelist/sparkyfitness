@@ -33,24 +33,36 @@ tags:
 - AI Assistant
 - Quantified Self
 apis:
-- name: SparkyFitness API
+- name: SparkyFitness MCP Server
   description: >-
-    The REST API served by the SparkyFitness server on your own deployment.
-    423 operations across nine functional areas — nutrition and meals, fitness
-    and workouts, wellness and metrics, goals and personalization, medications
-    and GLP-1, external integrations, identity and security, AI and insights,
-    and system administration. API-key authenticated, scoped by PostgreSQL row
-    level security to the key's user.
+    A first-party Model Context Protocol server running in-process inside the SparkyFitness API server,
+    mounted at POST /mcp over a stateless streamable HTTP transport. 56 tools across food, exercise, check-ins,
+    goals, coaching, vision, profile, reports and medications, authenticated with a Bearer API key and
+    scoped to that key's user by row level security. Five admin-only developer tools bypass RLS and are
+    off unless DEV_TOOLS_ENABLED=true.
+  humanURL: https://codewithcj.github.io/SparkyFitness/features/mcp-server
+  baseURL: https://{host}/mcp
+  tags:
+  - MCP
+  - AI Assistant
+  - Agents
+  properties:
+  - type: MCPServer
+    url: mcp/sparkyfitness-mcp.yml
+  - type: ToolCrosswalk
+    url: mcp/sparkyfitness-tool-crosswalk.yml
+  - type: Documentation
+    url: https://codewithcj.github.io/SparkyFitness/features/mcp-server
+- aid: sparkyfitness:sparkyfitness-admin-api
+  name: SparkyFitness Admin API
+  description: The Admin API from SparkyFitness — 3 operation(s) for admin.
   humanURL: https://codewithcj.github.io/SparkyFitness/developer/api-reference
   baseURL: https://{host}/api
   tags:
-  - Health
-  - Fitness
-  - Nutrition
-  - REST
+  - Admin
   properties:
   - type: OpenAPI
-    url: openapi/sparkyfitness-openapi.yml
+    url: openapi/sparkyfitness-admin-api-openapi.yml
   - type: Documentation
     url: https://codewithcj.github.io/SparkyFitness/developer/api-reference
   - type: Authentication
@@ -65,35 +77,497 @@ apis:
     url: rate-limits/sparkyfitness-rate-limits.yml
   - type: DataModel
     url: data-model/sparkyfitness-data-model.yml
-  - type: Overlay
-    url: overlays/sparkyfitness-openapi-overlay.yaml
-- name: SparkyFitness MCP Server
-  description: >-
-    A first-party Model Context Protocol server running in-process inside the
-    SparkyFitness API server, mounted at POST /mcp over a stateless streamable
-    HTTP transport. 56 tools across food, exercise, check-ins, goals, coaching,
-    vision, profile, reports and medications, authenticated with a Bearer API
-    key and scoped to that key's user by row level security. Five admin-only
-    developer tools bypass RLS and are off unless DEV_TOOLS_ENABLED=true.
-  humanURL: https://codewithcj.github.io/SparkyFitness/features/mcp-server
-  baseURL: https://{host}/mcp
+- aid: sparkyfitness:sparkyfitness-ai-api
+  name: SparkyFitness AI API
+  description: The AI API from SparkyFitness — 1 operation(s) for ai.
+  humanURL: https://codewithcj.github.io/SparkyFitness/developer/api-reference
+  baseURL: https://{host}/api
   tags:
-  - MCP
-  - AI Assistant
-  - Agents
+  - AI
   properties:
-  - type: MCPServer
-    url: mcp/sparkyfitness-mcp.yml
-  - type: ToolCrosswalk
-    url: mcp/sparkyfitness-tool-crosswalk.yml
+  - type: OpenAPI
+    url: openapi/sparkyfitness-ai-api-openapi.yml
   - type: Documentation
-    url: https://codewithcj.github.io/SparkyFitness/features/mcp-server
+    url: https://codewithcj.github.io/SparkyFitness/developer/api-reference
+  - type: Authentication
+    url: authentication/sparkyfitness-authentication.yml
+  - type: ErrorCatalog
+    url: errors/sparkyfitness-problem-types.yml
+  - type: Conventions
+    url: conventions/sparkyfitness-conventions.yml
+  - type: Idempotency
+    url: conventions/sparkyfitness-conventions.yml
+  - type: RateLimits
+    url: rate-limits/sparkyfitness-rate-limits.yml
+  - type: DataModel
+    url: data-model/sparkyfitness-data-model.yml
+- aid: sparkyfitness:sparkyfitness-ai-insights-api
+  name: SparkyFitness AI & Insights API
+  description: AI-powered chat assistance, reports, trends, and analytical insights.
+  humanURL: https://codewithcj.github.io/SparkyFitness/developer/api-reference
+  baseURL: https://{host}/api
+  tags:
+  - AI & Insights
+  properties:
+  - type: OpenAPI
+    url: openapi/sparkyfitness-ai-insights-api-openapi.yml
+  - type: Documentation
+    url: https://codewithcj.github.io/SparkyFitness/developer/api-reference
+  - type: Authentication
+    url: authentication/sparkyfitness-authentication.yml
+  - type: ErrorCatalog
+    url: errors/sparkyfitness-problem-types.yml
+  - type: Conventions
+    url: conventions/sparkyfitness-conventions.yml
+  - type: Idempotency
+    url: conventions/sparkyfitness-conventions.yml
+  - type: RateLimits
+    url: rate-limits/sparkyfitness-rate-limits.yml
+  - type: DataModel
+    url: data-model/sparkyfitness-data-model.yml
+- aid: sparkyfitness:sparkyfitness-allergen-preferences-api
+  name: SparkyFitness Allergen Preferences API
+  description: >-
+    The Allergen Preferences API from SparkyFitness — 2 operation(s) for allergen preferences.
+  humanURL: https://codewithcj.github.io/SparkyFitness/developer/api-reference
+  baseURL: https://{host}/api
+  tags:
+  - Allergen Preferences
+  properties:
+  - type: OpenAPI
+    url: openapi/sparkyfitness-allergen-preferences-api-openapi.yml
+  - type: Documentation
+    url: https://codewithcj.github.io/SparkyFitness/developer/api-reference
+  - type: Authentication
+    url: authentication/sparkyfitness-authentication.yml
+  - type: ErrorCatalog
+    url: errors/sparkyfitness-problem-types.yml
+  - type: Conventions
+    url: conventions/sparkyfitness-conventions.yml
+  - type: Idempotency
+    url: conventions/sparkyfitness-conventions.yml
+  - type: RateLimits
+    url: rate-limits/sparkyfitness-rate-limits.yml
+  - type: DataModel
+    url: data-model/sparkyfitness-data-model.yml
+- aid: sparkyfitness:sparkyfitness-authentication-api
+  name: SparkyFitness Authentication API
+  description: The Authentication API from SparkyFitness — 4 operation(s) for authentication.
+  humanURL: https://codewithcj.github.io/SparkyFitness/developer/api-reference
+  baseURL: https://{host}/api
+  tags:
+  - Authentication
+  properties:
+  - type: OpenAPI
+    url: openapi/sparkyfitness-authentication-api-openapi.yml
+  - type: Documentation
+    url: https://codewithcj.github.io/SparkyFitness/developer/api-reference
+  - type: Authentication
+    url: authentication/sparkyfitness-authentication.yml
+  - type: ErrorCatalog
+    url: errors/sparkyfitness-problem-types.yml
+  - type: Conventions
+    url: conventions/sparkyfitness-conventions.yml
+  - type: Idempotency
+    url: conventions/sparkyfitness-conventions.yml
+  - type: RateLimits
+    url: rate-limits/sparkyfitness-rate-limits.yml
+  - type: DataModel
+    url: data-model/sparkyfitness-data-model.yml
+- aid: sparkyfitness:sparkyfitness-dashboard-api
+  name: SparkyFitness Dashboard API
+  description: The Dashboard API from SparkyFitness — 3 operation(s) for dashboard.
+  humanURL: https://codewithcj.github.io/SparkyFitness/developer/api-reference
+  baseURL: https://{host}/api
+  tags:
+  - Dashboard
+  properties:
+  - type: OpenAPI
+    url: openapi/sparkyfitness-dashboard-api-openapi.yml
+  - type: Documentation
+    url: https://codewithcj.github.io/SparkyFitness/developer/api-reference
+  - type: Authentication
+    url: authentication/sparkyfitness-authentication.yml
+  - type: ErrorCatalog
+    url: errors/sparkyfitness-problem-types.yml
+  - type: Conventions
+    url: conventions/sparkyfitness-conventions.yml
+  - type: Idempotency
+    url: conventions/sparkyfitness-conventions.yml
+  - type: RateLimits
+    url: rate-limits/sparkyfitness-rate-limits.yml
+  - type: DataModel
+    url: data-model/sparkyfitness-data-model.yml
+- aid: sparkyfitness:sparkyfitness-dashboard-layouts-api
+  name: SparkyFitness Dashboard Layouts API
+  description: The Dashboard Layouts API from SparkyFitness — 1 operation(s) for dashboard layouts.
+  humanURL: https://codewithcj.github.io/SparkyFitness/developer/api-reference
+  baseURL: https://{host}/api
+  tags:
+  - Dashboard Layouts
+  properties:
+  - type: OpenAPI
+    url: openapi/sparkyfitness-dashboard-layouts-api-openapi.yml
+  - type: Documentation
+    url: https://codewithcj.github.io/SparkyFitness/developer/api-reference
+  - type: Authentication
+    url: authentication/sparkyfitness-authentication.yml
+  - type: ErrorCatalog
+    url: errors/sparkyfitness-problem-types.yml
+  - type: Conventions
+    url: conventions/sparkyfitness-conventions.yml
+  - type: Idempotency
+    url: conventions/sparkyfitness-conventions.yml
+  - type: RateLimits
+    url: rate-limits/sparkyfitness-rate-limits.yml
+  - type: DataModel
+    url: data-model/sparkyfitness-data-model.yml
+- aid: sparkyfitness:sparkyfitness-exercise-entries-api
+  name: SparkyFitness Exercise Entries API
+  description: The Exercise Entries API from SparkyFitness — 1 operation(s) for exercise entries.
+  humanURL: https://codewithcj.github.io/SparkyFitness/developer/api-reference
+  baseURL: https://{host}/api
+  tags:
+  - Exercise Entries
+  properties:
+  - type: OpenAPI
+    url: openapi/sparkyfitness-exercise-entries-api-openapi.yml
+  - type: Documentation
+    url: https://codewithcj.github.io/SparkyFitness/developer/api-reference
+  - type: Authentication
+    url: authentication/sparkyfitness-authentication.yml
+  - type: ErrorCatalog
+    url: errors/sparkyfitness-problem-types.yml
+  - type: Conventions
+    url: conventions/sparkyfitness-conventions.yml
+  - type: Idempotency
+    url: conventions/sparkyfitness-conventions.yml
+  - type: RateLimits
+    url: rate-limits/sparkyfitness-rate-limits.yml
+  - type: DataModel
+    url: data-model/sparkyfitness-data-model.yml
+- aid: sparkyfitness:sparkyfitness-exercise-stats-api
+  name: SparkyFitness Exercise Stats API
+  description: The Exercise Stats API from SparkyFitness — 4 operation(s) for exercise stats.
+  humanURL: https://codewithcj.github.io/SparkyFitness/developer/api-reference
+  baseURL: https://{host}/api
+  tags:
+  - Exercise Stats
+  properties:
+  - type: OpenAPI
+    url: openapi/sparkyfitness-exercise-stats-api-openapi.yml
+  - type: Documentation
+    url: https://codewithcj.github.io/SparkyFitness/developer/api-reference
+  - type: Authentication
+    url: authentication/sparkyfitness-authentication.yml
+  - type: ErrorCatalog
+    url: errors/sparkyfitness-problem-types.yml
+  - type: Conventions
+    url: conventions/sparkyfitness-conventions.yml
+  - type: Idempotency
+    url: conventions/sparkyfitness-conventions.yml
+  - type: RateLimits
+    url: rate-limits/sparkyfitness-rate-limits.yml
+  - type: DataModel
+    url: data-model/sparkyfitness-data-model.yml
+- aid: sparkyfitness:sparkyfitness-exercise-workouts-api
+  name: SparkyFitness Exercise & Workouts API
+  description: >-
+    The Exercise & Workouts API from SparkyFitness — 23 operation(s) for exercise & workouts.
+  humanURL: https://codewithcj.github.io/SparkyFitness/developer/api-reference
+  baseURL: https://{host}/api
+  tags:
+  - Exercise & Workouts
+  properties:
+  - type: OpenAPI
+    url: openapi/sparkyfitness-exercise-workouts-api-openapi.yml
+  - type: Documentation
+    url: https://codewithcj.github.io/SparkyFitness/developer/api-reference
+  - type: Authentication
+    url: authentication/sparkyfitness-authentication.yml
+  - type: ErrorCatalog
+    url: errors/sparkyfitness-problem-types.yml
+  - type: Conventions
+    url: conventions/sparkyfitness-conventions.yml
+  - type: Idempotency
+    url: conventions/sparkyfitness-conventions.yml
+  - type: RateLimits
+    url: rate-limits/sparkyfitness-rate-limits.yml
+  - type: DataModel
+    url: data-model/sparkyfitness-data-model.yml
+- aid: sparkyfitness:sparkyfitness-external-integrations-api
+  name: SparkyFitness External Integrations API
+  description: Third-party service connections (Garmin, Withings, OIDC, etc.).
+  humanURL: https://codewithcj.github.io/SparkyFitness/developer/api-reference
+  baseURL: https://{host}/api
+  tags:
+  - External Integrations
+  properties:
+  - type: OpenAPI
+    url: openapi/sparkyfitness-external-integrations-api-openapi.yml
+  - type: Documentation
+    url: https://codewithcj.github.io/SparkyFitness/developer/api-reference
+  - type: Authentication
+    url: authentication/sparkyfitness-authentication.yml
+  - type: ErrorCatalog
+    url: errors/sparkyfitness-problem-types.yml
+  - type: Conventions
+    url: conventions/sparkyfitness-conventions.yml
+  - type: Idempotency
+    url: conventions/sparkyfitness-conventions.yml
+  - type: RateLimits
+    url: rate-limits/sparkyfitness-rate-limits.yml
+  - type: DataModel
+    url: data-model/sparkyfitness-data-model.yml
+- aid: sparkyfitness:sparkyfitness-fitness-workouts-api
+  name: SparkyFitness Fitness & Workouts API
+  description: Exercise database, workout presets, plan templates, and activity logging.
+  humanURL: https://codewithcj.github.io/SparkyFitness/developer/api-reference
+  baseURL: https://{host}/api
+  tags:
+  - Fitness & Workouts
+  properties:
+  - type: OpenAPI
+    url: openapi/sparkyfitness-fitness-workouts-api-openapi.yml
+  - type: Documentation
+    url: https://codewithcj.github.io/SparkyFitness/developer/api-reference
+  - type: Authentication
+    url: authentication/sparkyfitness-authentication.yml
+  - type: ErrorCatalog
+    url: errors/sparkyfitness-problem-types.yml
+  - type: Conventions
+    url: conventions/sparkyfitness-conventions.yml
+  - type: Idempotency
+    url: conventions/sparkyfitness-conventions.yml
+  - type: RateLimits
+    url: rate-limits/sparkyfitness-rate-limits.yml
+  - type: DataModel
+    url: data-model/sparkyfitness-data-model.yml
+- aid: sparkyfitness:sparkyfitness-goals-personalization-api
+  name: SparkyFitness Goals & Personalization API
+  description: Personal goal setting, goal presets, and application preferences.
+  humanURL: https://codewithcj.github.io/SparkyFitness/developer/api-reference
+  baseURL: https://{host}/api
+  tags:
+  - Goals & Personalization
+  properties:
+  - type: OpenAPI
+    url: openapi/sparkyfitness-goals-personalization-api-openapi.yml
+  - type: Documentation
+    url: https://codewithcj.github.io/SparkyFitness/developer/api-reference
+  - type: Authentication
+    url: authentication/sparkyfitness-authentication.yml
+  - type: ErrorCatalog
+    url: errors/sparkyfitness-problem-types.yml
+  - type: Conventions
+    url: conventions/sparkyfitness-conventions.yml
+  - type: Idempotency
+    url: conventions/sparkyfitness-conventions.yml
+  - type: RateLimits
+    url: rate-limits/sparkyfitness-rate-limits.yml
+  - type: DataModel
+    url: data-model/sparkyfitness-data-model.yml
+- aid: sparkyfitness:sparkyfitness-identity-security-api
+  name: SparkyFitness Identity & Security API
+  description: User authentication, registration, profile management, MFA, and access control.
+  humanURL: https://codewithcj.github.io/SparkyFitness/developer/api-reference
+  baseURL: https://{host}/api
+  tags:
+  - Identity & Security
+  properties:
+  - type: OpenAPI
+    url: openapi/sparkyfitness-identity-security-api-openapi.yml
+  - type: Documentation
+    url: https://codewithcj.github.io/SparkyFitness/developer/api-reference
+  - type: Authentication
+    url: authentication/sparkyfitness-authentication.yml
+  - type: ErrorCatalog
+    url: errors/sparkyfitness-problem-types.yml
+  - type: Conventions
+    url: conventions/sparkyfitness-conventions.yml
+  - type: Idempotency
+    url: conventions/sparkyfitness-conventions.yml
+  - type: RateLimits
+    url: rate-limits/sparkyfitness-rate-limits.yml
+  - type: DataModel
+    url: data-model/sparkyfitness-data-model.yml
+- aid: sparkyfitness:sparkyfitness-medications-glp-1-api
+  name: SparkyFitness Medications & GLP-1 API
+  description: >-
+    Medication cabinet, schedules, GLP-1 injections, pen/vial inventory, titration, and modeled PK/site-rotation.
+  humanURL: https://codewithcj.github.io/SparkyFitness/developer/api-reference
+  baseURL: https://{host}/api
+  tags:
+  - Medications & GLP-1
+  properties:
+  - type: OpenAPI
+    url: openapi/sparkyfitness-medications-glp-1-api-openapi.yml
+  - type: Documentation
+    url: https://codewithcj.github.io/SparkyFitness/developer/api-reference
+  - type: Authentication
+    url: authentication/sparkyfitness-authentication.yml
+  - type: ErrorCatalog
+    url: errors/sparkyfitness-problem-types.yml
+  - type: Conventions
+    url: conventions/sparkyfitness-conventions.yml
+  - type: Idempotency
+    url: conventions/sparkyfitness-conventions.yml
+  - type: RateLimits
+    url: rate-limits/sparkyfitness-rate-limits.yml
+  - type: DataModel
+    url: data-model/sparkyfitness-data-model.yml
+- aid: sparkyfitness:sparkyfitness-nutrition-meals-api
+  name: SparkyFitness Nutrition & Meals API
+  description: Food database, diary logging, meal planning, and nutritional preferences.
+  humanURL: https://codewithcj.github.io/SparkyFitness/developer/api-reference
+  baseURL: https://{host}/api
+  tags:
+  - Nutrition & Meals
+  properties:
+  - type: OpenAPI
+    url: openapi/sparkyfitness-nutrition-meals-api-openapi.yml
+  - type: Documentation
+    url: https://codewithcj.github.io/SparkyFitness/developer/api-reference
+  - type: Authentication
+    url: authentication/sparkyfitness-authentication.yml
+  - type: ErrorCatalog
+    url: errors/sparkyfitness-problem-types.yml
+  - type: Conventions
+    url: conventions/sparkyfitness-conventions.yml
+  - type: Idempotency
+    url: conventions/sparkyfitness-conventions.yml
+  - type: RateLimits
+    url: rate-limits/sparkyfitness-rate-limits.yml
+  - type: DataModel
+    url: data-model/sparkyfitness-data-model.yml
+- aid: sparkyfitness:sparkyfitness-sleepscience-api
+  name: SparkyFitness Sleep Science API
+  description: The SleepScience API from SparkyFitness — 7 operation(s) for sleepscience.
+  humanURL: https://codewithcj.github.io/SparkyFitness/developer/api-reference
+  baseURL: https://{host}/api
+  tags:
+  - SleepScience
+  properties:
+  - type: OpenAPI
+    url: openapi/sparkyfitness-sleepscience-api-openapi.yml
+  - type: Documentation
+    url: https://codewithcj.github.io/SparkyFitness/developer/api-reference
+  - type: Authentication
+    url: authentication/sparkyfitness-authentication.yml
+  - type: ErrorCatalog
+    url: errors/sparkyfitness-problem-types.yml
+  - type: Conventions
+    url: conventions/sparkyfitness-conventions.yml
+  - type: Idempotency
+    url: conventions/sparkyfitness-conventions.yml
+  - type: RateLimits
+    url: rate-limits/sparkyfitness-rate-limits.yml
+  - type: DataModel
+    url: data-model/sparkyfitness-data-model.yml
+- aid: sparkyfitness:sparkyfitness-synced-data-api
+  name: SparkyFitness Synced Data API
+  description: The Synced Data API from SparkyFitness — 2 operation(s) for synced data.
+  humanURL: https://codewithcj.github.io/SparkyFitness/developer/api-reference
+  baseURL: https://{host}/api
+  tags:
+  - Synced Data
+  properties:
+  - type: OpenAPI
+    url: openapi/sparkyfitness-synced-data-api-openapi.yml
+  - type: Documentation
+    url: https://codewithcj.github.io/SparkyFitness/developer/api-reference
+  - type: Authentication
+    url: authentication/sparkyfitness-authentication.yml
+  - type: ErrorCatalog
+    url: errors/sparkyfitness-problem-types.yml
+  - type: Conventions
+    url: conventions/sparkyfitness-conventions.yml
+  - type: Idempotency
+    url: conventions/sparkyfitness-conventions.yml
+  - type: RateLimits
+    url: rate-limits/sparkyfitness-rate-limits.yml
+  - type: DataModel
+    url: data-model/sparkyfitness-data-model.yml
+- aid: sparkyfitness:sparkyfitness-system-admin-api
+  name: SparkyFitness System & Admin API
+  description: System configuration, administrative tasks, backups, reviews, and versioning.
+  humanURL: https://codewithcj.github.io/SparkyFitness/developer/api-reference
+  baseURL: https://{host}/api
+  tags:
+  - System & Admin
+  properties:
+  - type: OpenAPI
+    url: openapi/sparkyfitness-system-admin-api-openapi.yml
+  - type: Documentation
+    url: https://codewithcj.github.io/SparkyFitness/developer/api-reference
+  - type: Authentication
+    url: authentication/sparkyfitness-authentication.yml
+  - type: ErrorCatalog
+    url: errors/sparkyfitness-problem-types.yml
+  - type: Conventions
+    url: conventions/sparkyfitness-conventions.yml
+  - type: Idempotency
+    url: conventions/sparkyfitness-conventions.yml
+  - type: RateLimits
+    url: rate-limits/sparkyfitness-rate-limits.yml
+  - type: DataModel
+    url: data-model/sparkyfitness-data-model.yml
+- aid: sparkyfitness:sparkyfitness-utility-api
+  name: SparkyFitness Utility API
+  description: The Utility API from SparkyFitness — 1 operation(s) for utility.
+  humanURL: https://codewithcj.github.io/SparkyFitness/developer/api-reference
+  baseURL: https://{host}/api
+  tags:
+  - Utility
+  properties:
+  - type: OpenAPI
+    url: openapi/sparkyfitness-utility-api-openapi.yml
+  - type: Documentation
+    url: https://codewithcj.github.io/SparkyFitness/developer/api-reference
+  - type: Authentication
+    url: authentication/sparkyfitness-authentication.yml
+  - type: ErrorCatalog
+    url: errors/sparkyfitness-problem-types.yml
+  - type: Conventions
+    url: conventions/sparkyfitness-conventions.yml
+  - type: Idempotency
+    url: conventions/sparkyfitness-conventions.yml
+  - type: RateLimits
+    url: rate-limits/sparkyfitness-rate-limits.yml
+  - type: DataModel
+    url: data-model/sparkyfitness-data-model.yml
+- aid: sparkyfitness:sparkyfitness-wellness-metrics-api
+  name: SparkyFitness Wellness & Metrics API
+  description: Health metrics tracking (weight, measurements, sleep, mood) and fasting.
+  humanURL: https://codewithcj.github.io/SparkyFitness/developer/api-reference
+  baseURL: https://{host}/api
+  tags:
+  - Wellness & Metrics
+  properties:
+  - type: OpenAPI
+    url: openapi/sparkyfitness-wellness-metrics-api-openapi.yml
+  - type: Documentation
+    url: https://codewithcj.github.io/SparkyFitness/developer/api-reference
+  - type: Authentication
+    url: authentication/sparkyfitness-authentication.yml
+  - type: ErrorCatalog
+    url: errors/sparkyfitness-problem-types.yml
+  - type: Conventions
+    url: conventions/sparkyfitness-conventions.yml
+  - type: Idempotency
+    url: conventions/sparkyfitness-conventions.yml
+  - type: RateLimits
+    url: rate-limits/sparkyfitness-rate-limits.yml
+  - type: DataModel
+    url: data-model/sparkyfitness-data-model.yml
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
 - FN: APIs.json
   email: info@apis.io
 common:
+- type: Overlay
+  url: overlays/sparkyfitness-openapi-overlay.yaml
 - type: Website
   url: https://codewithcj.github.io/SparkyFitness/
 - type: Documentation
