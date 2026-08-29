@@ -578,6 +578,9 @@ maintainers:
 - FN: APIs.json
   email: info@apis.io
 common:
+- type: CapabilityMap
+  url: capabilities/sparkyfitness-capability-edges.yml
+  name: SparkyFitness Business Capability Map
 - type: Overlay
   url: overlays/sparkyfitness-openapi-overlay.yaml
 - type: Website
