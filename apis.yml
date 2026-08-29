@@ -17,6 +17,18 @@ description: >-
 url: https://raw.githubusercontent.com/api-evangelist/sparkyfitness/refs/heads/main/apis.yml
 x-type: company
 x-source: harvest:health-device-stack
+deliveryModel:
+  model: unknown
+  open_source: unknown
+  commercial: true
+  callable_host: false
+  label: Delivery model not determined — needs a product licence on record
+  confidence: low
+  source:
+  - pricing
+  - repository-unlicensed
+  generated: '2026-08-28'
+  method: derived
 image: https://codewithcj.github.io/SparkyFitness/logo.png
 specificationVersion: '0.20'
 created: '2026-08-27'
