@@ -1,0 +1,1344 @@
+openapi: 3.2.0
+info:
+  title: SparkyFitness Fitness & Workouts API
+  version: 1.0.0
+  description: API documentation for the SparkyFitness application, providing a comprehensive guide to all available endpoints. Have caution using the API directly, as improper use may lead to data loss or corruption.  Also note that the API is subject to change without notice due to heavy development, so always refer to the latest documentation for up-to-date information. It might have flaw and due to vite/nginx internal proxy actual end point accessed via front end URL might be different than hitting them directly on the server.
+  contact:
+    name: SparkyFitness Support
+servers:
+- url: https://{host}/api
+  description: Self-hosted SparkyFitness instance (the operator supplies the host). The upstream spec declares the relative base "/api".
+  variables:
+    host:
+      default: sparkyfitness.example.com
+      description: Hostname of your own SparkyFitness deployment. SparkyFitness is self-hosted; there is no vendor-operated API host.
+security:
+- apiKeyAuth: []
+tags:
+- name: Fitness & Workouts
+  description: Exercise database, workout presets, plan templates, and activity logging.
+paths:
+  /exercise-entries/by-date:
+    get:
+      summary: Get exercise entries by selected date
+      tags:
+      - Fitness & Workouts
+      description: Retrieves a list of all exercise entries for a specific date, passed as a query parameter.
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: query
+        name: selectedDate
+        required: true
+        schema:
+          type: string
+          format: date
+        description: The date to retrieve exercise entries for (YYYY-MM-DD).
+      responses:
+        '200':
+          description: A list of exercise entries for the specified date.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ExerciseEntry'
+        '400':
+          description: Selected date parameter is missing.
+        '403':
+          description: User does not have permission to access this resource.
+        '500':
+          description: Failed to fetch exercise entries.
+  /exercise-entries:
+    post:
+      summary: Create a new exercise entry
+      tags:
+      - Fitness & Workouts
+      description: Adds a new exercise entry to the user's diary. Supports multipart/form-data for image uploads.
+      security:
+      - apiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExerciseEntry'
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                exercise_id:
+                  type: string
+                  format: uuid
+                duration_minutes:
+                  type: number
+                calories_burned:
+                  type: number
+                entry_date:
+                  type: string
+                  format: date
+                notes:
+                  type: string
+                sets:
+                  type: string
+                  description: JSON string of sets data.
+                reps:
+                  type: number
+                weight:
+                  type: number
+                workout_plan_assignment_id:
+                  type: string
+                  format: uuid
+                image:
+                  type: string
+                  format: binary
+                distance:
+                  type: number
+                avg_heart_rate:
+                  type: number
+                activity_details:
+                  type: string
+                  description: JSON string of activity details.
+      responses:
+        '201':
+          description: The exercise entry was created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExerciseEntry'
+        '400':
+          description: Invalid request body or exercise ID.
+        '403':
+          description: User does not have permission to create an exercise entry.
+        '500':
+          description: Failed to create exercise entry.
+  /exercise-entries/from-plan:
+    post:
+      summary: Log a workout from a Workout Plan
+      tags:
+      - Fitness & Workouts
+      description: Logs exercises from a specified workout plan to the user's diary for a given date.
+      security:
+      - apiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - entry_date
+              - exercises
+              properties:
+                workout_plan_template_id:
+                  type: string
+                  format: uuid
+                  description: The ID of the workout plan template (optional).
+                workout_plan_assignment_id:
+                  type: string
+                  format: uuid
+                  description: The ID of the workout plan assignment (optional).
+                entry_date:
+                  type: string
+                  format: date
+                  description: The date for which the workout is logged.
+                exercises:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      exercise_id:
+                        type: string
+                        format: uuid
+                      duration_minutes:
+                        type: number
+                      calories_burned:
+                        type: number
+                      notes:
+                        type: string
+                      sets:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            reps:
+                              type: number
+                            weight:
+                              type: number
+                            duration:
+                              type: integer
+                              description: Duration in seconds.
+                      reps:
+                        type: number
+                      weight:
+                        type: number
+                      image_url:
+                        type: string
+                        format: url
+                    required:
+                    - exercise_id
+                    - duration_minutes
+                    - calories_burned
+      responses:
+        '201':
+          description: The exercise entries were created successfully from the plan.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ExerciseEntry'
+        '403':
+          description: User does not have permission to log this workout.
+        '500':
+          description: Failed to log workout from plan.
+  /exercise-entries/history/{exerciseId}:
+    get:
+      summary: Get history for a specific exercise
+      tags:
+      - Fitness & Workouts
+      description: Retrieves the historical exercise entries for a given exercise ID.
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: path
+        name: exerciseId
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: The ID of the exercise to retrieve history for.
+      - in: query
+        name: limit
+        schema:
+          type: integer
+          default: 10
+        description: The maximum number of history entries to return.
+      responses:
+        '200':
+          description: A list of historical exercise entries.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ExerciseEntry'
+        '400':
+          description: Exercise ID is required and must be a valid UUID.
+        '403':
+          description: User does not have permission to access this resource.
+        '500':
+          description: Failed to fetch exercise history.
+  /exercise-entries/{id}:
+    get:
+      summary: Get a specific exercise entry by ID
+      tags:
+      - Fitness & Workouts
+      description: Retrieves a single exercise entry by its ID.
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: The ID of the exercise entry to retrieve.
+      responses:
+        '200':
+          description: The requested exercise entry.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExerciseEntry'
+        '400':
+          description: Exercise Entry ID is required and must be a valid UUID.
+        '403':
+          description: User does not have permission to access this resource.
+        '404':
+          description: Exercise entry not found.
+        '500':
+          description: Failed to fetch exercise entry.
+    put:
+      summary: Update an exercise entry
+      tags:
+      - Fitness & Workouts
+      description: Updates an existing exercise entry. Supports multipart/form-data for image uploads.
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: The ID of the exercise entry to update.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExerciseEntry'
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                exercise_id:
+                  type: string
+                  format: uuid
+                duration_minutes:
+                  type: number
+                calories_burned:
+                  type: number
+                entry_date:
+                  type: string
+                  format: date
+                notes:
+                  type: string
+                sets:
+                  type: string
+                  description: JSON string of sets data.
+                reps:
+                  type: number
+                weight:
+                  type: number
+                workout_plan_assignment_id:
+                  type: string
+                  format: uuid
+                image:
+                  type: string
+                  format: binary
+                distance:
+                  type: number
+                avg_heart_rate:
+                  type: number
+                activity_details:
+                  type: string
+                  description: JSON string of activity details.
+      responses:
+        '200':
+          description: The exercise entry was updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExerciseEntry'
+        '400':
+          description: Invalid request body or exercise entry ID.
+        '403':
+          description: User does not have permission to update this exercise entry.
+        '404':
+          description: Exercise entry not found.
+        '500':
+          description: Failed to update exercise entry.
+    delete:
+      summary: Delete an exercise entry
+      tags:
+      - Fitness & Workouts
+      description: Deletes a specific exercise entry.
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: The ID of the exercise entry to delete.
+      responses:
+        '200':
+          description: Exercise entry deleted successfully.
+        '400':
+          description: Exercise Entry ID is required and must be a valid UUID.
+        '403':
+          description: User does not have permission to delete this exercise entry.
+        '404':
+          description: Exercise entry not found.
+        '500':
+          description: Failed to delete exercise entry.
+  /exercise-entries/progress/{exerciseId}:
+    get:
+      summary: Get progress data for a specific exercise
+      tags:
+      - Fitness & Workouts
+      description: Retrieves progress data (e.g., weight, reps over time) for a given exercise.
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: path
+        name: exerciseId
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: The ID of the exercise to retrieve progress for.
+      - in: query
+        name: startDate
+        schema:
+          type: string
+          format: date
+        required: true
+        description: The start date for the progress data (YYYY-MM-DD).
+      - in: query
+        name: endDate
+        schema:
+          type: string
+          format: date
+        required: true
+        description: The end date for the progress data (YYYY-MM-DD).
+      responses:
+        '200':
+          description: Progress data for the specified exercise.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    date:
+                      type: string
+                      format: date
+                    value:
+                      type: number
+        '400':
+          description: Exercise ID, start date, or end date is missing.
+        '403':
+          description: User does not have permission to access this resource.
+        '404':
+          description: Exercise not found.
+        '500':
+          description: Failed to fetch exercise progress data.
+  /exercise-entries/import-history-csv:
+    post:
+      summary: Import historical exercise entries from CSV
+      tags:
+      - Fitness & Workouts
+      description: Imports historical exercise entries from a CSV file.
+      security:
+      - apiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - entries
+              properties:
+                entries:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      exercise_id:
+                        type: string
+                        format: uuid
+                      duration_minutes:
+                        type: number
+                      calories_burned:
+                        type: number
+                      entry_date:
+                        type: string
+                        format: date
+                      notes:
+                        type: string
+                      sets:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            reps:
+                              type: number
+                            weight:
+                              type: number
+                            duration:
+                              type: integer
+                              description: Duration in seconds.
+                      reps:
+                        type: number
+                      weight:
+                        type: number
+                      workout_plan_assignment_id:
+                        type: string
+                        format: uuid
+                      image_url:
+                        type: string
+                        format: url
+                      distance:
+                        type: number
+                      avg_heart_rate:
+                        type: number
+                      activity_details:
+                        type: object
+                    required:
+                    - exercise_id
+                    - entry_date
+      responses:
+        '201':
+          description: The exercise entries were imported successfully.
+        '400':
+          description: Invalid data format. Expected an array of entries.
+        '403':
+          description: User does not have permission to import exercise entries.
+        '409':
+          description: Conflict, some entries could not be imported due to existing data.
+        '500':
+          description: Failed to import exercise entries.
+  /exercise-preset-entries:
+    post:
+      summary: Create a grouped workout session
+      tags:
+      - Fitness & Workouts
+      description: 'Creates a grouped workout from a workout preset, an inline exercises array, or both.
+
+        `workout_preset_id` alone copies that preset''s own stored exercise/set structure.
+
+        `exercises` alone creates a freeform session with the given structure.
+
+        Both together (e.g. a live workout started from a preset) tag the session to that
+
+        preset for stats scoping while using the client-supplied exercise/set structure
+
+        verbatim, keeping the session editable like any other client-authored session.
+
+        Returns the full nested grouped session payload used by the mobile client.
+
+        '
+      security:
+      - apiKeyAuth: []
+      responses:
+        '201':
+          description: The grouped workout session was created successfully.
+        '400':
+          description: Invalid request body.
+        '401':
+          description: Unauthorized.
+        '404':
+          description: Workout preset not found.
+  /exercise-preset-entries/{id}:
+    get:
+      summary: Get a grouped workout session by ID
+      tags:
+      - Fitness & Workouts
+      description: Returns the full nested grouped workout session, including child exercises and sets.
+      security:
+      - apiKeyAuth: []
+      responses:
+        '200':
+          description: The grouped workout session.
+        '400':
+          description: Invalid grouped workout ID.
+        '401':
+          description: Unauthorized.
+        '404':
+          description: Grouped workout session not found.
+    put:
+      summary: Update a grouped workout session
+      tags:
+      - Fitness & Workouts
+      description: Updates grouped workout header fields and, for manual, sparky, or workout plan sessions, can replace the child exercises array in one request. Returns the full nested grouped session payload.
+      security:
+      - apiKeyAuth: []
+      responses:
+        '200':
+          description: The grouped workout session was updated successfully.
+        '400':
+          description: Invalid request body or grouped workout ID.
+        '401':
+          description: Unauthorized.
+        '404':
+          description: Grouped workout session not found.
+        '409':
+          description: Nested exercise edits are not supported for synced/imported grouped workouts.
+    delete:
+      summary: Delete a grouped workout session
+      tags:
+      - Fitness & Workouts
+      description: Deletes a grouped workout session and cascades to its child exercise entries.
+      security:
+      - apiKeyAuth: []
+      responses:
+        '204':
+          description: Grouped workout session deleted successfully.
+        '400':
+          description: Invalid grouped workout ID.
+        '401':
+          description: Unauthorized.
+        '404':
+          description: Grouped workout session not found.
+  /freeexercisedb/add:
+    post:
+      summary: Add a free-exercise-db exercise to user's local exercises
+      tags:
+      - Fitness & Workouts
+      description: Adds a selected exercise from the free exercise database to the authenticated user's personal exercise list.
+      security:
+      - apiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - exerciseId
+              properties:
+                exerciseId:
+                  type: string
+                  description: The ID of the free-exercise-db exercise to add.
+      responses:
+        '201':
+          description: The newly created exercise in the user's database.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Exercise'
+        '400':
+          description: Exercise ID is required.
+        '401':
+          description: Unauthorized, authentication token is missing or invalid.
+        '500':
+          description: Error adding free-exercise-db exercise.
+  /v2/exercise-entries/history:
+    get:
+      summary: Get paginated exercise entry history
+      tags:
+      - Fitness & Workouts
+      description: Returns paginated exercise sessions (preset groups and standalone entries) sorted by date descending.
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: query
+        name: page
+        schema:
+          type: integer
+          default: 1
+        description: Page number (1-based)
+      - in: query
+        name: pageSize
+        schema:
+          type: integer
+          default: 20
+        description: Number of sessions per page (max 100)
+      - in: query
+        name: userId
+        schema:
+          type: string
+        description: Optional user ID for family access
+      - in: query
+        name: exerciseId
+        schema:
+          type: string
+        description: Only return sessions containing this exercise
+      responses:
+        '200':
+          description: Paginated exercise history
+        '403':
+          description: User does not have permission to access this resource
+        '500':
+          description: Internal server error
+  /v2/exercise-entries/by-date:
+    get:
+      summary: Get exercise sessions for a specific date
+      tags:
+      - Fitness & Workouts
+      description: Returns exercise sessions (preset groups and standalone entries) for a given date with properly parsed exercise snapshots.
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: query
+        name: selectedDate
+        required: true
+        schema:
+          type: string
+          format: date
+        description: The date to retrieve exercise entries for (YYYY-MM-DD)
+      - in: query
+        name: userId
+        schema:
+          type: string
+        description: Optional user ID for family access
+      responses:
+        '200':
+          description: Exercise sessions for the specified date
+        '400':
+          description: Missing or invalid selectedDate parameter
+        '403':
+          description: User does not have permission to access this resource
+        '500':
+          description: Internal server error
+  /workout-plan-templates:
+    post:
+      summary: Create a new workout plan template
+      tags:
+      - Fitness & Workouts
+      description: Creates a new workout plan template for the authenticated user.
+      security:
+      - apiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkoutPlanTemplate'
+      responses:
+        '201':
+          description: The workout plan template was created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkoutPlanTemplate'
+        '401':
+          description: Unauthorized.
+        '500':
+          description: Internal server error.
+    get:
+      summary: Get all workout plan templates
+      tags:
+      - Fitness & Workouts
+      description: Retrieves all workout plan templates for the authenticated user.
+      security:
+      - apiKeyAuth: []
+      responses:
+        '200':
+          description: A list of workout plan templates.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WorkoutPlanTemplate'
+        '401':
+          description: Unauthorized.
+        '500':
+          description: Internal server error.
+  /workout-plan-templates/{id}:
+    get:
+      summary: Get a specific workout plan template by ID
+      tags:
+      - Fitness & Workouts
+      description: Retrieves a specific workout plan template by its ID.
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: The ID of the workout plan template to retrieve.
+      responses:
+        '200':
+          description: The requested workout plan template.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkoutPlanTemplate'
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+        '404':
+          description: Workout plan template not found.
+        '500':
+          description: Internal server error.
+    put:
+      summary: Update an existing workout plan template
+      tags:
+      - Fitness & Workouts
+      description: Updates an existing workout plan template.
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: The ID of the workout plan template to update.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkoutPlanTemplate'
+      responses:
+        '200':
+          description: The workout plan template was updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkoutPlanTemplate'
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+        '404':
+          description: Workout plan template not found or could not be updated.
+        '500':
+          description: Internal server error.
+    delete:
+      summary: Delete a workout plan template
+      tags:
+      - Fitness & Workouts
+      description: Deletes a specific workout plan template.
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: The ID of the workout plan template to delete.
+      responses:
+        '200':
+          description: Workout plan template deleted successfully.
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+        '404':
+          description: Workout plan template not found or could not be deleted.
+        '500':
+          description: Internal server error.
+  /workout-plan-templates/active/{date}:
+    get:
+      summary: Get the active workout plan for a specific date
+      tags:
+      - Fitness & Workouts
+      description: Retrieves the active workout plan for the authenticated user on a given date.
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: path
+        name: date
+        required: true
+        schema:
+          type: string
+          format: date
+        description: The date to check for an active plan (YYYY-MM-DD).
+      responses:
+        '200':
+          description: The active workout plan for the date.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkoutPlanTemplate'
+        '401':
+          description: Unauthorized.
+        '500':
+          description: Internal server error.
+  /workout-presets:
+    post:
+      summary: Create a new workout preset
+      tags:
+      - Fitness & Workouts
+      description: Creates a new workout preset for the authenticated user.
+      security:
+      - apiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkoutPreset'
+      responses:
+        '201':
+          description: The workout preset was created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkoutPreset'
+        '401':
+          description: Unauthorized.
+        '500':
+          description: Internal server error.
+    get:
+      summary: Get all workout presets
+      tags:
+      - Fitness & Workouts
+      description: Retrieves all workout presets available to the authenticated user (including public ones).
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: query
+        name: page
+        schema:
+          type: integer
+          default: 1
+        description: Page number for pagination.
+      - in: query
+        name: limit
+        schema:
+          type: integer
+          default: 10
+        description: Number of presets per page.
+      responses:
+        '200':
+          description: A paginated list of workout presets.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  presets:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/WorkoutPreset'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+        '401':
+          description: Unauthorized.
+        '500':
+          description: Internal server error.
+  /workout-presets/search:
+    get:
+      summary: Search for workout presets
+      tags:
+      - Fitness & Workouts
+      description: Searches for workout presets based on a name search term.
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: query
+        name: searchTerm
+        required: true
+        schema:
+          type: string
+        description: The name or part of the name to search for.
+      - in: query
+        name: limit
+        schema:
+          type: integer
+        description: Maximum number of results to return.
+      responses:
+        '200':
+          description: A list of workout presets matching the search term.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WorkoutPreset'
+        '401':
+          description: Unauthorized.
+        '500':
+          description: Internal server error.
+  /workout-presets/{id}:
+    get:
+      summary: Get a specific workout preset by ID
+      tags:
+      - Fitness & Workouts
+      description: Retrieves a specific workout preset by its ID.
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: The ID of the workout preset to retrieve.
+      responses:
+        '200':
+          description: The requested workout preset.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkoutPreset'
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+        '404':
+          description: Workout preset not found.
+        '500':
+          description: Internal server error.
+    put:
+      summary: Update an existing workout preset
+      tags:
+      - Fitness & Workouts
+      description: Updates an existing workout preset.
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: The ID of the workout preset to update.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkoutPreset'
+      responses:
+        '200':
+          description: The workout preset was updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkoutPreset'
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+        '404':
+          description: Workout preset not found or could not be updated.
+        '500':
+          description: Internal server error.
+    delete:
+      summary: Delete a workout preset
+      tags:
+      - Fitness & Workouts
+      description: Deletes a specific workout preset.
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: The ID of the workout preset to delete.
+      responses:
+        '200':
+          description: Workout preset deleted successfully.
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+        '404':
+          description: Workout preset not found or could not be deleted.
+        '500':
+          description: Internal server error.
+components:
+  schemas:
+    WorkoutSet:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Internal ID of the set
+        set_number:
+          type: integer
+        set_type:
+          type: string
+          description: e.g., "Normal", "Warmup", "Dropset"
+        reps:
+          type:
+          - integer
+          - 'null'
+        weight:
+          type:
+          - number
+          - 'null'
+        duration:
+          type:
+          - integer
+          - 'null'
+          description: Duration in seconds
+        distance:
+          type:
+          - number
+          - 'null'
+          description: Distance in km (cardio sets)
+        rest_time:
+          type:
+          - integer
+          - 'null'
+          description: Rest time in seconds
+        notes:
+          type:
+          - string
+          - 'null'
+      required:
+      - set_number
+      - set_type
+    WorkoutPreset:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        is_public:
+          type: boolean
+        exercises:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+              exercise_id:
+                type: string
+                format: uuid
+              exercise_name:
+                type: string
+              image_url:
+                type:
+                - string
+                - 'null'
+              superset_group:
+                type:
+                - integer
+                - 'null'
+              sets:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WorkoutSet'
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required:
+      - id
+      - user_id
+      - name
+    WorkoutPlanTemplate:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        plan_name:
+          type: string
+        description:
+          type: string
+        start_date:
+          type: string
+          format: date-time
+        end_date:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        is_active:
+          type: boolean
+        assignments:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+              day_of_week:
+                type: integer
+                description: 0-6 (Sunday-Saturday)
+              workout_preset_id:
+                type:
+                - string
+                - 'null'
+                format: uuid
+              workout_preset_name:
+                type:
+                - string
+                - 'null'
+              exercise_id:
+                type:
+                - string
+                - 'null'
+                format: uuid
+              exercise_name:
+                type:
+                - string
+                - 'null'
+              sets:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WorkoutSet'
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required:
+      - id
+      - user_id
+      - plan_name
+      - start_date
+      - is_active
+    Exercise:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier for the exercise.
+        user_id:
+          type: string
+          format: uuid
+          description: The ID of the user who owns the exercise.
+        name:
+          type: string
+          description: The name of the exercise.
+        category:
+          type: string
+          description: The category of the exercise (e.g., "Strength", "Cardio").
+        modality:
+          type: string
+          enum:
+          - weight_reps
+          - reps_only
+          - duration
+          - duration_distance
+          description: Which per-set editor clients render for the exercise. Derived from the category when not supplied on create.
+        equipment:
+          type: array
+          items:
+            type: string
+          description: A list of equipment required for the exercise.
+        muscle_groups:
+          type: array
+          items:
+            type: string
+          description: A list of muscle groups targeted by the exercise.
+        description:
+          type: string
+          description: A detailed description of the exercise.
+        instructions:
+          type: array
+          items:
+            type: string
+          description: Step-by-step instructions for performing the exercise.
+        images:
+          type: array
+          items:
+            type: string
+          description: URLs or paths to images demonstrating the exercise.
+        is_public:
+          type: boolean
+          description: Indicates if the exercise is publicly available.
+        created_at:
+          type: string
+          format: date-time
+          description: The date and time when the exercise was created.
+        updated_at:
+          type: string
+          format: date-time
+          description: The date and time when the exercise was last updated.
+      required:
+      - id
+      - user_id
+      - name
+      - category
+    ExerciseEntry:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier for the exercise entry.
+        user_id:
+          type: string
+          format: uuid
+          description: The ID of the user who owns the exercise entry.
+        exercise_id:
+          type: string
+          format: uuid
+          description: The ID of the exercise performed.
+        duration_minutes:
+          type: number
+          description: The duration of the exercise in minutes.
+        calories_burned:
+          type: number
+          description: The number of calories burned during the exercise.
+        entry_date:
+          type: string
+          format: date
+          description: The date of the exercise entry (YYYY-MM-DD).
+        entry_time:
+          type: string
+          description: The wall-clock local start time of the exercise session (e.g., HH:MM). Nullable.
+        notes:
+          type: string
+          description: Any additional notes for the exercise entry.
+        sets:
+          type: array
+          items:
+            type: object
+            properties:
+              reps:
+                type: number
+              weight:
+                type: number
+              duration:
+                type: integer
+                description: Duration in seconds.
+          description: Details of sets performed (reps, weight, duration in seconds).
+        reps:
+          type: number
+          description: Total repetitions (if not detailed in sets).
+        weight:
+          type: number
+          description: Weight used (if not detailed in sets).
+        workout_plan_assignment_id:
+          type: string
+          format: uuid
+          description: The ID of the workout plan assignment this entry belongs to.
+        image_url:
+          type: string
+          format: url
+          description: URL to an image associated with the exercise entry.
+        distance:
+          type: number
+          description: Distance covered for cardio exercises.
+        avg_heart_rate:
+          type: number
+          description: Average heart rate during the exercise.
+        activity_details:
+          type: object
+          description: Additional activity-specific details (JSONB).
+        created_at:
+          type: string
+          format: date-time
+          description: The date and time when the exercise entry was created.
+        updated_at:
+          type: string
+          format: date-time
+          description: The date and time when the exercise entry was last updated.
+      required:
+      - user_id
+      - exercise_id
+      - entry_date
+  securitySchemes:
+    apiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: API key authentication via x-api-key header.
+x-provenance:
+  generated: '2026-08-27'
+  method: derived
+  source: https://github.com/CodeWithCJ/SparkyFitness — assembled from the project's own swagger-jsdoc configuration (SparkyFitnessServer/config/swagger.ts) and the 419 @swagger JSDoc blocks in SparkyFitnessServer/routes/**, using the same scan paths and the same cookieAuth->apiKeyAuth post-processing the server applies. This is the identical document a running instance serves at GET /api/api-docs/json (Swagger UI at /api/api-docs/swagger, ReDoc at /api/api-docs/redoc).
+  note: 'Not fetched from a live host: SparkyFitness is self-hosted and the project operates no public instance, so the contract can only be read from the source that generates it. Upstream sets no operationIds; paths+methods are the stable identifiers.'
+  upstream_version: server package.json 1.6.4 (release v1.6.4, 2026-08-27)

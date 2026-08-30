@@ -1,0 +1,635 @@
+openapi: 3.2.0
+info:
+  title: SparkyFitness Identity & Security API
+  version: 1.0.0
+  description: API documentation for the SparkyFitness application, providing a comprehensive guide to all available endpoints. Have caution using the API directly, as improper use may lead to data loss or corruption.  Also note that the API is subject to change without notice due to heavy development, so always refer to the latest documentation for up-to-date information. It might have flaw and due to vite/nginx internal proxy actual end point accessed via front end URL might be different than hitting them directly on the server.
+  contact:
+    name: SparkyFitness Support
+servers:
+- url: https://{host}/api
+  description: Self-hosted SparkyFitness instance (the operator supplies the host). The upstream spec declares the relative base "/api".
+  variables:
+    host:
+      default: sparkyfitness.example.com
+      description: Hostname of your own SparkyFitness deployment. SparkyFitness is self-hosted; there is no vendor-operated API host.
+security:
+- apiKeyAuth: []
+tags:
+- name: Identity & Security
+  description: User authentication, registration, profile management, MFA, and access control.
+paths:
+  /admin/auth/settings/mfa-mandatory:
+    get:
+      summary: Get global MFA mandatory setting
+      tags:
+      - Identity & Security
+      security:
+      - apiKeyAuth: []
+      responses:
+        '200':
+          description: Global MFA mandatory setting.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isMfaMandatory:
+                    type: boolean
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+        '500':
+          description: Server error.
+    put:
+      summary: Update global MFA mandatory setting
+      tags:
+      - Identity & Security
+      security:
+      - apiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                isMfaMandatory:
+                  type: boolean
+              required:
+              - isMfaMandatory
+      responses:
+        '200':
+          description: Global MFA mandatory setting updated.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: Invalid request body.
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+        '500':
+          description: Server error.
+  /admin/auth/users/{userId}/mfa/reset:
+    post:
+      summary: Reset a user's MFA
+      tags:
+      - Identity & Security
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: path
+        name: userId
+        schema:
+          type: string
+          format: uuid
+        required: true
+        description: The ID of the user whose MFA to reset.
+      responses:
+        '200':
+          description: User MFA reset successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+        '404':
+          description: User not found.
+        '500':
+          description: Server error.
+  /identity/user/generate-api-key:
+    post:
+      summary: Generate an API key for the current user
+      tags:
+      - Identity & Security
+      description: Creates a new Better Auth API key for the currently authenticated user.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - name
+              properties:
+                name:
+                  type: string
+                expiresIn:
+                  type: number
+                  description: Expiration time in seconds
+      responses:
+        '201':
+          description: API key generated successfully.
+        '400':
+          description: Invalid request body.
+  /identity/user/api-key/{apiKeyId}:
+    delete:
+      summary: Delete an API key
+      tags:
+      - Identity & Security
+      description: Deletes a specific Better Auth API key for the currently authenticated user.
+      parameters:
+      - in: path
+        name: apiKeyId
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: API key deleted successfully.
+        '404':
+          description: API key not found.
+  /identity/user-api-keys:
+    get:
+      summary: Get the current user's API keys
+      tags:
+      - Identity & Security
+      description: Retrieves a list of Better Auth API keys for the currently authenticated user.
+      responses:
+        '200':
+          description: A list of API keys.
+  /identity/users/accessible-users:
+    get:
+      summary: Get accessible users
+      tags:
+      - Identity & Security
+      description: Retrieves a list of users that the current authenticated user has access to.
+      responses:
+        '200':
+          description: A list of accessible users.
+        '403':
+          description: User is not authorized to access this resource.
+  /identity/access/can-access-user-data:
+    get:
+      summary: Check if the current user can access another user's data
+      tags:
+      - Identity & Security
+      description: Verifies if the authenticated user has permission to access specific data of another user.
+      parameters:
+      - in: query
+        name: targetUserId
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - in: query
+        name: permissionType
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Access check result.
+        '400':
+          description: Missing targetUserId or permissionType.
+  /identity/access/check-family-access:
+    get:
+      summary: Check family access permissions
+      tags:
+      - Identity & Security
+      description: Checks if the authenticated user has family access permissions to another user's data.
+      parameters:
+      - in: query
+        name: ownerUserId
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - in: query
+        name: permission
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Family access check result.
+        '400':
+          description: Missing ownerUserId or permission.
+  /identity/family-access:
+    get:
+      summary: Get family access entries
+      tags:
+      - Identity & Security
+      description: Retrieves a list of family access entries where the authenticated user is either the owner or the family member.
+      security:
+      - apiKeyAuth: []
+      responses:
+        '200':
+          description: A list of family access entries.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      format: uuid
+                      description: The ID of the family access entry.
+                    owner_user_id:
+                      type: string
+                      format: uuid
+                      description: The ID of the user who owns the data.
+                    family_user_id:
+                      type: string
+                      format: uuid
+                      description: The ID of the family member who has access.
+                    family_email:
+                      type: string
+                      format: email
+                      description: The email of the family member.
+                    access_permissions:
+                      type: object
+                      description: JSONB object defining the access permissions.
+        '401':
+          description: Unauthorized, authentication token is missing or invalid.
+        '500':
+          description: Server error.
+    post:
+      summary: Create a new family access entry
+      tags:
+      - Identity & Security
+      description: Creates a new family access entry, allowing another user to access the authenticated user's data.
+      security:
+      - apiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - family_user_id
+              - family_email
+              - access_permissions
+              properties:
+                family_user_id:
+                  type: string
+                  format: uuid
+                  description: The ID of the family member to grant access to.
+                family_email:
+                  type: string
+                  format: email
+                  description: The email of the family member.
+                access_permissions:
+                  type: object
+                  description: JSONB object defining the access permissions.
+      responses:
+        '201':
+          description: Family access entry created successfully.
+        '400':
+          description: Missing required fields.
+        '401':
+          description: Unauthorized, authentication token is missing or invalid.
+        '403':
+          description: User is not authorized to create this entry.
+        '500':
+          description: Server error.
+  /identity/family-access/{id}:
+    put:
+      summary: Update a family access entry
+      tags:
+      - Identity & Security
+      description: Updates an existing family access entry.
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+          format: uuid
+          description: The ID of the family access entry to update.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                family_user_id:
+                  type: string
+                  format: uuid
+                  description: The ID of the family member.
+                family_email:
+                  type: string
+                  format: email
+                  description: The email of the family member.
+                access_permissions:
+                  type: object
+                  description: JSONB object defining the access permissions.
+      responses:
+        '200':
+          description: Family access entry updated successfully.
+        '400':
+          description: Family Access ID is required.
+        '401':
+          description: Unauthorized, authentication token is missing or invalid.
+        '403':
+          description: User is not authorized to update this entry.
+        '404':
+          description: Family access entry not found or not authorized to update.
+        '500':
+          description: Server error.
+    delete:
+      summary: Delete a family access entry
+      tags:
+      - Identity & Security
+      description: Deletes a specific family access entry.
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+          format: uuid
+          description: The ID of the family access entry to delete.
+      responses:
+        '200':
+          description: Family access entry deleted successfully.
+        '400':
+          description: Family Access ID is required.
+        '401':
+          description: Unauthorized, authentication token is missing or invalid.
+        '403':
+          description: User is not authorized to delete this entry.
+        '404':
+          description: Family access entry not found or not authorized to delete.
+        '500':
+          description: Server error.
+  /identity/user:
+    get:
+      summary: Get current user's information
+      tags:
+      - Identity & Security
+      description: Retrieves the profile information for the currently authenticated user.
+      responses:
+        '200':
+          description: The user's profile information.
+        '404':
+          description: User not found.
+  /identity/switch-context:
+    post:
+      summary: Switch active user context
+      tags:
+      - Identity & Security
+      description: Switches the active user identity for the current session.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - targetUserId
+              properties:
+                targetUserId:
+                  type: string
+                  format: uuid
+      responses:
+        '200':
+          description: Context switched successfully.
+        '403':
+          description: Forbidden.
+        '500':
+          description: Internal server error.
+  /identity/users/find-by-email:
+    get:
+      summary: Find a user by email
+      tags:
+      - Identity & Security
+      description: Retrieves the user ID for a given email address.
+      parameters:
+      - in: query
+        name: email
+        required: true
+        schema:
+          type: string
+          format: email
+      responses:
+        '200':
+          description: The user ID.
+        '400':
+          description: Email parameter is missing.
+        '404':
+          description: User not found.
+  /identity/profiles:
+    get:
+      summary: Get the current user's profile
+      tags:
+      - Identity & Security
+      description: Retrieves the profile for the currently authenticated user.
+      responses:
+        '200':
+          description: The user's profile information.
+        '403':
+          description: User is not authorized to access this profile.
+    put:
+      summary: Update the current user's profile
+      tags:
+      - Identity & Security
+      description: Updates the profile for the currently authenticated user.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                full_name:
+                  type: string
+                phone_number:
+                  type: string
+                date_of_birth:
+                  type: string
+                  format: date
+                bio:
+                  type: string
+                avatar_url:
+                  type: string
+                gender:
+                  type: string
+      responses:
+        '200':
+          description: Profile updated successfully.
+        '403':
+          description: User is not authorized to update this profile.
+        '404':
+          description: Profile not found or no changes made.
+  /identity/update-password:
+    post:
+      summary: Update user password
+      tags:
+      - Identity & Security
+      description: Allows an authenticated user to update their password.
+      security:
+      - apiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - newPassword
+              properties:
+                newPassword:
+                  type: string
+                  format: password
+                  description: The new password for the user.
+      responses:
+        '200':
+          description: Password updated successfully.
+        '400':
+          description: New password is required.
+        '401':
+          description: Unauthorized, authentication token is missing or invalid.
+        '404':
+          description: User not found.
+        '500':
+          description: Server error.
+  /identity/update-email:
+    post:
+      summary: Update user email
+      tags:
+      - Identity & Security
+      description: Allows an authenticated user to update their email address. A verification process will be initiated for the new email.
+      security:
+      - apiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - newEmail
+              properties:
+                newEmail:
+                  type: string
+                  format: email
+                  description: The new email address for the user.
+      responses:
+        '200':
+          description: Email update initiated. User will need to verify new email.
+        '400':
+          description: New email is required.
+        '401':
+          description: Unauthorized, authentication token is missing or invalid.
+        '404':
+          description: User not found.
+        '409':
+          description: Email already in use by another account.
+        '500':
+          description: Server error.
+  /identity/profiles/avatar:
+    post:
+      summary: Upload user avatar
+      tags:
+      - Identity & Security
+      description: Uploads a new avatar image for the authenticated user.
+      security:
+      - apiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                avatar:
+                  type: string
+                  format: binary
+                  description: The image file to upload (jpeg, jpg, png, gif).
+      responses:
+        '200':
+          description: Avatar uploaded successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  avatar_url:
+                    type: string
+        '400':
+          description: No file uploaded or invalid file type.
+        '401':
+          description: Unauthorized.
+        '500':
+          description: Internal server error.
+  /identity/profiles/avatar/{filename}:
+    get:
+      summary: Get user avatar image
+      tags:
+      - Identity & Security
+      description: Retrieves the avatar image file by its filename.
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: path
+        name: filename
+        required: true
+        schema:
+          type: string
+        description: The filename of the avatar image.
+      responses:
+        '200':
+          description: The avatar image file.
+          content:
+            image/*:
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: Avatar not found.
+        '500':
+          description: Internal server error.
+  /identity/mfa/email-toggle:
+    post:
+      summary: Toggle Email MFA
+      tags:
+      - Identity & Security
+      description: Enables or disables Email MFA for the currently authenticated user.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                enabled:
+                  type: boolean
+      responses:
+        '200':
+          description: MFA settings updated successfully.
+components:
+  securitySchemes:
+    apiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: API key authentication via x-api-key header.
+x-provenance:
+  generated: '2026-08-27'
+  method: derived
+  source: https://github.com/CodeWithCJ/SparkyFitness — assembled from the project's own swagger-jsdoc configuration (SparkyFitnessServer/config/swagger.ts) and the 419 @swagger JSDoc blocks in SparkyFitnessServer/routes/**, using the same scan paths and the same cookieAuth->apiKeyAuth post-processing the server applies. This is the identical document a running instance serves at GET /api/api-docs/json (Swagger UI at /api/api-docs/swagger, ReDoc at /api/api-docs/redoc).
+  note: 'Not fetched from a live host: SparkyFitness is self-hosted and the project operates no public instance, so the contract can only be read from the source that generates it. Upstream sets no operationIds; paths+methods are the stable identifiers.'
+  upstream_version: server package.json 1.6.4 (release v1.6.4, 2026-08-27)

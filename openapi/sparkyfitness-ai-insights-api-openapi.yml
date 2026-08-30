@@ -1,0 +1,485 @@
+openapi: 3.2.0
+info:
+  title: SparkyFitness AI & Insights API
+  version: 1.0.0
+  description: API documentation for the SparkyFitness application, providing a comprehensive guide to all available endpoints. Have caution using the API directly, as improper use may lead to data loss or corruption.  Also note that the API is subject to change without notice due to heavy development, so always refer to the latest documentation for up-to-date information. It might have flaw and due to vite/nginx internal proxy actual end point accessed via front end URL might be different than hitting them directly on the server.
+  contact:
+    name: SparkyFitness Support
+servers:
+- url: https://{host}/api
+  description: Self-hosted SparkyFitness instance (the operator supplies the host). The upstream spec declares the relative base "/api".
+  variables:
+    host:
+      default: sparkyfitness.example.com
+      description: Hostname of your own SparkyFitness deployment. SparkyFitness is self-hosted; there is no vendor-operated API host.
+security:
+- apiKeyAuth: []
+tags:
+- name: AI & Insights
+  description: AI-powered chat assistance, reports, trends, and analytical insights.
+paths:
+  /chat:
+    post:
+      summary: Process a chat message or save AI service settings
+      tags:
+      - AI & Insights
+      security:
+      - apiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                messages:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      role:
+                        type: string
+                        enum:
+                        - user
+                        - assistant
+                        - system
+                      content:
+                        type: string
+                service_config_id:
+                  type: string
+                  format: uuid
+                action:
+                  type: string
+                  enum:
+                  - save_ai_service_settings
+                service_data:
+                  type: object
+      responses:
+        '200':
+          description: Successful response from the AI service or confirmation of settings save.
+        '400':
+          description: Bad request.
+        '404':
+          description: Not found.
+        '500':
+          description: Server error.
+  /chat/clear-old-history:
+    post:
+      summary: Clear old chat history for the authenticated user
+      tags:
+      - AI & Insights
+      security:
+      - apiKeyAuth: []
+      responses:
+        '200':
+          description: Confirmation of successful clearing.
+        '500':
+          description: Server error.
+  /chat/ai-service-settings:
+    get:
+      summary: Retrieve AI service settings for the authenticated user
+      tags:
+      - AI & Insights
+      security:
+      - apiKeyAuth: []
+      responses:
+        '200':
+          description: List of AI service settings.
+        '403':
+          description: Forbidden.
+        '500':
+          description: Server error.
+  /chat/ai-service-settings/active:
+    get:
+      summary: Retrieve the active AI service setting for the authenticated user
+      tags:
+      - AI & Insights
+      security:
+      - apiKeyAuth: []
+      responses:
+        '200':
+          description: Active AI service setting.
+        '403':
+          description: Forbidden.
+        '404':
+          description: Not found.
+        '500':
+          description: Server error.
+  /chat/ai-service-settings/test:
+    post:
+      summary: Test an AI service connection with a minimal live completion
+      description: 'Runs a minimal completion against the supplied provider config without persisting anything. Returns HTTP 200 for both pass (`ok: true`) and provider failure (`ok: false`, with a `category`), so the client can show a friendly, category-specific message instead of a generic API error. On edit, a blank `api_key` falls back to the stored encrypted key.
+
+        '
+      tags:
+      - AI & Insights
+      security:
+      - apiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - service_type
+              properties:
+                id:
+                  type: string
+                  format: uuid
+                service_type:
+                  type: string
+                api_key:
+                  type: string
+                custom_url:
+                  type: string
+                model_name:
+                  type: string
+      responses:
+        '200':
+          description: Test result (pass or provider failure).
+        '400':
+          description: Bad request (malformed body or missing required model).
+        '403':
+          description: Forbidden (per-user AI config disabled, or non-admin testing a global service).
+        '500':
+          description: Server error.
+  /chat/ai-service-settings/{id}:
+    delete:
+      summary: Delete an AI service setting
+      tags:
+      - AI & Insights
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      responses:
+        '200':
+          description: Confirmation of successful deletion.
+        '400':
+          description: Bad request.
+        '403':
+          description: Forbidden.
+        '404':
+          description: Not found.
+        '500':
+          description: Server error.
+  /chat/sparky-chat-history:
+    get:
+      summary: Retrieve Sparky chat history for the authenticated user
+      tags:
+      - AI & Insights
+      security:
+      - apiKeyAuth: []
+      responses:
+        '200':
+          description: Chat history.
+        '403':
+          description: Forbidden.
+        '500':
+          description: Server error.
+  /chat/sparky-chat-history/entry/{id}:
+    get:
+      summary: Retrieve a single Sparky chat history entry
+      tags:
+      - AI & Insights
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Chat history entry.
+        '400':
+          description: Bad request.
+        '403':
+          description: Forbidden.
+        '404':
+          description: Not found.
+        '500':
+          description: Server error.
+  /chat/sparky-chat-history/{id}:
+    put:
+      summary: Update a Sparky chat history entry
+      tags:
+      - AI & Insights
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Updated chat history entry.
+        '400':
+          description: Bad request.
+        '403':
+          description: Forbidden.
+        '404':
+          description: Not found.
+        '500':
+          description: Server error.
+    delete:
+      summary: Delete a Sparky chat history entry
+      tags:
+      - AI & Insights
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Confirmation of successful deletion.
+        '400':
+          description: Bad request.
+        '403':
+          description: Forbidden.
+        '404':
+          description: Not found.
+        '500':
+          description: Server error.
+  /chat/clear-all-history:
+    post:
+      summary: Clear all Sparky chat history for the authenticated user
+      tags:
+      - AI & Insights
+      security:
+      - apiKeyAuth: []
+      responses:
+        '200':
+          description: Confirmation of successful clearing.
+        '403':
+          description: Forbidden.
+        '500':
+          description: Server error.
+  /chat/save-history:
+    post:
+      summary: Save a Sparky chat history entry
+      tags:
+      - AI & Insights
+      security:
+      - apiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                content:
+                  type: string
+                messageType:
+                  type: string
+                metadata:
+                  type: object
+      responses:
+        '201':
+          description: Confirmation of successful saving.
+        '400':
+          description: Bad request.
+        '403':
+          description: Forbidden.
+        '500':
+          description: Server error.
+  /chat/food-options:
+    post:
+      summary: Generate food options for a given food name and unit
+      tags:
+      - AI & Insights
+      security:
+      - apiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                foodName:
+                  type: string
+                unit:
+                  type: string
+                service_config_id:
+                  type: string
+                  format: uuid
+      responses:
+        '200':
+          description: Raw AI JSON text containing the generated food options, returned as a string in `content`.
+        '400':
+          description: Missing service_config_id.
+        '404':
+          description: No AI service configured, or its API key / custom URL is missing.
+        '422':
+          description: AI response unusable (refused, truncated, empty, invalid JSON, or unsupported provider).
+        '500':
+          description: Server error.
+        '502':
+          description: Upstream AI service error.
+        '504':
+          description: AI service timed out.
+  /reports:
+    get:
+      summary: Get comprehensive reports data
+      tags:
+      - AI & Insights
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: query
+        name: userId
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - in: query
+        name: startDate
+        required: true
+        schema:
+          type: string
+          format: date
+      - in: query
+        name: endDate
+        required: true
+        schema:
+          type: string
+          format: date
+      responses:
+        '200':
+          description: Reports data.
+  /reports/mini-nutrition-trends:
+    get:
+      summary: Get mini nutrition trends
+      tags:
+      - AI & Insights
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: query
+        name: userId
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - in: query
+        name: startDate
+        required: true
+        schema:
+          type: string
+          format: date
+      - in: query
+        name: endDate
+        required: true
+        schema:
+          type: string
+          format: date
+      responses:
+        '200':
+          description: Mini nutrition trends.
+  /reports/nutrition-trends-with-goals:
+    get:
+      summary: Get nutrition trends with goals
+      tags:
+      - AI & Insights
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: query
+        name: userId
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - in: query
+        name: startDate
+        required: true
+        schema:
+          type: string
+          format: date
+      - in: query
+        name: endDate
+        required: true
+        schema:
+          type: string
+          format: date
+      responses:
+        '200':
+          description: Nutrition trends with goals.
+  /reports/exercise-dashboard:
+    get:
+      summary: Get exercise dashboard data
+      tags:
+      - AI & Insights
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: query
+        name: userId
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - in: query
+        name: startDate
+        required: true
+        schema:
+          type: string
+          format: date
+      - in: query
+        name: endDate
+        required: true
+        schema:
+          type: string
+          format: date
+      - in: query
+        name: equipment
+        schema:
+          type: string
+      - in: query
+        name: muscle
+        schema:
+          type: string
+      - in: query
+        name: exercise
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Exercise dashboard data.
+components:
+  securitySchemes:
+    apiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: API key authentication via x-api-key header.
+x-provenance:
+  generated: '2026-08-27'
+  method: derived
+  source: https://github.com/CodeWithCJ/SparkyFitness — assembled from the project's own swagger-jsdoc configuration (SparkyFitnessServer/config/swagger.ts) and the 419 @swagger JSDoc blocks in SparkyFitnessServer/routes/**, using the same scan paths and the same cookieAuth->apiKeyAuth post-processing the server applies. This is the identical document a running instance serves at GET /api/api-docs/json (Swagger UI at /api/api-docs/swagger, ReDoc at /api/api-docs/redoc).
+  note: 'Not fetched from a live host: SparkyFitness is self-hosted and the project operates no public instance, so the contract can only be read from the source that generates it. Upstream sets no operationIds; paths+methods are the stable identifiers.'
+  upstream_version: server package.json 1.6.4 (release v1.6.4, 2026-08-27)

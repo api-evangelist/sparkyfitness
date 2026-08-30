@@ -1,0 +1,684 @@
+openapi: 3.2.0
+info:
+  title: SparkyFitness Medications & GLP-1 API
+  version: 1.0.0
+  description: API documentation for the SparkyFitness application, providing a comprehensive guide to all available endpoints. Have caution using the API directly, as improper use may lead to data loss or corruption.  Also note that the API is subject to change without notice due to heavy development, so always refer to the latest documentation for up-to-date information. It might have flaw and due to vite/nginx internal proxy actual end point accessed via front end URL might be different than hitting them directly on the server.
+  contact:
+    name: SparkyFitness Support
+servers:
+- url: https://{host}/api
+  description: Self-hosted SparkyFitness instance (the operator supplies the host). The upstream spec declares the relative base "/api".
+  variables:
+    host:
+      default: sparkyfitness.example.com
+      description: Hostname of your own SparkyFitness deployment. SparkyFitness is self-hosted; there is no vendor-operated API host.
+security:
+- apiKeyAuth: []
+tags:
+- name: Medications & GLP-1
+  description: Medication cabinet, schedules, GLP-1 injections, pen/vial inventory, titration, and modeled PK/site-rotation.
+paths:
+  /v2/medications:
+    get:
+      summary: List the user's medications
+      tags:
+      - Medications & GLP-1
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: query
+        name: glp1Only
+        schema:
+          type: boolean
+      - in: query
+        name: activeOnly
+        schema:
+          type: boolean
+      responses:
+        '200':
+          description: A list of medications.
+    post:
+      summary: Create a medication
+      tags:
+      - Medications & GLP-1
+      security:
+      - apiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - name
+              properties:
+                name:
+                  type: string
+                is_glp1:
+                  type: boolean
+                is_supplement:
+                  type: boolean
+                nutrients:
+                  type: object
+                  description: Fixed-key and custom nutrient amounts per dose
+                type_id:
+                  type: string
+                strength_value:
+                  type: number
+                strength_unit:
+                  type: string
+      responses:
+        '201':
+          description: Created.
+        '400':
+          description: Invalid request.
+  /v2/medications/{id}:
+    get:
+      summary: Get a medication (with schedules)
+      tags:
+      - Medications & GLP-1
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: The medication.
+        '404':
+          description: Not found.
+    put:
+      summary: Update a medication (partial)
+      tags:
+      - Medications & GLP-1
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Updated.
+        '404':
+          description: Not found.
+    delete:
+      summary: Delete a medication (cascades)
+      tags:
+      - Medications & GLP-1
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Deleted.
+        '404':
+          description: Not found.
+  /v2/medications/{medicationId}/schedules:
+    post:
+      summary: Add a schedule rule to a medication
+      tags:
+      - Medications & GLP-1
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: path
+        name: medicationId
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '201':
+          description: Created.
+        '400':
+          description: Invalid request.
+        '403':
+          description: Supplement doses require food diary access for this profile.
+  /v2/medications/schedules/{id}:
+    put:
+      summary: Update a schedule rule (partial)
+      tags:
+      - Medications & GLP-1
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Updated.
+        '400':
+          description: Invalid request.
+        '404':
+          description: Not found.
+    delete:
+      summary: Delete a schedule rule
+      tags:
+      - Medications & GLP-1
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Deleted.
+        '404':
+          description: Not found.
+  /v2/medications/{medicationId}/pens:
+    get:
+      summary: List pens/vials for a medication
+      tags:
+      - Medications & GLP-1
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: path
+        name: medicationId
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Pen/vial inventory.
+    post:
+      summary: Add a pen/vial (concentration, volume, BUD, doses)
+      tags:
+      - Medications & GLP-1
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: path
+        name: medicationId
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '201':
+          description: Created.
+        '400':
+          description: Invalid request.
+  /v2/medications/pens/{id}:
+    put:
+      summary: Update a pen/vial
+      tags:
+      - Medications & GLP-1
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Updated.
+        '404':
+          description: Not found.
+    delete:
+      summary: Delete a pen/vial
+      tags:
+      - Medications & GLP-1
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Deleted.
+        '404':
+          description: Not found.
+  /v2/medications/{medicationId}/injections:
+    get:
+      summary: List injections for a medication
+      tags:
+      - Medications & GLP-1
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: path
+        name: medicationId
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Injection history.
+  /v2/medications/injections:
+    post:
+      summary: Log an injection (optionally deduct from a pen/vial; auto-picks the pen when deduct_pen is set without pen_id)
+      tags:
+      - Medications & GLP-1
+      security:
+      - apiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - medication_id
+              properties:
+                medication_id:
+                  type: string
+                  format: uuid
+                pen_id:
+                  type: string
+                  format: uuid
+                site:
+                  type: string
+                dose_mg:
+                  type: number
+                deduct_pen:
+                  type: boolean
+      responses:
+        '201':
+          description: Created (returns injection + updated pen).
+        '400':
+          description: Invalid request.
+  /v2/medications/injections/{id}:
+    put:
+      summary: Update an injection (timing, site, dose, notes — not pen deduction)
+      tags:
+      - Medications & GLP-1
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Updated.
+        '404':
+          description: Not found.
+    delete:
+      summary: Delete an injection (credits the dose back to its pen when one was deducted)
+      tags:
+      - Medications & GLP-1
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Deleted.
+        '404':
+          description: Not found.
+  /v2/medications/{medicationId}/titration:
+    get:
+      summary: List titration/taper steps
+      tags:
+      - Medications & GLP-1
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: path
+        name: medicationId
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Titration plan steps.
+    post:
+      summary: Add a titration/taper step
+      tags:
+      - Medications & GLP-1
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: path
+        name: medicationId
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '201':
+          description: Created.
+        '400':
+          description: Invalid request.
+  /v2/medications/titration/{id}:
+    put:
+      summary: Update a titration step
+      tags:
+      - Medications & GLP-1
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Updated.
+        '404':
+          description: Not found.
+    delete:
+      summary: Delete a titration step
+      tags:
+      - Medications & GLP-1
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Deleted.
+        '404':
+          description: Not found.
+  /v2/medications/{medicationId}/glp1/serum-curve:
+    get:
+      summary: Modeled GLP-1 serum-level curve (PK model, not measured)
+      tags:
+      - Medications & GLP-1
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: path
+        name: medicationId
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - in: query
+        name: fromDay
+        schema:
+          type: number
+      - in: query
+        name: toDay
+        schema:
+          type: number
+      - in: query
+        name: stepDays
+        schema:
+          type: number
+      responses:
+        '200':
+          description: Sampled curve + current modeled level + disclaimer.
+        '404':
+          description: Medication not found.
+  /v2/medications/{medicationId}/glp1/site-suggestion:
+    get:
+      summary: Suggest the next injection site (rotation + lipo rest window)
+      tags:
+      - Medications & GLP-1
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: path
+        name: medicationId
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Suggested site + resting sites + zone map.
+  /v2/medications/entries:
+    get:
+      summary: List logged adherence doses, merged with GLP-1 injection logs
+      description: Injection rows are folded into the same feed and flagged with entry_type='injection'; their id is an injection id, so update/delete them via the /injections endpoints.
+      tags:
+      - Medications & GLP-1
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: query
+        name: fromDate
+        schema:
+          type: string
+          format: date
+      - in: query
+        name: toDate
+        schema:
+          type: string
+          format: date
+      - in: query
+        name: medicationId
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Logged doses (adherence entries + injections).
+    post:
+      summary: Log an adherence dose (taken/skipped/snoozed/prn_taken)
+      tags:
+      - Medications & GLP-1
+      security:
+      - apiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - medication_id
+              properties:
+                medication_id:
+                  type: string
+                  format: uuid
+                schedule_id:
+                  type: string
+                  format: uuid
+                status:
+                  type: string
+                  enum:
+                  - taken
+                  - skipped
+                  - snoozed
+                  - prn_taken
+                taken_at:
+                  type: string
+                  format: date-time
+                entry_date:
+                  type: string
+                  format: date
+                notes:
+                  type: string
+      responses:
+        '201':
+          description: Created.
+        '400':
+          description: Invalid request.
+        '403':
+          description: Supplement doses require food diary access for this profile.
+  /v2/medications/entries/{id}:
+    put:
+      summary: Update a logged dose (e.g. correct the taken-at time or notes)
+      tags:
+      - Medications & GLP-1
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  enum:
+                  - taken
+                  - skipped
+                  - snoozed
+                  - prn_taken
+                taken_at:
+                  type: string
+                  format: date-time
+                scheduled_for:
+                  type: string
+                  format: date-time
+                entry_date:
+                  type: string
+                  format: date
+                notes:
+                  type: string
+      responses:
+        '200':
+          description: Updated.
+        '404':
+          description: Not found.
+        '403':
+          description: Supplement doses require food diary access for this profile.
+    delete:
+      summary: Delete a logged dose
+      tags:
+      - Medications & GLP-1
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Deleted.
+        '404':
+          description: Not found.
+        '403':
+          description: Supplement doses require food diary access for this profile.
+  /v2/medications/display-preferences:
+    get:
+      summary: List the user's medication display preferences
+      tags:
+      - Medications & GLP-1
+      security:
+      - apiKeyAuth: []
+      responses:
+        '200':
+          description: Display preferences per view group and platform.
+  /v2/medications/display-preferences/{viewGroup}/{platform}:
+    put:
+      summary: Upsert the visible items for a view group and platform
+      tags:
+      - Medications & GLP-1
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: path
+        name: viewGroup
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: platform
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - visible_items
+              properties:
+                visible_items:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        '200':
+          description: Upserted preference.
+        '400':
+          description: Invalid request.
+    delete:
+      summary: Delete a display preference for a view group and platform
+      tags:
+      - Medications & GLP-1
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: path
+        name: viewGroup
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: platform
+        required: true
+        schema:
+          type: string
+      responses:
+        '204':
+          description: Deleted.
+        '404':
+          description: Not found.
+components:
+  securitySchemes:
+    apiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: API key authentication via x-api-key header.
+x-provenance:
+  generated: '2026-08-27'
+  method: derived
+  source: https://github.com/CodeWithCJ/SparkyFitness — assembled from the project's own swagger-jsdoc configuration (SparkyFitnessServer/config/swagger.ts) and the 419 @swagger JSDoc blocks in SparkyFitnessServer/routes/**, using the same scan paths and the same cookieAuth->apiKeyAuth post-processing the server applies. This is the identical document a running instance serves at GET /api/api-docs/json (Swagger UI at /api/api-docs/swagger, ReDoc at /api/api-docs/redoc).
+  note: 'Not fetched from a live host: SparkyFitness is self-hosted and the project operates no public instance, so the contract can only be read from the source that generates it. Upstream sets no operationIds; paths+methods are the stable identifiers.'
+  upstream_version: server package.json 1.6.4 (release v1.6.4, 2026-08-27)

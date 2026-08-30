@@ -1,0 +1,1332 @@
+openapi: 3.2.0
+info:
+  title: SparkyFitness External Integrations API
+  version: 1.0.0
+  description: API documentation for the SparkyFitness application, providing a comprehensive guide to all available endpoints. Have caution using the API directly, as improper use may lead to data loss or corruption.  Also note that the API is subject to change without notice due to heavy development, so always refer to the latest documentation for up-to-date information. It might have flaw and due to vite/nginx internal proxy actual end point accessed via front end URL might be different than hitting them directly on the server.
+  contact:
+    name: SparkyFitness Support
+servers:
+- url: https://{host}/api
+  description: Self-hosted SparkyFitness instance (the operator supplies the host). The upstream spec declares the relative base "/api".
+  variables:
+    host:
+      default: sparkyfitness.example.com
+      description: Hostname of your own SparkyFitness deployment. SparkyFitness is self-hosted; there is no vendor-operated API host.
+security:
+- apiKeyAuth: []
+tags:
+- name: External Integrations
+  description: Third-party service connections (Garmin, Withings, OIDC, etc.).
+paths:
+  /external-providers:
+    get:
+      summary: Get all external data providers for the authenticated user
+      tags:
+      - External Integrations
+      description: Retrieves a list of all external data providers configured by the authenticated user.
+      security:
+      - apiKeyAuth: []
+      responses:
+        '200':
+          description: A list of external data providers.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ExternalProvider'
+        '401':
+          description: Unauthorized, authentication token is missing or invalid.
+        '500':
+          description: Failed to fetch external data providers.
+    post:
+      summary: Create a new external data provider
+      tags:
+      - External Integrations
+      description: Creates a new external data provider configuration for the authenticated user.
+      security:
+      - apiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - provider_name
+              - provider_type
+              properties:
+                provider_name:
+                  type: string
+                  description: The name of the external provider (e.g., "Garmin").
+                provider_type:
+                  type: string
+                  description: The type of the external provider (e.g., "health", "fitness").
+                client_id:
+                  type: string
+                  description: The client ID for API access.
+                client_secret:
+                  type: string
+                  description: The client secret for API access.
+                access_token:
+                  type: string
+                  description: The access token for API access.
+                refresh_token:
+                  type: string
+                  description: The refresh token for API access.
+                expires_at:
+                  type: string
+                  format: date-time
+                  description: The expiration date and time of the access token.
+                scope:
+                  type: string
+                  description: The granted API scopes.
+      responses:
+        '201':
+          description: The new external data provider was created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExternalProvider'
+        '401':
+          description: Unauthorized, authentication token is missing or invalid.
+        '500':
+          description: Failed to create external data provider.
+  /external-providers/user/{targetUserId}:
+    get:
+      summary: Get external data providers for a specific user
+      tags:
+      - External Integrations
+      description: Retrieves external data providers for a specified user. Requires appropriate authorization.
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: path
+        name: targetUserId
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: The ID of the user whose providers are to be retrieved.
+      responses:
+        '200':
+          description: A list of external data providers for the target user.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ExternalProvider'
+        '400':
+          description: Missing target user ID.
+        '401':
+          description: Unauthorized, authentication token is missing or invalid.
+        '403':
+          description: Forbidden, user does not have permission to access this resource.
+        '500':
+          description: Failed to fetch external data providers.
+  /external-providers/{id}:
+    put:
+      summary: Update an existing external data provider
+      tags:
+      - External Integrations
+      description: Updates an existing external data provider configuration.
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: The ID of the external provider to update.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                provider_name:
+                  type: string
+                  description: The name of the external provider (e.g., "Garmin").
+                provider_type:
+                  type: string
+                  description: The type of the external provider (e.g., "health", "fitness").
+                client_id:
+                  type: string
+                  description: The client ID for API access.
+                client_secret:
+                  type: string
+                  description: The client secret for API access.
+                access_token:
+                  type: string
+                  description: The access token for API access.
+                refresh_token:
+                  type: string
+                  description: The refresh token for API access.
+                expires_at:
+                  type: string
+                  format: date-time
+                  description: The expiration date and time of the access token.
+                scope:
+                  type: string
+                  description: The granted API scopes.
+      responses:
+        '200':
+          description: The external data provider was updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExternalProvider'
+        '400':
+          description: Provider ID is required.
+        '401':
+          description: Unauthorized, authentication token is missing or invalid.
+        '403':
+          description: Forbidden, user does not have permission to update this provider.
+        '404':
+          description: External data provider not found.
+        '500':
+          description: Failed to update external data provider.
+    delete:
+      summary: Delete an external data provider
+      tags:
+      - External Integrations
+      description: Deletes a specific external data provider configuration.
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: The ID of the external provider to delete.
+      responses:
+        '200':
+          description: External data provider deleted successfully.
+        '400':
+          description: Provider ID is required.
+        '401':
+          description: Unauthorized, authentication token is missing or invalid.
+        '403':
+          description: Forbidden, user does not have permission to delete this provider.
+        '404':
+          description: External data provider not found.
+        '500':
+          description: Failed to delete external data provider.
+    get:
+      summary: Get details of a specific external data provider
+      tags:
+      - External Integrations
+      description: Retrieves the details of a specific external data provider by its ID.
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: The ID of the external provider to retrieve details for.
+      responses:
+        '200':
+          description: Details of the external data provider.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExternalProvider'
+        '400':
+          description: Missing provider ID.
+        '401':
+          description: Unauthorized, authentication token is missing or invalid.
+        '403':
+          description: Forbidden, user does not have permission to access this resource.
+        '500':
+          description: Failed to fetch external data provider details.
+  /external-providers/garmin/activities-and-workouts:
+    post:
+      summary: Process Garmin activities and workouts
+      tags:
+      - External Integrations
+      description: Endpoint for the Garmin microservice to send activity and workout data for processing.
+      security:
+      - apiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: Garmin activity and workout data.
+              example:
+                activities: []
+                workouts: []
+      responses:
+        '200':
+          description: Data processed successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  result:
+                    type: object
+        '401':
+          description: Unauthorized, authentication token is missing or invalid.
+        '500':
+          description: Error processing Garmin data.
+  /integrations/fitbit/authorize:
+    get:
+      summary: Initiate Fitbit OAuth flow
+      tags:
+      - External Integrations
+      security:
+      - apiKeyAuth: []
+      responses:
+        '200':
+          description: Authorization URL.
+  /integrations/fitbit/callback:
+    post:
+      summary: Handle Fitbit OAuth callback
+      tags:
+      - External Integrations
+  /integrations/fitbit/sync:
+    post:
+      summary: Manually trigger a Fitbit data sync
+      tags:
+      - External Integrations
+  /integrations/fitbit/disconnect:
+    post:
+      summary: Disconnect a Fitbit account
+      tags:
+      - External Integrations
+  /integrations/fitbit/status:
+    get:
+      summary: Get Fitbit connection status
+      tags:
+      - External Integrations
+  /foods/fatsecret/search:
+    get:
+      summary: Search for foods on FatSecret
+      tags:
+      - External Integrations
+      description: Searches for foods using the FatSecret API.
+      parameters:
+      - in: query
+        name: query
+        schema:
+          type: string
+        required: true
+        description: The search query.
+      - in: query
+        name: page
+        schema:
+          type: integer
+          default: 1
+        required: false
+        description: The page number for paginated results (defaults to 1).
+      - in: header
+        name: x-provider-id
+        schema:
+          type: string
+        required: true
+        description: The ID of the FatSecret data provider.
+      responses:
+        '200':
+          description: A list of foods from FatSecret with pagination metadata.
+        '400':
+          description: Missing search query or x-provider-id header.
+  /foods/fatsecret/nutrients:
+    get:
+      summary: Get nutrient information from FatSecret
+      tags:
+      - External Integrations
+      description: Retrieves nutrient information for a specific food from the FatSecret API.
+      parameters:
+      - in: query
+        name: foodId
+        schema:
+          type: string
+        required: true
+        description: The ID of the food to retrieve nutrient information for.
+      - in: header
+        name: x-provider-id
+        schema:
+          type: string
+        required: true
+        description: The ID of the FatSecret data provider.
+      responses:
+        '200':
+          description: Nutrient information for the specified food.
+        '400':
+          description: Missing foodId or x-provider-id header.
+  /foods/fatsecret/barcode/{barcode}:
+    get:
+      summary: Search for food by barcode on FatSecret
+      tags:
+      - External Integrations
+      description: Retrieves food details by barcode using the FatSecret API.
+      parameters:
+      - in: path
+        name: barcode
+        schema:
+          type: string
+        required: true
+        description: The barcode to search for.
+      - in: header
+        name: x-provider-id
+        schema:
+          type: string
+        required: true
+        description: The ID of the FatSecret data provider.
+      responses:
+        '200':
+          description: Food details for the given barcode.
+        '400':
+          description: Missing barcode or x-provider-id header.
+  /foods/openfoodfacts/search:
+    get:
+      summary: Search for foods on Open Food Facts
+      tags:
+      - External Integrations
+      description: Searches for foods using the Open Food Facts API.
+      parameters:
+      - in: query
+        name: query
+        schema:
+          type: string
+        required: true
+        description: The search query.
+      - in: query
+        name: page
+        schema:
+          type: integer
+          default: 1
+        required: false
+        description: The page number for paginated results (defaults to 1).
+      responses:
+        '200':
+          description: A list of foods from Open Food Facts with pagination metadata.
+        '400':
+          description: Missing search query.
+  /foods/openfoodfacts/barcode/{barcode}:
+    get:
+      summary: Search for food by barcode on Open Food Facts
+      tags:
+      - External Integrations
+      description: Retrieves food details by barcode using the Open Food Facts API.
+      parameters:
+      - in: path
+        name: barcode
+        schema:
+          type: string
+        required: true
+        description: The barcode to search for.
+      responses:
+        '200':
+          description: Food details for the given barcode.
+        '400':
+          description: Missing barcode.
+  /foods/nutritionix/search:
+    get:
+      summary: Search for foods on Nutritionix
+      tags:
+      - External Integrations
+      description: Searches for foods using the Nutritionix API.
+      parameters:
+      - in: query
+        name: query
+        schema:
+          type: string
+        required: true
+        description: The search query.
+      - in: query
+        name: providerId
+        schema:
+          type: string
+        required: true
+        description: The ID of the Nutritionix data provider.
+      responses:
+        '200':
+          description: A list of foods from Nutritionix.
+        '400':
+          description: Missing search query or providerId.
+  /foods/nutritionix/nutrients:
+    get:
+      summary: Get nutrient information from Nutritionix
+      tags:
+      - External Integrations
+      description: Retrieves nutrient information for a specific food from the Nutritionix API.
+      parameters:
+      - in: query
+        name: query
+        schema:
+          type: string
+        required: true
+        description: The search query.
+      - in: query
+        name: providerId
+        schema:
+          type: string
+        required: true
+        description: The ID of the Nutritionix data provider.
+      responses:
+        '200':
+          description: Nutrient information for the specified food.
+        '400':
+          description: Missing search query or providerId.
+  /foods/nutritionix/item:
+    get:
+      summary: Get branded food nutrient information from Nutritionix
+      tags:
+      - External Integrations
+      description: Retrieves nutrient information for a specific branded food item from the Nutritionix API.
+      parameters:
+      - in: query
+        name: nix_item_id
+        schema:
+          type: string
+        required: true
+        description: The Nutritionix item ID.
+      - in: query
+        name: providerId
+        schema:
+          type: string
+        required: true
+        description: The ID of the Nutritionix data provider.
+      responses:
+        '200':
+          description: Nutrient information for the specified branded food item.
+        '400':
+          description: Missing nix_item_id or providerId.
+  /foods/mealie/search:
+    get:
+      summary: Search for foods on Mealie
+      tags:
+      - External Integrations
+      description: Searches for foods using the Mealie API. When a page parameter is provided, returns a paginated response with items and pagination metadata. Without page, returns a plain array for backwards compatibility.
+      parameters:
+      - in: query
+        name: query
+        schema:
+          type: string
+        required: true
+        description: The search query.
+      - in: query
+        name: page
+        schema:
+          type: integer
+          minimum: 1
+        required: false
+        description: Page number for paginated results. When provided, response includes pagination metadata.
+      - in: header
+        name: x-provider-id
+        schema:
+          type: string
+        required: true
+        description: The ID of the Mealie data provider.
+      responses:
+        '200':
+          description: A list of foods from Mealie. Returns {items, pagination} when page param is provided, or a plain array otherwise.
+        '400':
+          description: Missing search query or x-provider-id header.
+  /foods/mealie/details:
+    get:
+      summary: Get food details from Mealie
+      tags:
+      - External Integrations
+      description: Retrieves details for a specific food from the Mealie API.
+      parameters:
+      - in: query
+        name: slug
+        schema:
+          type: string
+        required: true
+        description: The slug of the food to retrieve details for.
+      - in: header
+        name: x-provider-id
+        schema:
+          type: string
+        required: true
+        description: The ID of the Mealie data provider.
+      responses:
+        '200':
+          description: Details for the specified food.
+        '400':
+          description: Missing food slug or x-provider-id header.
+  /foods/tandoor/search:
+    get:
+      summary: Search for foods on Tandoor
+      tags:
+      - External Integrations
+      description: Searches for foods using the Tandoor API.
+      parameters:
+      - in: query
+        name: query
+        schema:
+          type: string
+        required: true
+        description: The search query.
+      - in: header
+        name: x-provider-id
+        schema:
+          type: string
+        required: true
+        description: The ID of the Tandoor data provider.
+      responses:
+        '200':
+          description: A list of foods from Tandoor.
+        '400':
+          description: Missing search query or x-provider-id header.
+  /foods/tandoor/details:
+    get:
+      summary: Get food details from Tandoor
+      tags:
+      - External Integrations
+      description: Retrieves details for a specific food from the Tandoor API.
+      parameters:
+      - in: query
+        name: id
+        schema:
+          type: string
+        required: true
+        description: The ID of the food to retrieve details for.
+      - in: header
+        name: x-provider-id
+        schema:
+          type: string
+        required: true
+        description: The ID of the Tandoor data provider.
+      responses:
+        '200':
+          description: Details for the specified food.
+        '400':
+          description: Missing food id or x-provider-id header.
+  /foods/norish/search:
+    get:
+      summary: Search for foods on Norish
+      tags:
+      - External Integrations
+      description: Searches for foods using the Norish API.
+      parameters:
+      - in: query
+        name: query
+        schema:
+          type: string
+        required: true
+        description: The search query.
+      - in: header
+        name: x-provider-id
+        schema:
+          type: string
+        required: true
+        description: The ID of the Norish data provider.
+      responses:
+        '200':
+          description: A list of foods from Norish.
+        '400':
+          description: Missing search query or x-provider-id header.
+  /foods/norish/details:
+    get:
+      summary: Get food details from Norish
+      tags:
+      - External Integrations
+      description: Retrieves details for a specific food from the Norish API.
+      parameters:
+      - in: query
+        name: id
+        schema:
+          type: string
+        required: true
+        description: The ID of the food to retrieve details for.
+      - in: header
+        name: x-provider-id
+        schema:
+          type: string
+        required: true
+        description: The ID of the Norish data provider.
+      responses:
+        '200':
+          description: Details for the specified food.
+        '400':
+          description: Missing food id or x-provider-id header.
+  /foods/usda/search:
+    get:
+      summary: Search for foods on USDA FoodData Central
+      tags:
+      - External Integrations
+      description: Searches for foods using the USDA FoodData Central API.
+      parameters:
+      - in: query
+        name: query
+        schema:
+          type: string
+        required: true
+        description: The search query.
+      - in: query
+        name: page
+        schema:
+          type: integer
+          default: 1
+        required: false
+        description: The page number for paginated results (defaults to 1).
+      - in: query
+        name: pageSize
+        schema:
+          type: integer
+          default: 50
+        required: false
+        description: The number of results per page (max 200, defaults to 50).
+      - in: header
+        name: x-provider-id
+        schema:
+          type: string
+        required: true
+        description: The ID of the USDA data provider.
+      responses:
+        '200':
+          description: A list of foods from USDA FoodData Central with pagination metadata.
+        '400':
+          description: Missing search query or x-provider-id header.
+  /foods/usda/details:
+    get:
+      summary: Get food details from USDA FoodData Central
+      tags:
+      - External Integrations
+      description: Retrieves details for a specific food from the USDA FoodData Central API.
+      parameters:
+      - in: query
+        name: fdcId
+        schema:
+          type: string
+        required: true
+        description: The FoodData Central ID of the food to retrieve details for.
+      - in: header
+        name: x-provider-id
+        schema:
+          type: string
+        required: true
+        description: The ID of the USDA data provider.
+      responses:
+        '200':
+          description: Details for the specified food.
+        '400':
+          description: Missing FDC ID or x-provider-id header.
+  /integrations/garmin/login:
+    post:
+      summary: Garmin direct login
+      tags:
+      - External Integrations
+      security:
+      - apiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+              required:
+              - email
+              - password
+      responses:
+        '200':
+          description: Login result.
+  /integrations/garmin/resume_login:
+    post:
+      summary: Resume Garmin login (e.g., after MFA)
+      tags:
+      - External Integrations
+      security:
+      - apiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                client_state:
+                  type: string
+                mfa_code:
+                  type: string
+              required:
+              - client_state
+              - mfa_code
+      responses:
+        '200':
+          description: Login result.
+  /integrations/garmin/sync/health_and_wellness:
+    post:
+      summary: Manually sync health and wellness data from Garmin
+      tags:
+      - External Integrations
+      security:
+      - apiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                startDate:
+                  type: string
+                  format: date
+                endDate:
+                  type: string
+                  format: date
+                metricTypes:
+                  type: array
+                  items:
+                    type: string
+              required:
+              - startDate
+              - endDate
+      responses:
+        '200':
+          description: Sync completed successfully.
+  /integrations/garmin/sync/activities_and_workouts:
+    post:
+      summary: Manually sync activities and workouts data from Garmin
+      tags:
+      - External Integrations
+      security:
+      - apiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                startDate:
+                  type: string
+                  format: date
+                endDate:
+                  type: string
+                  format: date
+                activityType:
+                  type: string
+              required:
+              - startDate
+              - endDate
+      responses:
+        '200':
+          description: Sync result.
+  /integrations/garmin/sync/nutrition_diary:
+    post:
+      summary: Manually sync nutrition diary data from Garmin
+      tags:
+      - External Integrations
+      security:
+      - apiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                startDate:
+                  type: string
+                  format: date
+                endDate:
+                  type: string
+                  format: date
+              required:
+              - startDate
+              - endDate
+      responses:
+        '200':
+          description: Nutrition sync completed successfully.
+  /integrations/garmin/sync:
+    post:
+      summary: Manual full sync for Garmin data
+      tags:
+      - External Integrations
+      security:
+      - apiKeyAuth: []
+      responses:
+        '200':
+          description: Full sync result.
+  /integrations/garmin/status:
+    get:
+      summary: Get Garmin connection status
+      tags:
+      - External Integrations
+      security:
+      - apiKeyAuth: []
+      responses:
+        '200':
+          description: Connection status.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GarminStatus'
+  /integrations/garmin/unlink:
+    post:
+      summary: Unlink Garmin account
+      tags:
+      - External Integrations
+      security:
+      - apiKeyAuth: []
+      responses:
+        '200':
+          description: Unlinked successfully.
+  /integrations/garmin/sleep_data:
+    post:
+      summary: Process sleep data from Garmin
+      tags:
+      - External Integrations
+      security:
+      - apiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                sleepData:
+                  type: array
+                  items:
+                    type: object
+                startDate:
+                  type: string
+                  format: date
+                endDate:
+                  type: string
+                  format: date
+              required:
+              - sleepData
+              - startDate
+              - endDate
+      responses:
+        '200':
+          description: Sleep data processed successfully.
+  /integrations/googlehealth/authorize:
+    get:
+      summary: Initiate Google Health OAuth flow
+      tags:
+      - External Integrations
+      security:
+      - apiKeyAuth: []
+      responses:
+        '200':
+          description: Authorization URL.
+  /integrations/googlehealth/callback:
+    post:
+      summary: Handle Google Health OAuth callback
+      tags:
+      - External Integrations
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - code
+              properties:
+                code:
+                  type: string
+  /integrations/googlehealth/sync:
+    post:
+      summary: Manually trigger a Google Health data sync
+      tags:
+      - External Integrations
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                startDate:
+                  type: string
+                  format: date
+                endDate:
+                  type: string
+                  format: date
+  /integrations/googlehealth/disconnect:
+    post:
+      summary: Disconnect a Google Health account
+      tags:
+      - External Integrations
+  /integrations/googlehealth/status:
+    get:
+      summary: Get Google Health connection status
+      tags:
+      - External Integrations
+  /integrations/hevy/sync:
+    post:
+      summary: Manually trigger a Hevy data sync
+      tags:
+      - External Integrations
+  /integrations/hevy/status:
+    get:
+      summary: Get Hevy connection status
+      tags:
+      - External Integrations
+  /integrations/oura/authorize:
+    get:
+      summary: Initiate Oura OAuth flow
+      tags:
+      - External Integrations
+      security:
+      - apiKeyAuth: []
+      responses:
+        '200':
+          description: Authorization URL.
+  /integrations/oura/callback:
+    post:
+      summary: Handle Oura OAuth callback
+      tags:
+      - External Integrations
+  /integrations/oura/sync:
+    post:
+      summary: Manually trigger an Oura data sync
+      tags:
+      - External Integrations
+  /integrations/oura/disconnect:
+    post:
+      summary: Disconnect an Oura account
+      tags:
+      - External Integrations
+  /integrations/oura/status:
+    get:
+      summary: Get Oura connection status
+      tags:
+      - External Integrations
+  /integrations/polar/authorize:
+    get:
+      summary: Initiate Polar OAuth flow
+      tags:
+      - External Integrations
+      security:
+      - apiKeyAuth: []
+      responses:
+        '200':
+          description: Successfully generated authorization URL.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  authUrl:
+                    type: string
+                    description: The Polar authorization URL.
+        '401':
+          description: Unauthorized.
+        '500':
+          description: Error initiating Polar authorization.
+  /integrations/polar/callback:
+    post:
+      summary: Handle Polar OAuth callback
+      tags:
+      - External Integrations
+      security:
+      - apiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - code
+              properties:
+                code:
+                  type: string
+                  description: The authorization code returned by Polar.
+      responses:
+        '200':
+          description: Polar account linked successfully.
+        '400':
+          description: Authorization code not received.
+        '401':
+          description: Unauthorized.
+        '500':
+          description: Failed to connect Polar account.
+  /integrations/polar/sync:
+    post:
+      summary: Manually trigger a Polar data sync
+      tags:
+      - External Integrations
+      security:
+      - apiKeyAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                providerId:
+                  type: string
+                  description: The unique identifier of the Polar provider to sync.
+      responses:
+        '200':
+          description: Polar data sync completed successfully.
+        '401':
+          description: Unauthorized.
+        '500':
+          description: Error initiating manual Polar sync.
+  /integrations/polar/disconnect:
+    post:
+      summary: Disconnect a Polar account
+      tags:
+      - External Integrations
+      security:
+      - apiKeyAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                providerId:
+                  type: string
+                  description: The unique identifier of the Polar provider to disconnect.
+      responses:
+        '200':
+          description: Polar account disconnected successfully.
+        '401':
+          description: Unauthorized.
+        '500':
+          description: Error disconnecting Polar account.
+  /integrations/polar/status:
+    get:
+      summary: Get Polar connection status
+      tags:
+      - External Integrations
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: query
+        name: providerId
+        schema:
+          type: string
+        description: The unique identifier of the Polar provider.
+      responses:
+        '200':
+          description: Polar connection status retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isConnected:
+                    type: boolean
+                  lastSyncAt:
+                    type: string
+                    format: date-time
+                  tokenExpiresAt:
+                    type: string
+                    format: date-time
+        '401':
+          description: Unauthorized.
+        '500':
+          description: Error getting Polar status.
+  /integrations/withings/data:
+    get:
+      summary: Get aggregated Withings data for display
+      tags:
+      - External Integrations
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: query
+        name: startDate
+        required: true
+        schema:
+          type: string
+          format: date
+      - in: query
+        name: endDate
+        required: true
+        schema:
+          type: string
+          format: date
+      responses:
+        '200':
+          description: Aggregated Withings data.
+  /withings/authorize:
+    get:
+      summary: Initiate Withings OAuth flow
+      tags:
+      - External Integrations
+      security:
+      - apiKeyAuth: []
+      responses:
+        '200':
+          description: Authorization URL.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  authUrl:
+                    type: string
+  /withings/callback:
+    post:
+      summary: Handle Withings OAuth callback
+      tags:
+      - External Integrations
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                code:
+                  type: string
+                state:
+                  type: string
+                error:
+                  type:
+                  - string
+                  - 'null'
+      responses:
+        '200':
+          description: Successfully linked.
+  /withings/sync:
+    post:
+      summary: Manually trigger a Withings data sync
+      tags:
+      - External Integrations
+      security:
+      - apiKeyAuth: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                startDate:
+                  type: string
+                  description: YYYY-MM-DD start date
+                endDate:
+                  type: string
+                  description: YYYY-MM-DD end date
+      responses:
+        '200':
+          description: Sync completed successfully.
+  /withings/disconnect:
+    post:
+      summary: Disconnect a Withings account
+      tags:
+      - External Integrations
+      security:
+      - apiKeyAuth: []
+      responses:
+        '200':
+          description: Disconnected successfully.
+  /withings/status:
+    get:
+      summary: Get Withings connection status and last sync time
+      tags:
+      - External Integrations
+      security:
+      - apiKeyAuth: []
+      responses:
+        '200':
+          description: Connection status.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WithingsStatus'
+components:
+  schemas:
+    GarminStatus:
+      type: object
+      properties:
+        is_connected:
+          type: boolean
+        last_sync_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+    WithingsStatus:
+      type: object
+      properties:
+        is_connected:
+          type: boolean
+        last_sync_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+    ExternalProvider:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier for the external provider.
+        user_id:
+          type: string
+          format: uuid
+          description: The ID of the user who owns this provider configuration.
+        provider_name:
+          type: string
+          description: The name of the external provider (e.g., "Garmin", "Withings").
+        provider_type:
+          type: string
+          description: The type of the external provider (e.g., "health", "fitness").
+        client_id:
+          type: string
+          description: The client ID for API access.
+        client_secret:
+          type: string
+          description: The client secret for API access.
+        access_token:
+          type: string
+          description: The access token for API access.
+        refresh_token:
+          type: string
+          description: The refresh token for API access.
+        expires_at:
+          type: string
+          format: date-time
+          description: The expiration date and time of the access token.
+        scope:
+          type: string
+          description: The granted API scopes.
+        created_at:
+          type: string
+          format: date-time
+          description: The date and time when the provider was configured.
+        updated_at:
+          type: string
+          format: date-time
+          description: The date and time when the provider was last updated.
+      required:
+      - user_id
+      - provider_name
+      - provider_type
+  securitySchemes:
+    apiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: API key authentication via x-api-key header.
+x-provenance:
+  generated: '2026-08-27'
+  method: derived
+  source: https://github.com/CodeWithCJ/SparkyFitness — assembled from the project's own swagger-jsdoc configuration (SparkyFitnessServer/config/swagger.ts) and the 419 @swagger JSDoc blocks in SparkyFitnessServer/routes/**, using the same scan paths and the same cookieAuth->apiKeyAuth post-processing the server applies. This is the identical document a running instance serves at GET /api/api-docs/json (Swagger UI at /api/api-docs/swagger, ReDoc at /api/api-docs/redoc).
+  note: 'Not fetched from a live host: SparkyFitness is self-hosted and the project operates no public instance, so the contract can only be read from the source that generates it. Upstream sets no operationIds; paths+methods are the stable identifiers.'
+  upstream_version: server package.json 1.6.4 (release v1.6.4, 2026-08-27)

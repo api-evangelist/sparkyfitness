@@ -1,0 +1,1075 @@
+openapi: 3.2.0
+info:
+  title: SparkyFitness Exercise & Workouts API
+  version: 1.0.0
+  description: API documentation for the SparkyFitness application, providing a comprehensive guide to all available endpoints. Have caution using the API directly, as improper use may lead to data loss or corruption.  Also note that the API is subject to change without notice due to heavy development, so always refer to the latest documentation for up-to-date information. It might have flaw and due to vite/nginx internal proxy actual end point accessed via front end URL might be different than hitting them directly on the server.
+  contact:
+    name: SparkyFitness Support
+servers:
+- url: https://{host}/api
+  description: Self-hosted SparkyFitness instance (the operator supplies the host). The upstream spec declares the relative base "/api".
+  variables:
+    host:
+      default: sparkyfitness.example.com
+      description: Hostname of your own SparkyFitness deployment. SparkyFitness is self-hosted; there is no vendor-operated API host.
+security:
+- apiKeyAuth: []
+tags:
+- name: Exercise & Workouts
+paths:
+  /exercises:
+    get:
+      summary: Retrieve a list of exercises with search, filter, and pagination
+      tags:
+      - Exercise & Workouts
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: query
+        name: searchTerm
+        schema:
+          type: string
+        description: Search term for exercise names.
+      - in: query
+        name: categoryFilter
+        schema:
+          type: string
+        description: Filter by exercise category.
+      - in: query
+        name: ownershipFilter
+        schema:
+          type: string
+        description: Filter by exercise ownership (e.g., 'user', 'public').
+      - in: query
+        name: equipmentFilter
+        schema:
+          type: string
+        description: Comma-separated list of equipment to filter by.
+      - in: query
+        name: muscleGroupFilter
+        schema:
+          type: string
+        description: Comma-separated list of muscle groups to filter by.
+      - in: query
+        name: currentPage
+        schema:
+          type: integer
+          default: 1
+        description: The current page number for pagination.
+      - in: query
+        name: itemsPerPage
+        schema:
+          type: integer
+          default: 10
+        description: The number of items to return per page.
+      responses:
+        '200':
+          description: A list of exercises and the total count.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  exercises:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Exercise'
+                  totalCount:
+                    type: integer
+                    description: Total number of exercises matching the criteria.
+        '403':
+          description: Forbidden, if the user does not have access.
+        '500':
+          description: Server error.
+  /exercises/suggested:
+    get:
+      summary: Retrieve a list of suggested exercises
+      tags:
+      - Exercise & Workouts
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: query
+        name: limit
+        schema:
+          type: integer
+          default: 5
+        description: The maximum number of suggested exercises to return.
+      responses:
+        '200':
+          description: A list of suggested exercises.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Exercise'
+        '403':
+          description: Forbidden, if the user does not have access.
+        '500':
+          description: Server error.
+  /exercises/recent:
+    get:
+      summary: Retrieve a list of recently performed exercises
+      tags:
+      - Exercise & Workouts
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: query
+        name: limit
+        schema:
+          type: integer
+          default: 5
+        description: The maximum number of recent exercises to return.
+      responses:
+        '200':
+          description: A list of recent exercises.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Exercise'
+        '403':
+          description: Forbidden, if the user does not have access.
+        '500':
+          description: Server error.
+  /exercises/top:
+    get:
+      summary: Retrieve a list of top exercises
+      tags:
+      - Exercise & Workouts
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: query
+        name: limit
+        schema:
+          type: integer
+          default: 5
+        description: The maximum number of top exercises to return.
+      responses:
+        '200':
+          description: A list of top exercises.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Exercise'
+        '403':
+          description: Forbidden, if the user does not have access.
+        '500':
+          description: Server error.
+  /exercises/search:
+    get:
+      summary: Search for exercises
+      tags:
+      - Exercise & Workouts
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: query
+        name: searchTerm
+        schema:
+          type: string
+        description: Term to search for in exercise names.
+      - in: query
+        name: equipmentFilter
+        schema:
+          type: string
+        description: Comma-separated list of equipment to filter by.
+      - in: query
+        name: muscleGroupFilter
+        schema:
+          type: string
+        description: Comma-separated list of muscle groups to filter by.
+      responses:
+        '200':
+          description: A list of exercises matching the search criteria.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Exercise'
+        '403':
+          description: Forbidden, if the user does not have access.
+        '500':
+          description: Server error.
+  /exercises/search-external:
+    get:
+      summary: Search for exercises from external providers like Wger
+      tags:
+      - Exercise & Workouts
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: query
+        name: query
+        schema:
+          type: string
+        description: Search term for external exercise names.
+      - in: query
+        name: providerId
+        schema:
+          type: string
+        required: true
+        description: The ID of the external provider (e.g., Wger).
+      - in: query
+        name: providerType
+        schema:
+          type: string
+        required: true
+        description: The type of the external provider.
+      - in: query
+        name: equipmentFilter
+        schema:
+          type: string
+        description: Comma-separated list of equipment to filter by.
+      - in: query
+        name: muscleGroupFilter
+        schema:
+          type: string
+        description: Comma-separated list of muscle groups to filter by.
+      - in: query
+        name: page
+        schema:
+          type: integer
+          default: 1
+        description: Page number (1-based).
+      - in: query
+        name: pageSize
+        schema:
+          type: integer
+          default: 20
+          maximum: 100
+        description: Number of results per page.
+      responses:
+        '200':
+          description: Paginated list of external exercises matching the search criteria.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      description: External search projection (see externalExerciseSearchItemSchema in @workspace/shared). wger and free-exercise-db items include the optional detail fields; nutritionix items carry only the base fields.
+                      required:
+                      - id
+                      - name
+                      - source
+                      properties:
+                        id:
+                          type: string
+                        name:
+                          type: string
+                        source:
+                          type: string
+                        category:
+                          type:
+                          - string
+                          - 'null'
+                        modality:
+                          type: string
+                          enum:
+                          - weight_reps
+                          - reps_only
+                          - duration
+                          - duration_distance
+                          description: Derived from the provider category so import previews can pick a set editor.
+                        calories_per_hour:
+                          type:
+                          - number
+                          - 'null'
+                        description:
+                          type: string
+                        force:
+                          type:
+                          - string
+                          - 'null'
+                        level:
+                          type:
+                          - string
+                          - 'null'
+                        mechanic:
+                          type:
+                          - string
+                          - 'null'
+                        equipment:
+                          type: array
+                          items:
+                            type: string
+                        primary_muscles:
+                          type: array
+                          items:
+                            type: string
+                        secondary_muscles:
+                          type: array
+                          items:
+                            type: string
+                        instructions:
+                          type: array
+                          items:
+                            type: string
+                        images:
+                          type: array
+                          items:
+                            type: string
+                  pagination:
+                    type: object
+                    properties:
+                      page:
+                        type: integer
+                      pageSize:
+                        type: integer
+                      totalCount:
+                        type: integer
+                      hasMore:
+                        type: boolean
+        '400':
+          description: Bad request, if search query/filters or provider details are missing.
+        '500':
+          description: Server error.
+  /exercises/equipment:
+    get:
+      summary: Retrieve a list of available exercise equipment types
+      tags:
+      - Exercise & Workouts
+      security:
+      - apiKeyAuth: []
+      responses:
+        '200':
+          description: A list of equipment types.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+        '500':
+          description: Server error.
+  /exercises/muscle-groups:
+    get:
+      summary: Retrieve a list of available exercise muscle groups
+      tags:
+      - Exercise & Workouts
+      security:
+      - apiKeyAuth: []
+      responses:
+        '200':
+          description: A list of muscle groups.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+        '500':
+          description: Server error.
+  /exercises/wger-filters:
+    get:
+      summary: Retrieve unique Wger muscle groups and equipment not present in local database
+      tags:
+      - Exercise & Workouts
+      security:
+      - apiKeyAuth: []
+      responses:
+        '200':
+          description: An object containing lists of unique muscle groups and equipment from Wger.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  uniqueMuscles:
+                    type: array
+                    items:
+                      type: string
+                    description: List of muscle groups from Wger not present locally.
+                  uniqueEquipment:
+                    type: array
+                    items:
+                      type: string
+                    description: List of equipment from Wger not present locally.
+        '500':
+          description: Server error.
+  /exercises/names:
+    get:
+      summary: Retrieve exercise names based on muscle and equipment filters
+      tags:
+      - Exercise & Workouts
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: query
+        name: muscle
+        schema:
+          type: string
+        description: Filter by muscle group.
+      - in: query
+        name: equipment
+        schema:
+          type: string
+        description: Filter by equipment type.
+      responses:
+        '200':
+          description: A list of exercise names.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+        '500':
+          description: Server error.
+  /exercises/add-external:
+    post:
+      summary: Add an external exercise (e.g., from Wger) to the user's exercises
+      tags:
+      - Exercise & Workouts
+      security:
+      - apiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - wgerExerciseId
+              properties:
+                wgerExerciseId:
+                  type: integer
+                  description: The ID of the external exercise from Wger.
+      responses:
+        '201':
+          description: The newly created exercise.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Exercise'
+        '400':
+          description: Bad request, if Wger exercise ID is missing.
+        '500':
+          description: Server error.
+  /exercises/add-nutritionix-exercise:
+    post:
+      summary: Add a Nutritionix exercise to the user's exercises
+      tags:
+      - Exercise & Workouts
+      security:
+      - apiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: Nutritionix exercise data.
+              example:
+                name: Dumbbell Bicep Curl
+                category: Strength
+                equipment:
+                - Dumbbell
+                muscle_groups:
+                - Biceps
+                description: Curl dumbbells to work biceps.
+                external_id: nutritionix_12345
+                external_provider: Nutritionix
+      responses:
+        '201':
+          description: The newly created exercise.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Exercise'
+        '400':
+          description: Bad request, if Nutritionix exercise data is missing.
+        '500':
+          description: Server error.
+  /exercises/{id}:
+    get:
+      summary: Retrieve an exercise by ID
+      tags:
+      - Exercise & Workouts
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+        description: The ID of the exercise to retrieve.
+      responses:
+        '200':
+          description: The exercise object.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Exercise'
+        '400':
+          description: Bad request, if exercise ID is invalid.
+        '403':
+          description: Forbidden, if the user does not have access.
+        '404':
+          description: Exercise not found.
+        '500':
+          description: Server error.
+    put:
+      summary: Update an existing exercise
+      tags:
+      - Exercise & Workouts
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+        description: The ID of the exercise to update.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                exerciseData:
+                  type: string
+                  description: JSON string of exercise data to update (name, category, modality, equipment, muscle_groups, description, instructions, is_public, images - existing image URLs). modality is one of weight_reps, reps_only, duration, duration_distance; omitted or unrecognized values leave the stored modality untouched, and changing the category alone never re-derives it.
+                  example: '{"name": "Updated Push-up", "category": "Strength", "modality": "reps_only", "equipment": ["None"], "muscle_groups": ["Chest", "Triceps"], "description": "An updated classic bodyweight exercise.", "instructions": ["Start in a plank position.", "Lower your body until your chest nearly touches the floor.", "Push back up to the starting position."], "is_public": true, "images": ["http://example.com/old_image.jpg"]}'
+                images:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                  description: New image files for the exercise.
+      responses:
+        '200':
+          description: The updated exercise object.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Exercise'
+        '400':
+          description: Bad request, if exercise ID is invalid or data is malformed.
+        '403':
+          description: Forbidden, if the user does not have access to update the exercise.
+        '404':
+          description: Exercise not found.
+        '500':
+          description: Server error.
+    delete:
+      summary: Delete an exercise by its ID
+      tags:
+      - Exercise & Workouts
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+        description: The ID of the exercise to delete.
+      - in: query
+        name: forceDelete
+        schema:
+          type: boolean
+          default: false
+        description: If true, forces deletion even if there are linked entries.
+      responses:
+        '200':
+          description: Exercise deleted successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: Bad request, if exercise ID is invalid.
+        '403':
+          description: Forbidden, if the user does not have access to delete the exercise.
+        '404':
+          description: Exercise not found.
+        '500':
+          description: Server error.
+  /exercises/:
+    post:
+      summary: Create a new exercise
+      tags:
+      - Exercise & Workouts
+      security:
+      - apiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                exerciseData:
+                  type: string
+                  description: JSON string of exercise data (name, category, modality, equipment, muscle_groups, description, instructions, is_public). modality is one of weight_reps, reps_only, duration, duration_distance; omitted or unrecognized values are derived from the category.
+                  example: '{"name": "Push-up", "category": "Strength", "modality": "reps_only", "equipment": ["None"], "muscle_groups": ["Chest", "Triceps"], "description": "A classic bodyweight exercise.", "instructions": ["Start in a plank position.", "Lower your body until your chest nearly touches the floor.", "Push back up to the starting position."], "is_public": true}'
+                images:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                  description: Array of image files for the exercise.
+      responses:
+        '201':
+          description: The newly created exercise.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Exercise'
+        '400':
+          description: Bad request, if exercise data is invalid.
+        '500':
+          description: Server error.
+  /exercises/import:
+    post:
+      summary: Import exercises from a CSV file
+      tags:
+      - Exercise & Workouts
+      security:
+      - apiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: CSV file containing exercise data.
+      responses:
+        '201':
+          description: Result of the import operation.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  importedCount:
+                    type: integer
+                  errors:
+                    type: array
+                    items:
+                      type: string
+        '500':
+          description: Server error.
+  /exercises/import-json:
+    post:
+      summary: Import exercises from a JSON array
+      tags:
+      - Exercise & Workouts
+      security:
+      - apiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - exercises
+              properties:
+                exercises:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Exercise'
+                  description: Array of exercise objects to import.
+      responses:
+        '201':
+          description: Result of the import operation.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  importedCount:
+                    type: integer
+                  errors:
+                    type: array
+                    items:
+                      type: string
+        '400':
+          description: Bad request, if data format is invalid.
+        '409':
+          description: Conflict, if there are duplicate exercises.
+        '500':
+          description: Server error.
+  /exercises/{id}/deletion-impact:
+    get:
+      summary: Get the impact of deleting an exercise
+      tags:
+      - Exercise & Workouts
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+        description: The ID of the exercise to check deletion impact for.
+      responses:
+        '200':
+          description: An object detailing the impact of deletion.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  canDelete:
+                    type: boolean
+                    description: Indicates if the exercise can be safely deleted.
+                  linkedEntries:
+                    type: integer
+                    description: Number of exercise entries linked to this exercise.
+                  message:
+                    type: string
+                    description: A message explaining the deletion impact.
+        '400':
+          description: Bad request, if exercise ID is invalid.
+        '403':
+          description: Forbidden, if the user does not have access.
+        '404':
+          description: Exercise not found.
+        '500':
+          description: Server error.
+  /exercises/needs-review:
+    get:
+      summary: Retrieve a list of exercises needing review
+      tags:
+      - Exercise & Workouts
+      security:
+      - apiKeyAuth: []
+      responses:
+        '200':
+          description: A list of exercises that need review.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Exercise'
+        '500':
+          description: Server error.
+  /exercises/update-snapshot:
+    post:
+      summary: Update the snapshot of exercise entries for a given exercise
+      tags:
+      - Exercise & Workouts
+      security:
+      - apiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - exerciseId
+              properties:
+                exerciseId:
+                  type: string
+                  format: uuid
+                  description: The ID of the exercise for which to update snapshots.
+      responses:
+        '200':
+          description: Result of the snapshot update operation.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: Bad request, if exercise ID is missing.
+        '500':
+          description: Server error.
+  /exercises/garmin-activity-details/{exerciseEntryId}:
+    get:
+      summary: Retrieve detailed Garmin activity data for an exercise entry
+      tags:
+      - Exercise & Workouts
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: path
+        name: exerciseEntryId
+        schema:
+          type: string
+          format: uuid
+        required: true
+        description: The ID of the exercise entry associated with the Garmin activity.
+      responses:
+        '200':
+          description: Detailed activity data from Garmin.
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          description: Invalid exercise entry ID.
+        '404':
+          description: Garmin activity details not found.
+        '500':
+          description: Server error.
+  /exercises/activity-details/{exerciseEntryId}/{providerName}:
+    get:
+      summary: Retrieve activity details by exercise entry ID and provider
+      tags:
+      - Exercise & Workouts
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: path
+        name: exerciseEntryId
+        schema:
+          type: string
+          format: uuid
+        required: true
+        description: The ID of the exercise entry to retrieve activity details for.
+      - in: path
+        name: providerName
+        schema:
+          type: string
+        required: true
+        description: The name of the external provider (e.g., 'Garmin').
+      responses:
+        '200':
+          description: Activity details from the specified provider.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  activityId:
+                    type: string
+                  activityType:
+                    type: string
+                  duration:
+                    type: number
+                  calories:
+                    type: number
+                  distance:
+                    type: number
+        '400':
+          description: Bad request, if exercise entry ID or provider name is invalid.
+        '404':
+          description: Activity details not found for this exercise entry and provider.
+        '500':
+          description: Server error.
+  /v2/exercises/search:
+    get:
+      summary: Paginated exercise library search
+      tags:
+      - Exercise & Workouts
+      description: Returns a paginated slice of the user's exercise library, ordered by name ASC. RLS scopes results to the caller.
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: query
+        name: searchTerm
+        schema:
+          type: string
+        description: Optional substring match against exercise name (ILIKE).
+      - in: query
+        name: equipmentFilter
+        schema:
+          type: string
+        description: Comma-separated list of equipment to filter by.
+      - in: query
+        name: muscleGroupFilter
+        schema:
+          type: string
+        description: Comma-separated list of muscle groups (primary or secondary).
+      - in: query
+        name: page
+        schema:
+          type: integer
+          default: 1
+        description: Page number (1-based).
+      - in: query
+        name: pageSize
+        schema:
+          type: integer
+          default: 20
+        description: Items per page (max 100).
+      responses:
+        '200':
+          description: Paginated exercise library results.
+        '400':
+          description: Invalid query parameters.
+        '401':
+          description: Unauthenticated.
+        '500':
+          description: Internal server error.
+  /v2/exercises/{exerciseId}/stats:
+    get:
+      summary: Per-exercise best set + last set stats + recent sessions
+      tags:
+      - Exercise & Workouts
+      description: 'Returns the caller''s all-time best set (heaviest weight; tie-broken by reps DESC, entry_date DESC, created_at DESC),
+
+        most recent set (entry_date + created_at DESC, then highest set_number), and up to 3 most recent sessions
+
+        (entry date + full set list, newest first) for a single exercise. Recent sessions include warmup sets;
+
+        entries with no weight/reps-bearing sets (e.g. cardio) are skipped. Both set fields are null and
+
+        recentSessions is empty when the user has no qualifying history. Scoped to req.userId.
+
+        '
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: path
+        name: exerciseId
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: Exercise UUID.
+      - in: query
+        name: excludePresetEntryId
+        required: false
+        schema:
+          type: string
+          format: uuid
+        description: 'Optional preset-entry UUID to exclude from the baseline. Used by the live active-workout card so today''s
+
+          in-progress (or pre-persisted planned) sets do not pollute the historical best/last baseline, and by the
+
+          edit-workout screens to exclude the workout being edited. Also applies to recentSessions.
+
+          '
+      - in: query
+        name: presetId
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+        description: 'Optional workout preset id to scope recentSessions to. When supplied, only sessions performed as that
+
+          preset are considered, so the live "Previous" placeholders reflect this preset''s own history instead of
+
+          this exercise''s history from a different preset. Does not affect bestSet/lastSet, which stay
+
+          exercise-global (a PR is a PR regardless of which preset it happened under).
+
+          '
+      responses:
+        '200':
+          description: Best set + last set stats + recent sessions.
+        '400':
+          description: Invalid exerciseId, excludePresetEntryId (not a UUID), or presetId (not a positive integer).
+        '401':
+          description: Unauthenticated.
+        '403':
+          description: Forbidden (no diary permission when acting on behalf of another user).
+        '500':
+          description: Internal server error.
+components:
+  schemas:
+    Exercise:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier for the exercise.
+        user_id:
+          type: string
+          format: uuid
+          description: The ID of the user who owns the exercise.
+        name:
+          type: string
+          description: The name of the exercise.
+        category:
+          type: string
+          description: The category of the exercise (e.g., "Strength", "Cardio").
+        modality:
+          type: string
+          enum:
+          - weight_reps
+          - reps_only
+          - duration
+          - duration_distance
+          description: Which per-set editor clients render for the exercise. Derived from the category when not supplied on create.
+        equipment:
+          type: array
+          items:
+            type: string
+          description: A list of equipment required for the exercise.
+        muscle_groups:
+          type: array
+          items:
+            type: string
+          description: A list of muscle groups targeted by the exercise.
+        description:
+          type: string
+          description: A detailed description of the exercise.
+        instructions:
+          type: array
+          items:
+            type: string
+          description: Step-by-step instructions for performing the exercise.
+        images:
+          type: array
+          items:
+            type: string
+          description: URLs or paths to images demonstrating the exercise.
+        is_public:
+          type: boolean
+          description: Indicates if the exercise is publicly available.
+        created_at:
+          type: string
+          format: date-time
+          description: The date and time when the exercise was created.
+        updated_at:
+          type: string
+          format: date-time
+          description: The date and time when the exercise was last updated.
+      required:
+      - id
+      - user_id
+      - name
+      - category
+  securitySchemes:
+    apiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: API key authentication via x-api-key header.
+x-provenance:
+  generated: '2026-08-27'
+  method: derived
+  source: https://github.com/CodeWithCJ/SparkyFitness — assembled from the project's own swagger-jsdoc configuration (SparkyFitnessServer/config/swagger.ts) and the 419 @swagger JSDoc blocks in SparkyFitnessServer/routes/**, using the same scan paths and the same cookieAuth->apiKeyAuth post-processing the server applies. This is the identical document a running instance serves at GET /api/api-docs/json (Swagger UI at /api/api-docs/swagger, ReDoc at /api/api-docs/redoc).
+  note: 'Not fetched from a live host: SparkyFitness is self-hosted and the project operates no public instance, so the contract can only be read from the source that generates it. Upstream sets no operationIds; paths+methods are the stable identifiers.'
+  upstream_version: server package.json 1.6.4 (release v1.6.4, 2026-08-27)

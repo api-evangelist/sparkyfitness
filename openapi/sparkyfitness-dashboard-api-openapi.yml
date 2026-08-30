@@ -1,0 +1,166 @@
+openapi: 3.2.0
+info:
+  title: SparkyFitness Dashboard API
+  version: 1.0.0
+  description: API documentation for the SparkyFitness application, providing a comprehensive guide to all available endpoints. Have caution using the API directly, as improper use may lead to data loss or corruption.  Also note that the API is subject to change without notice due to heavy development, so always refer to the latest documentation for up-to-date information. It might have flaw and due to vite/nginx internal proxy actual end point accessed via front end URL might be different than hitting them directly on the server.
+  contact:
+    name: SparkyFitness Support
+servers:
+- url: https://{host}/api
+  description: Self-hosted SparkyFitness instance (the operator supplies the host). The upstream spec declares the relative base "/api".
+  variables:
+    host:
+      default: sparkyfitness.example.com
+      description: Hostname of your own SparkyFitness deployment. SparkyFitness is self-hosted; there is no vendor-operated API host.
+security:
+- apiKeyAuth: []
+tags:
+- name: Dashboard
+paths:
+  /daily-summary:
+    get:
+      summary: Get consolidated daily summary
+      tags:
+      - Dashboard
+      description: Returns goals, food entries, exercise sessions, and water intake for a single date in one response.
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: query
+        name: date
+        required: true
+        schema:
+          type: string
+          format: date
+          example: '2026-03-26'
+        description: Date in YYYY-MM-DD format
+      - in: query
+        name: userId
+        schema:
+          type: string
+          format: uuid
+        description: Optional user ID for family access
+      responses:
+        '200':
+          description: Daily summary containing goals, food entries, exercise sessions, and water intake
+        '400':
+          description: Missing or invalid date parameter
+        '403':
+          description: User does not have permission to access this resource
+        '500':
+          description: Internal server error
+  /daily-summary/range:
+    get:
+      summary: Get per-day calorie balance for a date range
+      tags:
+      - Dashboard
+      description: 'Returns one calorie-balance row per day, computed by the same code path as GET /daily-summary. Reports uses this instead of deriving the balance in the browser, which is what caused issue #2094.
+
+        '
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: query
+        name: startDate
+        required: true
+        schema:
+          type: string
+          format: date
+          example: '2026-08-06'
+      - in: query
+        name: endDate
+        required: true
+        schema:
+          type: string
+          format: date
+          example: '2026-08-20'
+      - in: query
+        name: userId
+        schema:
+          type: string
+          format: uuid
+        description: Optional user ID for family access
+      responses:
+        '200':
+          description: One calorie-balance row per calendar day in the range
+        '400':
+          description: Missing/invalid dates, inverted range, or range longer than 366 days
+        '403':
+          description: User does not have permission to access this resource
+        '500':
+          description: Internal server error
+  /dashboard/stats:
+    get:
+      summary: Get dashboard statistics for external widgets
+      tags:
+      - Dashboard
+      description: Returns daily energy goal stats. Can be authenticated via Browser Session or API Key (x-api-key).
+      parameters:
+      - in: query
+        name: date
+        schema:
+          type: string
+          format: date
+        description: The date to fetch stats for (YYYY-MM-DD). Defaults to today in user's timezone.
+      responses:
+        '200':
+          description: Statistics retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  eaten:
+                    type: integer
+                    description: Food and supplement kcal logged for the day.
+                  burned:
+                    type: integer
+                    description: 'Resolved exercise calories plus BMR when the user enables "Include BMR in Net Calories". Exercise is max(device Active Calories, logged workouts + background steps), never their sum.
+
+                      '
+                  remaining:
+                    type: integer
+                    description: Budget left, per the user's calorie goal adjustment mode.
+                  goal:
+                    type: integer
+                  net:
+                    type: integer
+                    description: eaten - burned.
+                  progress:
+                    type: integer
+                    minimum: 0
+                    description: 'Percent of the goal consumed. Not capped at 100 — a day over budget reports above 100, matching the Diary.
+
+                      '
+                  steps:
+                    type: integer
+                    description: Total step count from the day's check-in, or 0.
+                  stepCalories:
+                    type: integer
+                    description: 'kcal from steps no logged workout already accounted for. 0 when the caller lacks checkin permission.
+
+                      '
+                  bmr:
+                    type: integer
+                  unit:
+                    type: string
+                    example: kcal
+        '401':
+          description: Authentication required.
+        '403':
+          description: 'Family access denied — the caller lacks `diary` permission on the requested user.
+
+            '
+components:
+  securitySchemes:
+    apiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: API key authentication via x-api-key header.
+x-provenance:
+  generated: '2026-08-27'
+  method: derived
+  source: https://github.com/CodeWithCJ/SparkyFitness — assembled from the project's own swagger-jsdoc configuration (SparkyFitnessServer/config/swagger.ts) and the 419 @swagger JSDoc blocks in SparkyFitnessServer/routes/**, using the same scan paths and the same cookieAuth->apiKeyAuth post-processing the server applies. This is the identical document a running instance serves at GET /api/api-docs/json (Swagger UI at /api/api-docs/swagger, ReDoc at /api/api-docs/redoc).
+  note: 'Not fetched from a live host: SparkyFitness is self-hosted and the project operates no public instance, so the contract can only be read from the source that generates it. Upstream sets no operationIds; paths+methods are the stable identifiers.'
+  upstream_version: server package.json 1.6.4 (release v1.6.4, 2026-08-27)

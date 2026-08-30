@@ -1,0 +1,925 @@
+openapi: 3.2.0
+info:
+  title: SparkyFitness System & Admin API
+  version: 1.0.0
+  description: API documentation for the SparkyFitness application, providing a comprehensive guide to all available endpoints. Have caution using the API directly, as improper use may lead to data loss or corruption.  Also note that the API is subject to change without notice due to heavy development, so always refer to the latest documentation for up-to-date information. It might have flaw and due to vite/nginx internal proxy actual end point accessed via front end URL might be different than hitting them directly on the server.
+  contact:
+    name: SparkyFitness Support
+servers:
+- url: https://{host}/api
+  description: Self-hosted SparkyFitness instance (the operator supplies the host). The upstream spec declares the relative base "/api".
+  variables:
+    host:
+      default: sparkyfitness.example.com
+      description: Hostname of your own SparkyFitness deployment. SparkyFitness is self-hosted; there is no vendor-operated API host.
+security:
+- apiKeyAuth: []
+tags:
+- name: System & Admin
+  description: System configuration, administrative tasks, backups, reviews, and versioning.
+paths:
+  /admin/users:
+    get:
+      summary: Get all users with pagination and search
+      tags:
+      - System & Admin
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: query
+        name: limit
+        schema:
+          type: integer
+          default: 10
+        description: The maximum number of users to return.
+      - in: query
+        name: offset
+        schema:
+          type: integer
+          default: 0
+        description: The number of users to skip before starting to return results.
+      - in: query
+        name: searchTerm
+        schema:
+          type: string
+        description: Search term for user names or emails.
+      responses:
+        '200':
+          description: A list of users.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+        '500':
+          description: Server error.
+  /admin/users/{userId}:
+    delete:
+      summary: Delete a user
+      tags:
+      - System & Admin
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: path
+        name: userId
+        schema:
+          type: string
+          format: uuid
+        required: true
+        description: The ID of the user to delete.
+      responses:
+        '200':
+          description: User deleted successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden (e.g., cannot delete primary admin).
+        '404':
+          description: User not found.
+        '500':
+          description: Server error.
+  /admin/users/{userId}/status:
+    put:
+      summary: Update user status (active/inactive)
+      tags:
+      - System & Admin
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: path
+        name: userId
+        schema:
+          type: string
+          format: uuid
+        required: true
+        description: The ID of the user to update.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                isActive:
+                  type: boolean
+              required:
+              - isActive
+      responses:
+        '200':
+          description: User status updated successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: Invalid request body.
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden (e.g., cannot change primary admin status).
+        '404':
+          description: User not found.
+        '500':
+          description: Server error.
+  /admin/users/{userId}/role:
+    put:
+      summary: Update user role (user/admin)
+      tags:
+      - System & Admin
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: path
+        name: userId
+        schema:
+          type: string
+          format: uuid
+        required: true
+        description: The ID of the user to update.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                role:
+                  type: string
+                  enum:
+                  - user
+                  - admin
+              required:
+              - role
+      responses:
+        '200':
+          description: User role updated successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: Invalid request body.
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden (e.g., cannot change primary admin role).
+        '404':
+          description: User not found.
+        '500':
+          description: Server error.
+  /admin/users/{userId}/full-name:
+    put:
+      summary: Update user's full name
+      tags:
+      - System & Admin
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: path
+        name: userId
+        schema:
+          type: string
+          format: uuid
+        required: true
+        description: The ID of the user to update.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                fullName:
+                  type: string
+              required:
+              - fullName
+      responses:
+        '200':
+          description: User full name updated successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: Invalid request body.
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+        '404':
+          description: User not found.
+        '500':
+          description: Server error.
+  /admin/users/{userId}/reset-password:
+    post:
+      summary: Initiate a password reset for a user
+      tags:
+      - System & Admin
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: path
+        name: userId
+        schema:
+          type: string
+          format: uuid
+        required: true
+        description: The ID of the user to reset the password for.
+      responses:
+        '200':
+          description: Password reset email sent successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+        '404':
+          description: User not found.
+        '500':
+          description: Server error.
+  /admin/users/{userId}/mfa/reset:
+    post:
+      summary: Reset MFA for a user
+      tags:
+      - System & Admin
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: path
+        name: userId
+        schema:
+          type: string
+          format: uuid
+        required: true
+        description: The ID of the user to reset MFA for.
+      responses:
+        '200':
+          description: MFA reset successfully.
+        '404':
+          description: User not found.
+  /admin/ai-service-settings/global:
+    get:
+      summary: Get all global AI service settings
+      tags:
+      - System & Admin
+      security:
+      - apiKeyAuth: []
+      responses:
+        '200':
+          description: List of global AI service settings
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+    post:
+      summary: Create a new global AI service setting
+      tags:
+      - System & Admin
+      security:
+      - apiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                service_name:
+                  type: string
+                service_type:
+                  type: string
+                api_key:
+                  type: string
+                custom_url:
+                  type: string
+                system_prompt:
+                  type: string
+                is_active:
+                  type: boolean
+                model_name:
+                  type: string
+                chat_tool_profile:
+                  type: string
+                  enum:
+                  - full
+                  - core
+      responses:
+        '201':
+          description: Global AI service setting created
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+  /admin/ai-service-settings/global/{id}:
+    put:
+      summary: Update a global AI service setting
+      tags:
+      - System & Admin
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                service_name:
+                  type: string
+                service_type:
+                  type: string
+                api_key:
+                  type: string
+                custom_url:
+                  type: string
+                system_prompt:
+                  type: string
+                is_active:
+                  type: boolean
+                model_name:
+                  type: string
+                chat_tool_profile:
+                  type: string
+                  enum:
+                  - full
+                  - core
+      responses:
+        '200':
+          description: Global AI service setting updated
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Setting not found
+    delete:
+      summary: Delete a global AI service setting
+      tags:
+      - System & Admin
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Global AI service setting deleted
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Setting not found
+  /admin/external-data-providers/global:
+    get:
+      summary: Get all global external data providers
+      tags:
+      - System & Admin
+      security:
+      - apiKeyAuth: []
+      responses:
+        '200':
+          description: List of global external data providers
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+    post:
+      summary: Create a new global external data provider
+      tags:
+      - System & Admin
+      security:
+      - apiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                provider_name:
+                  type: string
+                provider_type:
+                  type: string
+                app_id:
+                  type: string
+                app_key:
+                  type: string
+                base_url:
+                  type: string
+                is_active:
+                  type: boolean
+      responses:
+        '201':
+          description: Global external data provider created
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+  /admin/external-data-providers/global/{id}:
+    put:
+      summary: Update a global external data provider
+      tags:
+      - System & Admin
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                provider_name:
+                  type: string
+                provider_type:
+                  type: string
+                app_id:
+                  type: string
+                app_key:
+                  type: string
+                base_url:
+                  type: string
+                is_active:
+                  type: boolean
+      responses:
+        '200':
+          description: Global external data provider updated
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Provider not found
+    delete:
+      summary: Delete a global external data provider
+      tags:
+      - System & Admin
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Global external data provider deleted
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Provider not found
+  /announcement/current:
+    get:
+      summary: Get current active announcement from GitHub
+      tags:
+      - System & Admin
+      responses:
+        '200':
+          description: Announcement payload.
+  /admin/backup/manual:
+    post:
+      summary: Trigger a manual backup
+      tags:
+      - System & Admin
+      security:
+      - apiKeyAuth: []
+      responses:
+        '200':
+          description: Backup completed successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  path:
+                    type: string
+                  fileName:
+                    type: string
+        '500':
+          description: Server error during backup.
+  /admin/backup/restore:
+    post:
+      summary: Upload and restore a backup
+      tags:
+      - System & Admin
+      security:
+      - apiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                backupFile:
+                  type: string
+                  format: binary
+                  description: The backup file to upload.
+      responses:
+        '200':
+          description: Restore completed successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: No backup file uploaded.
+        '500':
+          description: Server error during restore.
+  /admin/backup/settings:
+    get:
+      summary: Get backup settings
+      tags:
+      - System & Admin
+      security:
+      - apiKeyAuth: []
+      responses:
+        '200':
+          description: Backup settings retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BackupSettings'
+        '500':
+          description: Server error.
+    post:
+      summary: Update backup settings
+      tags:
+      - System & Admin
+      security:
+      - apiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                backupEnabled:
+                  type: boolean
+                backupDays:
+                  type: array
+                  items:
+                    type: string
+                backupTime:
+                  type: string
+                retentionDays:
+                  type: integer
+      responses:
+        '200':
+          description: Backup settings saved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  settings:
+                    $ref: '#/components/schemas/BackupSettings'
+        '500':
+          description: Server error.
+  /admin/backup/list:
+    get:
+      summary: List all available backup files
+      tags:
+      - System & Admin
+      security:
+      - apiKeyAuth: []
+      responses:
+        '200':
+          description: Backup files listed successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  backups:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        fileName:
+                          type: string
+                        size:
+                          type: integer
+                        createdAt:
+                          type: string
+                          format: date-time
+                          description: When the backup run started.
+                        completedAt:
+                          type: string
+                          format: date-time
+                          description: When the backup run finished.
+        '500':
+          description: Server error.
+  /admin/backup/download/{fileName}:
+    get:
+      summary: Download a specific backup file
+      tags:
+      - System & Admin
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - in: path
+        name: fileName
+        required: true
+        schema:
+          type: string
+        description: The backup file name, as returned by GET /admin/backup/list.
+      responses:
+        '200':
+          description: Backup file downloaded successfully.
+          content:
+            application/gzip:
+              schema:
+                type: string
+                format: binary
+        '400':
+          description: Invalid backup file name.
+        '404':
+          description: Backup file not found.
+        '500':
+          description: Server error.
+  /admin/global-settings:
+    get:
+      summary: GET Global Authentication Settings (Admin Only)
+      tags:
+      - System & Admin
+      security:
+      - apiKeyAuth: []
+      responses:
+        '200':
+          description: Global settings.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GlobalSettings'
+    put:
+      summary: Update Global Authentication Settings (Admin Only)
+      tags:
+      - System & Admin
+      security:
+      - apiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GlobalSettings'
+      responses:
+        '200':
+          description: Settings updated successfully.
+  /global-settings/allow-user-ai-config:
+    get:
+      summary: Check if users are allowed to configure AI services (Public)
+      tags:
+      - System & Admin
+      security:
+      - apiKeyAuth: []
+      responses:
+        '200':
+          description: Returns whether user AI config is allowed.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  allow_user_ai_config:
+                    type: boolean
+  /health:
+    get:
+      summary: System health check
+      tags:
+      - System & Admin
+      responses:
+        '200':
+          description: System is up and running.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: UP
+  /review/needs-review-count:
+    get:
+      summary: Get the count of items needing review
+      tags:
+      - System & Admin
+      security:
+      - apiKeyAuth: []
+      responses:
+        '200':
+          description: Count of items.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: integer
+  /review/needs-review:
+    get:
+      summary: Get the list of items needing review
+      tags:
+      - System & Admin
+      security:
+      - apiKeyAuth: []
+      responses:
+        '200':
+          description: List of items needing review.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      format: uuid
+                    type:
+                      type: string
+                      enum:
+                      - food
+                      - exercise
+                    name:
+                      type: string
+  /version/current:
+    get:
+      summary: Get current app version
+      tags:
+      - System & Admin
+      responses:
+        '200':
+          description: App version.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  version:
+                    type: string
+  /version/latest-github:
+    get:
+      summary: Get latest GitHub release
+      tags:
+      - System & Admin
+      responses:
+        '200':
+          description: Latest release.
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier for the user.
+        email:
+          type: string
+          format: email
+          description: The user's email address.
+        role:
+          type: string
+          enum:
+          - user
+          - admin
+          description: The user's role in the system.
+        is_active:
+          type: boolean
+          description: Indicates if the user account is active.
+        full_name:
+          type:
+          - string
+          - 'null'
+          description: The user's full name.
+        created_at:
+          type: string
+          format: date-time
+          description: The date and time when the user account was created.
+        last_login_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: The date and time of the user's last login.
+      required:
+      - id
+      - email
+      - role
+      - is_active
+    GlobalSettings:
+      type: object
+      properties:
+        enable_email_password_login:
+          type: boolean
+        is_oidc_active:
+          type: boolean
+        is_mfa_mandatory:
+          type: boolean
+        default_vision_ai_service_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: Global default AI service used for vision tasks (food-photo, label scan) by users on the global default. Null clears it.
+    BackupSettings:
+      type: object
+      properties:
+        backupEnabled:
+          type: boolean
+        backupDays:
+          type: array
+          items:
+            type: string
+        backupTime:
+          type: string
+        retentionDays:
+          type: integer
+        lastBackupStatus:
+          type: string
+        lastBackupTimestamp:
+          type: string
+          format: date-time
+        backupLocation:
+          type: string
+  securitySchemes:
+    apiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: API key authentication via x-api-key header.
+x-provenance:
+  generated: '2026-08-27'
+  method: derived
+  source: https://github.com/CodeWithCJ/SparkyFitness — assembled from the project's own swagger-jsdoc configuration (SparkyFitnessServer/config/swagger.ts) and the 419 @swagger JSDoc blocks in SparkyFitnessServer/routes/**, using the same scan paths and the same cookieAuth->apiKeyAuth post-processing the server applies. This is the identical document a running instance serves at GET /api/api-docs/json (Swagger UI at /api/api-docs/swagger, ReDoc at /api/api-docs/redoc).
+  note: 'Not fetched from a live host: SparkyFitness is self-hosted and the project operates no public instance, so the contract can only be read from the source that generates it. Upstream sets no operationIds; paths+methods are the stable identifiers.'
+  upstream_version: server package.json 1.6.4 (release v1.6.4, 2026-08-27)
