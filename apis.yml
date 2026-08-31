@@ -39,6 +39,17 @@ tags:
 - Fitness
 - Nutrition
 - Self-Hosted
+- Open-Source
+- Wearables
+- MCP
+- AI Assistant
+- Quantified Self
+tags_raw:
+- Company
+- Health
+- Fitness
+- Nutrition
+- Self-Hosted
 - Open Source
 - Wearables
 - MCP
@@ -95,6 +106,8 @@ apis:
   humanURL: https://codewithcj.github.io/SparkyFitness/developer/api-reference
   baseURL: https://{host}/api
   tags:
+  - Artificial Intelligence
+  tags_raw:
   - AI
   properties:
   - type: OpenAPI
