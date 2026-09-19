@@ -219,6 +219,8 @@ apis:
   humanURL: https://codewithcj.github.io/SparkyFitness/developer/api-reference
   baseURL: https://{host}/api
   tags:
+  - Dashboards
+  tags_raw:
   - Dashboard
   properties:
   - type: OpenAPI
