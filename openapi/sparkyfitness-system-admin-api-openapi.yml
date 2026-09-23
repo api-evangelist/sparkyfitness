@@ -2,7 +2,7 @@ openapi: 3.2.0
 info:
   title: SparkyFitness System & Admin API
   version: 1.0.0
-  description: API documentation for the SparkyFitness application, providing a comprehensive guide to all available endpoints. Have caution using the API directly, as improper use may lead to data loss or corruption.  Also note that the API is subject to change without notice due to heavy development, so always refer to the latest documentation for up-to-date information. It might have flaw and due to vite/nginx internal proxy actual end point accessed via front end URL might be different than hitting them directly on the server.
+  description: API documentation for the SparkyFitness application, providing a comprehensive guide to all available endpoints.
   contact:
     name: SparkyFitness Support
 servers:
@@ -58,6 +58,8 @@ paths:
           description: Forbidden.
         '500':
           description: Server error.
+      operationId: getAdminUsers
+      x-operation-id-source: derived
   /admin/users/{userId}:
     delete:
       summary: Delete a user
@@ -91,6 +93,8 @@ paths:
           description: User not found.
         '500':
           description: Server error.
+      operationId: deleteAdminUsersByUserId
+      x-operation-id-source: derived
   /admin/users/{userId}/status:
     put:
       summary: Update user status (active/inactive)
@@ -137,6 +141,8 @@ paths:
           description: User not found.
         '500':
           description: Server error.
+      operationId: putAdminUsersByUserIdStatus
+      x-operation-id-source: derived
   /admin/users/{userId}/role:
     put:
       summary: Update user role (user/admin)
@@ -186,6 +192,8 @@ paths:
           description: User not found.
         '500':
           description: Server error.
+      operationId: putAdminUsersByUserIdRole
+      x-operation-id-source: derived
   /admin/users/{userId}/full-name:
     put:
       summary: Update user's full name
@@ -232,6 +240,8 @@ paths:
           description: User not found.
         '500':
           description: Server error.
+      operationId: putAdminUsersByUserIdFullName
+      x-operation-id-source: derived
   /admin/users/{userId}/reset-password:
     post:
       summary: Initiate a password reset for a user
@@ -265,6 +275,8 @@ paths:
           description: User not found.
         '500':
           description: Server error.
+      operationId: postAdminUsersByUserIdResetPassword
+      x-operation-id-source: derived
   /admin/users/{userId}/mfa/reset:
     post:
       summary: Reset MFA for a user
@@ -285,6 +297,8 @@ paths:
           description: MFA reset successfully.
         '404':
           description: User not found.
+      operationId: postAdminUsersByUserIdMfaReset
+      x-operation-id-source: derived
   /admin/ai-service-settings/global:
     get:
       summary: Get all global AI service settings
@@ -299,6 +313,8 @@ paths:
           description: Unauthorized
         '403':
           description: Forbidden
+      operationId: getAdminAiServiceSettingsGlobal
+      x-operation-id-source: derived
     post:
       summary: Create a new global AI service setting
       tags:
@@ -340,6 +356,8 @@ paths:
           description: Unauthorized
         '403':
           description: Forbidden
+      operationId: postAdminAiServiceSettingsGlobal
+      x-operation-id-source: derived
   /admin/ai-service-settings/global/{id}:
     put:
       summary: Update a global AI service setting
@@ -391,6 +409,8 @@ paths:
           description: Forbidden
         '404':
           description: Setting not found
+      operationId: putAdminAiServiceSettingsGlobalById
+      x-operation-id-source: derived
     delete:
       summary: Delete a global AI service setting
       tags:
@@ -413,6 +433,8 @@ paths:
           description: Forbidden
         '404':
           description: Setting not found
+      operationId: deleteAdminAiServiceSettingsGlobalById
+      x-operation-id-source: derived
   /admin/external-data-providers/global:
     get:
       summary: Get all global external data providers
@@ -427,6 +449,8 @@ paths:
           description: Unauthorized
         '403':
           description: Forbidden
+      operationId: getAdminExternalDataProvidersGlobal
+      x-operation-id-source: derived
     post:
       summary: Create a new global external data provider
       tags:
@@ -461,6 +485,8 @@ paths:
           description: Unauthorized
         '403':
           description: Forbidden
+      operationId: postAdminExternalDataProvidersGlobal
+      x-operation-id-source: derived
   /admin/external-data-providers/global/{id}:
     put:
       summary: Update a global external data provider
@@ -505,6 +531,8 @@ paths:
           description: Forbidden
         '404':
           description: Provider not found
+      operationId: putAdminExternalDataProvidersGlobalById
+      x-operation-id-source: derived
     delete:
       summary: Delete a global external data provider
       tags:
@@ -527,6 +555,8 @@ paths:
           description: Forbidden
         '404':
           description: Provider not found
+      operationId: deleteAdminExternalDataProvidersGlobalById
+      x-operation-id-source: derived
   /announcement/current:
     get:
       summary: Get current active announcement from GitHub
@@ -535,6 +565,8 @@ paths:
       responses:
         '200':
           description: Announcement payload.
+      operationId: getAnnouncementCurrent
+      x-operation-id-source: derived
   /admin/backup/manual:
     post:
       summary: Trigger a manual backup
@@ -558,6 +590,8 @@ paths:
                     type: string
         '500':
           description: Server error during backup.
+      operationId: postAdminBackupManual
+      x-operation-id-source: derived
   /admin/backup/restore:
     post:
       summary: Upload and restore a backup
@@ -590,6 +624,8 @@ paths:
           description: No backup file uploaded.
         '500':
           description: Server error during restore.
+      operationId: postAdminBackupRestore
+      x-operation-id-source: derived
   /admin/backup/settings:
     get:
       summary: Get backup settings
@@ -606,6 +642,8 @@ paths:
                 $ref: '#/components/schemas/BackupSettings'
         '500':
           description: Server error.
+      operationId: getAdminBackupSettings
+      x-operation-id-source: derived
     post:
       summary: Update backup settings
       tags:
@@ -643,6 +681,8 @@ paths:
                     $ref: '#/components/schemas/BackupSettings'
         '500':
           description: Server error.
+      operationId: postAdminBackupSettings
+      x-operation-id-source: derived
   /admin/backup/list:
     get:
       summary: List all available backup files
@@ -677,6 +717,8 @@ paths:
                           description: When the backup run finished.
         '500':
           description: Server error.
+      operationId: getAdminBackupList
+      x-operation-id-source: derived
   /admin/backup/download/{fileName}:
     get:
       summary: Download a specific backup file
@@ -705,6 +747,8 @@ paths:
           description: Backup file not found.
         '500':
           description: Server error.
+      operationId: getAdminBackupDownloadByFileName
+      x-operation-id-source: derived
   /admin/global-settings:
     get:
       summary: GET Global Authentication Settings (Admin Only)
@@ -719,6 +763,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GlobalSettings'
+      operationId: getAdminGlobalSettings
+      x-operation-id-source: derived
     put:
       summary: Update Global Authentication Settings (Admin Only)
       tags:
@@ -734,6 +780,8 @@ paths:
       responses:
         '200':
           description: Settings updated successfully.
+      operationId: putAdminGlobalSettings
+      x-operation-id-source: derived
   /global-settings/allow-user-ai-config:
     get:
       summary: Check if users are allowed to configure AI services (Public)
@@ -751,6 +799,8 @@ paths:
                 properties:
                   allow_user_ai_config:
                     type: boolean
+      operationId: getGlobalSettingsAllowUserAiConfig
+      x-operation-id-source: derived
   /health:
     get:
       summary: System health check
@@ -767,6 +817,8 @@ paths:
                   status:
                     type: string
                     example: UP
+      operationId: getHealth
+      x-operation-id-source: derived
   /review/needs-review-count:
     get:
       summary: Get the count of items needing review
@@ -784,6 +836,8 @@ paths:
                 properties:
                   count:
                     type: integer
+      operationId: getReviewNeedsReviewCount
+      x-operation-id-source: derived
   /review/needs-review:
     get:
       summary: Get the list of items needing review
@@ -811,6 +865,8 @@ paths:
                       - exercise
                     name:
                       type: string
+      operationId: getReviewNeedsReview
+      x-operation-id-source: derived
   /version/current:
     get:
       summary: Get current app version
@@ -826,6 +882,8 @@ paths:
                 properties:
                   version:
                     type: string
+      operationId: getVersionCurrent
+      x-operation-id-source: derived
   /version/latest-github:
     get:
       summary: Get latest GitHub release
@@ -834,8 +892,25 @@ paths:
       responses:
         '200':
           description: Latest release.
+      operationId: getVersionLatestGithub
+      x-operation-id-source: derived
 components:
   schemas:
+    GlobalSettings:
+      type: object
+      properties:
+        enable_email_password_login:
+          type: boolean
+        is_oidc_active:
+          type: boolean
+        is_mfa_mandatory:
+          type: boolean
+        default_vision_ai_service_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: Global default AI service used for vision tasks (food-photo, label scan) by users on the global default. Null clears it.
     User:
       type: object
       properties:
@@ -876,21 +951,6 @@ components:
       - email
       - role
       - is_active
-    GlobalSettings:
-      type: object
-      properties:
-        enable_email_password_login:
-          type: boolean
-        is_oidc_active:
-          type: boolean
-        is_mfa_mandatory:
-          type: boolean
-        default_vision_ai_service_id:
-          type:
-          - string
-          - 'null'
-          format: uuid
-          description: Global default AI service used for vision tasks (food-photo, label scan) by users on the global default. Null clears it.
     BackupSettings:
       type: object
       properties:

@@ -2,7 +2,7 @@ openapi: 3.2.0
 info:
   title: SparkyFitness Wellness & Metrics API
   version: 1.0.0
-  description: API documentation for the SparkyFitness application, providing a comprehensive guide to all available endpoints. Have caution using the API directly, as improper use may lead to data loss or corruption.  Also note that the API is subject to change without notice due to heavy development, so always refer to the latest documentation for up-to-date information. It might have flaw and due to vite/nginx internal proxy actual end point accessed via front end URL might be different than hitting them directly on the server.
+  description: API documentation for the SparkyFitness application, providing a comprehensive guide to all available endpoints.
   contact:
     name: SparkyFitness Support
 servers:
@@ -21,9 +21,7 @@ paths:
   /measurements/check-in-photos/dates:
     get:
       summary: List the dates on which the user has progress photos
-      description: 'Returns the distinct calendar days (YYYY-MM-DD, newest first) that have at least one progress photo. Used to mark those days on the check-in calendar. Registered before /:date so it is not shadowed by it.
-
-        '
+      description: Returns the distinct calendar days (YYYY-MM-DD, newest first) that have at least one progress photo. Used to mark those days on the check-in calendar. Registered before /:date so it is not shadowed by it.
       tags:
       - Wellness & Metrics
       security:
@@ -38,6 +36,8 @@ paths:
                 items:
                   type: string
                   format: date
+      operationId: getMeasurementsCheckInPhotosDates
+      x-operation-id-source: derived
   /measurements/check-in-photos/{date}:
     get:
       summary: Get progress photos for a check-in date
@@ -57,6 +57,8 @@ paths:
           description: Array of photo records for the given date.
         '400':
           description: Invalid date format.
+      operationId: getMeasurementsCheckInPhotosByDate
+      x-operation-id-source: derived
   /measurements/check-in-photos/file/{id}:
     get:
       summary: Serve a progress photo image (authenticated, owner/family only)
@@ -81,6 +83,8 @@ paths:
                 format: binary
         '404':
           description: Photo not found or not accessible.
+      operationId: getMeasurementsCheckInPhotosFileById
+      x-operation-id-source: derived
   /measurements/check-in-photos/{date}/{type}:
     post:
       summary: Upload a progress photo (front, back, or side)
@@ -119,6 +123,8 @@ paths:
           description: Photo uploaded successfully.
         '400':
           description: Invalid parameters or file type.
+      operationId: postMeasurementsCheckInPhotosByDateByType
+      x-operation-id-source: derived
   /measurements/check-in-photos/photo/{id}:
     delete:
       summary: Delete a progress photo by ID
@@ -138,6 +144,8 @@ paths:
           description: Photo deleted.
         '400':
           description: Invalid ID.
+      operationId: deleteMeasurementsCheckInPhotosPhotoById
+      x-operation-id-source: derived
   /fasting/current:
     get:
       summary: Get current active fast
@@ -157,6 +165,8 @@ paths:
           description: Unauthorized.
         '500':
           description: Internal server error.
+      operationId: getFastingCurrent
+      x-operation-id-source: derived
   /fasting/start:
     post:
       summary: Start a new fast
@@ -199,6 +209,8 @@ paths:
           description: Unauthorized.
         '500':
           description: Internal server error.
+      operationId: postFastingStart
+      x-operation-id-source: derived
   /fasting/end:
     post:
       summary: End an active fast
@@ -251,6 +263,8 @@ paths:
           description: Fast not found.
         '500':
           description: Internal server error.
+      operationId: postFastingEnd
+      x-operation-id-source: derived
   /fasting/{id}:
     put:
       summary: Update an existing fast
@@ -286,6 +300,8 @@ paths:
           description: Fast not found.
         '500':
           description: Internal server error.
+      operationId: putFastingById
+      x-operation-id-source: derived
     delete:
       summary: Delete a fasting log
       tags:
@@ -310,6 +326,8 @@ paths:
           description: Fast not found.
         '500':
           description: Internal server error.
+      operationId: deleteFastingById
+      x-operation-id-source: derived
   /fasting/history:
     get:
       summary: Get fasting history
@@ -344,6 +362,8 @@ paths:
           description: Unauthorized.
         '500':
           description: Internal server error.
+      operationId: getFastingHistory
+      x-operation-id-source: derived
   /fasting/stats:
     get:
       summary: Get fasting statistics
@@ -370,6 +390,8 @@ paths:
           description: Unauthorized.
         '500':
           description: Internal server error.
+      operationId: getFastingStats
+      x-operation-id-source: derived
   /fasting/history/range/{startDate}/{endDate}:
     get:
       summary: Get fasting logs by date range
@@ -406,6 +428,8 @@ paths:
           description: Unauthorized.
         '500':
           description: Internal server error.
+      operationId: getFastingHistoryRangeByStartDateByEndDate
+      x-operation-id-source: derived
   /measurements/health-data:
     post:
       summary: Submit health data via API Key
@@ -472,14 +496,14 @@ paths:
           description: Unauthorized (missing or invalid API key).
         '403':
           description: Forbidden (API key lacks write permission).
+      operationId: postMeasurementsHealthData
+      x-operation-id-source: derived
   /measurements/import-health-data:
     post:
       summary: Import health data from a CSV (session authenticated)
       tags:
       - Wellness & Metrics
-      description: 'Bulk-imports client-parsed health data rows (body measurements, sleep, vitals, daily activity totals, hydration) through the same processHealthData pipeline used by mobile sync. Rows without a `source` default to `CSV_Import` so re-imports dedup on the same natural keys.
-
-        '
+      description: Bulk-imports client-parsed health data rows (body measurements, sleep, vitals, daily activity totals, hydration) through the same processHealthData pipeline used by mobile sync. Rows without a `source` default to `CSV_Import` so re-imports dedup on the same natural keys.
       security:
       - apiKeyAuth: []
       requestBody:
@@ -507,6 +531,8 @@ paths:
           description: Unauthorized.
         '403':
           description: Forbidden (lacks checkin permission).
+      operationId: postMeasurementsImportHealthData
+      x-operation-id-source: derived
   /measurements/water-intake/{date}:
     get:
       summary: Get water intake for a date
@@ -543,6 +569,8 @@ paths:
           description: Invalid date format.
         '403':
           description: Forbidden.
+      operationId: getMeasurementsWaterIntakeByDate
+      x-operation-id-source: derived
   /measurements/water-intake:
     post:
       summary: Upsert water intake
@@ -584,6 +612,8 @@ paths:
           description: Validation error.
         '403':
           description: Forbidden.
+      operationId: postMeasurementsWaterIntake
+      x-operation-id-source: derived
   /measurements/water-intake/entry/{id}:
     get:
       summary: Get a specific water intake entry by ID
@@ -601,6 +631,8 @@ paths:
       responses:
         '200':
           description: The water intake entry.
+      operationId: getMeasurementsWaterIntakeEntryById
+      x-operation-id-source: derived
   /measurements/water-intake/{id}:
     put:
       summary: Update a water intake entry
@@ -640,6 +672,8 @@ paths:
           description: Forbidden.
         '404':
           description: Water intake entry not found.
+      operationId: putMeasurementsWaterIntakeById
+      x-operation-id-source: derived
     delete:
       summary: Delete a water intake entry
       tags:
@@ -656,6 +690,8 @@ paths:
       responses:
         '200':
           description: Water intake entry deleted successfully.
+      operationId: deleteMeasurementsWaterIntakeById
+      x-operation-id-source: derived
   /measurements/check-in:
     post:
       summary: Upsert check-in measurements
@@ -709,6 +745,8 @@ paths:
           description: Check-in measurements upserted successfully.
         '400':
           description: Validation error.
+      operationId: postMeasurementsCheckIn
+      x-operation-id-source: derived
   /measurements/check-in/latest-on-or-before-date:
     get:
       summary: Get latest check-in measurements on or before a date
@@ -726,6 +764,8 @@ paths:
       responses:
         '200':
           description: The latest check-in measurements.
+      operationId: getMeasurementsCheckInLatestOnOrBeforeDate
+      x-operation-id-source: derived
   /measurements/check-in/{date}:
     get:
       summary: Get check-in measurements for a specific date
@@ -754,6 +794,8 @@ paths:
           description: Invalid date format.
         '403':
           description: Forbidden.
+      operationId: getMeasurementsCheckInByDate
+      x-operation-id-source: derived
   /measurements/check-in/{id}:
     put:
       summary: Update a check-in measurement entry
@@ -802,6 +844,8 @@ paths:
           description: Validation error or missing entry_date.
         '404':
           description: Check-in measurement not found.
+      operationId: putMeasurementsCheckInById
+      x-operation-id-source: derived
     delete:
       summary: Delete a check-in measurement entry
       tags:
@@ -818,6 +862,8 @@ paths:
       responses:
         '200':
           description: Measurement deleted successfully.
+      operationId: deleteMeasurementsCheckInById
+      x-operation-id-source: derived
   /measurements/custom-categories:
     get:
       summary: Get all custom measurement categories
@@ -834,6 +880,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/CustomMeasurementCategory'
+      operationId: getMeasurementsCustomCategories
+      x-operation-id-source: derived
     post:
       summary: Create a new custom measurement category
       tags:
@@ -872,6 +920,8 @@ paths:
           description: Custom category created successfully.
         '400':
           description: Validation error.
+      operationId: postMeasurementsCustomCategories
+      x-operation-id-source: derived
   /measurements/custom-entries:
     post:
       summary: Upsert a custom measurement entry
@@ -921,6 +971,8 @@ paths:
           description: Custom entry upserted successfully.
         '400':
           description: Validation error.
+      operationId: postMeasurementsCustomEntries
+      x-operation-id-source: derived
     get:
       summary: Get custom measurement entries with filtering
       tags:
@@ -944,6 +996,8 @@ paths:
       responses:
         '200':
           description: List of custom measurement entries.
+      operationId: getMeasurementsCustomEntries
+      x-operation-id-source: derived
   /measurements/custom-entries/{id}:
     delete:
       summary: Delete a custom measurement entry
@@ -961,6 +1015,8 @@ paths:
       responses:
         '200':
           description: Entry deleted successfully.
+      operationId: deleteMeasurementsCustomEntriesById
+      x-operation-id-source: derived
   /measurements/custom-categories/{id}:
     put:
       summary: Update a custom measurement category
@@ -1002,6 +1058,8 @@ paths:
           description: Validation error.
         '404':
           description: Custom category not found.
+      operationId: putMeasurementsCustomCategoriesById
+      x-operation-id-source: derived
     delete:
       summary: Delete a custom measurement category
       tags:
@@ -1018,6 +1076,8 @@ paths:
       responses:
         '200':
           description: Category deleted successfully.
+      operationId: deleteMeasurementsCustomCategoriesById
+      x-operation-id-source: derived
   /measurements/custom-entries/{date}:
     get:
       summary: Get custom measurement entries for a specific date
@@ -1038,6 +1098,8 @@ paths:
           description: List of custom measurement entries for the date.
         '400':
           description: Invalid date format.
+      operationId: getMeasurementsCustomEntriesByDate
+      x-operation-id-source: derived
   /measurements/check-in-measurements-range/{startDate}/{endDate}:
     get:
       summary: Get check-in measurements within a date range
@@ -1061,6 +1123,8 @@ paths:
       responses:
         '200':
           description: List of check-in measurements.
+      operationId: getMeasurementsCheckInMeasurementsRangeByStartDateByEndDate
+      x-operation-id-source: derived
   /measurements/custom-measurements-range/{categoryId}/{startDate}/{endDate}:
     get:
       summary: Get custom measurements within a date range
@@ -1090,6 +1154,8 @@ paths:
       responses:
         '200':
           description: List of custom measurements.
+      operationId: getMeasurementsCustomMeasurementsRangeByCategoryIdByStartDateByEndDate
+      x-operation-id-source: derived
   /measurements/most-recent/{measurementType}:
     get:
       summary: Get most recent measurement of a specific type
@@ -1107,6 +1173,8 @@ paths:
       responses:
         '200':
           description: The most recent measurement.
+      operationId: getMeasurementsMostRecentByMeasurementType
+      x-operation-id-source: derived
   /mood:
     post:
       summary: Create or update a mood entry
@@ -1148,6 +1216,8 @@ paths:
           description: Unauthorized.
         '500':
           description: Internal server error.
+      operationId: postMood
+      x-operation-id-source: derived
     get:
       summary: Get mood entries within a date range
       tags:
@@ -1192,6 +1262,8 @@ paths:
           description: Unauthorized.
         '500':
           description: Internal server error.
+      operationId: getMood
+      x-operation-id-source: derived
   /mood/{id}:
     get:
       summary: Get a mood entry by ID
@@ -1215,6 +1287,8 @@ paths:
                 $ref: '#/components/schemas/MoodEntry'
         '404':
           description: Mood entry not found.
+      operationId: getMoodById
+      x-operation-id-source: derived
     put:
       summary: Update a mood entry
       tags:
@@ -1241,6 +1315,8 @@ paths:
       responses:
         '200':
           description: Updated mood entry.
+      operationId: putMoodById
+      x-operation-id-source: derived
     delete:
       summary: Delete a mood entry
       tags:
@@ -1259,6 +1335,8 @@ paths:
           description: Deleted successfully.
         '404':
           description: Not found.
+      operationId: deleteMoodById
+      x-operation-id-source: derived
   /mood/date/{entryDate}:
     get:
       summary: Get a mood entry by date
@@ -1276,6 +1354,8 @@ paths:
       responses:
         '200':
           description: The mood entry for the date (or empty object if not found).
+      operationId: getMoodDateByEntryDate
+      x-operation-id-source: derived
   /sleep/analytics:
     get:
       summary: Get sleep analytics
@@ -1314,6 +1394,8 @@ paths:
           description: Unauthorized.
         '500':
           description: Internal server error.
+      operationId: getSleepAnalytics
+      x-operation-id-source: derived
   /sleep/manual_entry:
     post:
       summary: Create a manual sleep entry
@@ -1366,6 +1448,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SleepEntry'
+      operationId: postSleepManualEntry
+      x-operation-id-source: derived
   /sleep:
     get:
       summary: Get sleep entries within a date range
@@ -1395,6 +1479,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/SleepEntry'
+      operationId: getSleep
+      x-operation-id-source: derived
   /sleep/details:
     get:
       summary: Get sleep entries details within a date range
@@ -1419,6 +1505,8 @@ paths:
       responses:
         '200':
           description: Sleep entries details.
+      operationId: getSleepDetails
+      x-operation-id-source: derived
   /sleep/{id}:
     put:
       summary: Update an existing sleep entry
@@ -1464,6 +1552,8 @@ paths:
       responses:
         '200':
           description: Sleep entry updated successfully.
+      operationId: putSleepById
+      x-operation-id-source: derived
     delete:
       summary: Delete a sleep entry
       tags:
@@ -1480,6 +1570,8 @@ paths:
       responses:
         '200':
           description: Sleep entry deleted successfully.
+      operationId: deleteSleepById
+      x-operation-id-source: derived
   /v2/measurements/water-intake/entry/{id}:
     get:
       summary: Get a water intake entry by ID
@@ -1551,6 +1643,8 @@ paths:
                   error:
                     type: string
                     example: Water intake entry not found.
+      operationId: getV2MeasurementsWaterIntakeEntryById
+      x-operation-id-source: derived
   /v2/measurements/water-intake/{date}:
     get:
       summary: Get water intake for a date
@@ -1614,6 +1708,8 @@ paths:
                   error:
                     type: string
                     example: 'Forbidden: access denied.'
+      operationId: getV2MeasurementsWaterIntakeByDate
+      x-operation-id-source: derived
   /v2/measurements/water-intake:
     post:
       summary: Upsert a water intake entry
@@ -1693,6 +1789,8 @@ paths:
                   error:
                     type: string
                     example: 'Forbidden: access denied.'
+      operationId: postV2MeasurementsWaterIntake
+      x-operation-id-source: derived
   /v2/measurements/water-intake/{id}:
     put:
       summary: Update a water intake entry
@@ -1783,6 +1881,8 @@ paths:
                   error:
                     type: string
                     example: Water intake entry not found.
+      operationId: putV2MeasurementsWaterIntakeById
+      x-operation-id-source: derived
     delete:
       summary: Delete a water intake entry
       tags:
@@ -1808,6 +1908,8 @@ paths:
           description: Forbidden.
         '404':
           description: Water intake entry not found.
+      operationId: deleteV2MeasurementsWaterIntakeById
+      x-operation-id-source: derived
   /v2/measurements/water-intake/{date}/log:
     get:
       summary: Get water intake log entries for a date
@@ -1858,6 +1960,8 @@ paths:
           description: Validation error.
         '403':
           description: Forbidden.
+      operationId: getV2MeasurementsWaterIntakeByDateLog
+      x-operation-id-source: derived
   /v2/measurements/water-intake/log/{id}:
     delete:
       summary: Delete a water intake log entry
@@ -1884,6 +1988,8 @@ paths:
           description: Forbidden.
         '404':
           description: Log entry not found.
+      operationId: deleteV2MeasurementsWaterIntakeLogById
+      x-operation-id-source: derived
   /water-containers:
     post:
       summary: Create a new water container
@@ -1900,6 +2006,8 @@ paths:
       responses:
         '201':
           description: Water container created successfully.
+      operationId: postWaterContainers
+      x-operation-id-source: derived
     get:
       summary: Get all water containers for the user
       tags:
@@ -1915,6 +2023,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/WaterContainer'
+      operationId: getWaterContainers
+      x-operation-id-source: derived
   /water-containers/{id}:
     put:
       summary: Update a water container
@@ -1936,6 +2046,8 @@ paths:
       responses:
         '200':
           description: Water container updated successfully.
+      operationId: putWaterContainersById
+      x-operation-id-source: derived
     delete:
       summary: Delete a water container
       tags:
@@ -1951,6 +2063,8 @@ paths:
       responses:
         '200':
           description: Deleted successfully.
+      operationId: deleteWaterContainersById
+      x-operation-id-source: derived
   /water-containers/{id}/set-primary:
     put:
       summary: Set a water container as primary
@@ -1967,6 +2081,8 @@ paths:
       responses:
         '200':
           description: Primary container set successfully.
+      operationId: putWaterContainersByIdSetPrimary
+      x-operation-id-source: derived
   /water-containers/primary:
     get:
       summary: Get the primary water container for the user
@@ -1977,119 +2093,10 @@ paths:
       responses:
         '200':
           description: The primary water container.
+      operationId: getWaterContainersPrimary
+      x-operation-id-source: derived
 components:
   schemas:
-    SleepEntry:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        user_id:
-          type: string
-          format: uuid
-        entry_date:
-          type: string
-          format: date
-        bedtime:
-          type: string
-          format: date-time
-        wake_time:
-          type: string
-          format: date-time
-        duration_in_seconds:
-          type: integer
-        source:
-          type: string
-        sleep_score:
-          type:
-          - integer
-          - 'null'
-        record_timezone:
-          type:
-          - string
-          - 'null'
-          description: IANA timezone the entry was recorded in. NULL falls back to record_utc_offset_minutes, then the profile timezone.
-        record_utc_offset_minutes:
-          type:
-          - integer
-          - 'null'
-          description: UTC offset in minutes at recording time; used when record_timezone is absent.
-        created_at:
-          type: string
-          format: date-time
-        updated_at:
-          type: string
-          format: date-time
-      required:
-      - entry_date
-      - bedtime
-      - wake_time
-      - duration_in_seconds
-    SleepAnalytics:
-      type: object
-      properties:
-        date:
-          type: string
-          format: date
-        totalSleepDuration:
-          type: integer
-        timeAsleep:
-          type: integer
-        sleepScore:
-          type: number
-        earliestBedtime:
-          type:
-          - string
-          - 'null'
-          format: date-time
-        latestWakeTime:
-          type:
-          - string
-          - 'null'
-          format: date-time
-        sleepEfficiency:
-          type: number
-        sleepDebt:
-          type: number
-        stagePercentages:
-          type: object
-          additionalProperties:
-            type: number
-        awakePeriods:
-          type: integer
-        totalAwakeDuration:
-          type: integer
-    WaterContainer:
-      type: object
-      properties:
-        id:
-          type: integer
-        user_id:
-          type: string
-          format: uuid
-        name:
-          type: string
-        volume:
-          type: number
-          description: Volume in specified unit
-        unit:
-          type: string
-          description: ml, oz, etc.
-        is_primary:
-          type: boolean
-        servings_per_container:
-          type: number
-        created_at:
-          type: string
-          format: date-time
-        updated_at:
-          type: string
-          format: date-time
-      required:
-      - name
-      - volume
-      - unit
     MoodEntry:
       type: object
       properties:
@@ -2118,46 +2125,6 @@ components:
       required:
       - mood_value
       - entry_date
-    CustomMeasurementCategory:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        user_id:
-          type:
-          - string
-          - 'null'
-          format: uuid
-        name:
-          type: string
-        display_name:
-          type:
-          - string
-          - 'null'
-        frequency:
-          type: string
-        measurement_type:
-          type:
-          - string
-          - 'null'
-        data_type:
-          type:
-          - string
-          - 'null'
-          enum:
-          - numeric
-          - boolean
-          - text
-        created_at:
-          type: string
-          format: date-time
-        updated_at:
-          type: string
-          format: date-time
-      required:
-      - name
-      - frequency
     FastingLog:
       type: object
       properties:
@@ -2207,6 +2174,157 @@ components:
       - start_time
       - fasting_type
       - status
+    SleepAnalytics:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        totalSleepDuration:
+          type: integer
+        timeAsleep:
+          type: integer
+        sleepScore:
+          type: number
+        earliestBedtime:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        latestWakeTime:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        sleepEfficiency:
+          type: number
+        sleepDebt:
+          type: number
+        stagePercentages:
+          type: object
+          additionalProperties:
+            type: number
+        awakePeriods:
+          type: integer
+        totalAwakeDuration:
+          type: integer
+    CustomMeasurementCategory:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+        name:
+          type: string
+        display_name:
+          type:
+          - string
+          - 'null'
+        frequency:
+          type: string
+        measurement_type:
+          type:
+          - string
+          - 'null'
+        data_type:
+          type:
+          - string
+          - 'null'
+          enum:
+          - numeric
+          - boolean
+          - text
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required:
+      - name
+      - frequency
+    SleepEntry:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        entry_date:
+          type: string
+          format: date
+        bedtime:
+          type: string
+          format: date-time
+        wake_time:
+          type: string
+          format: date-time
+        duration_in_seconds:
+          type: integer
+        source:
+          type: string
+        sleep_score:
+          type:
+          - integer
+          - 'null'
+        record_timezone:
+          type:
+          - string
+          - 'null'
+          description: IANA timezone the entry was recorded in. NULL falls back to record_utc_offset_minutes, then the profile timezone.
+        record_utc_offset_minutes:
+          type:
+          - integer
+          - 'null'
+          description: UTC offset in minutes at recording time; used when record_timezone is absent.
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required:
+      - entry_date
+      - bedtime
+      - wake_time
+      - duration_in_seconds
+    WaterContainer:
+      type: object
+      properties:
+        id:
+          type: integer
+        user_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        volume:
+          type: number
+          description: Volume in specified unit
+        unit:
+          type: string
+          description: ml, oz, etc.
+        is_primary:
+          type: boolean
+        servings_per_container:
+          type: number
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required:
+      - name
+      - volume
+      - unit
   securitySchemes:
     apiKeyAuth:
       type: apiKey

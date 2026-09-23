@@ -2,7 +2,7 @@ openapi: 3.2.0
 info:
   title: SparkyFitness Exercise Entries API
   version: 1.0.0
-  description: API documentation for the SparkyFitness application, providing a comprehensive guide to all available endpoints. Have caution using the API directly, as improper use may lead to data loss or corruption.  Also note that the API is subject to change without notice due to heavy development, so always refer to the latest documentation for up-to-date information. It might have flaw and due to vite/nginx internal proxy actual end point accessed via front end URL might be different than hitting them directly on the server.
+  description: API documentation for the SparkyFitness application, providing a comprehensive guide to all available endpoints.
   contact:
     name: SparkyFitness Support
 servers:
@@ -19,10 +19,8 @@ tags:
 paths:
   /exercise-entries/import-fit:
     post:
-      summary: Import Garmin FIT activity files as exercise diary entries.
-      description: 'Decodes up to 10 uploaded .fit files and creates one exercise entry per file, including full activity details for reports. Re-uploading a file updates the existing entry. Per-file failures are reported as rows in the results array; the response is 200 unless the request itself is invalid.
-
-        '
+      summary: Import Garmin FIT activity files as exercise diary entries
+      description: Decodes up to 10 uploaded .fit files and creates one exercise entry per file, including full activity details for reports. Re-uploading a file updates the existing entry. Per-file failures are reported as rows in the results array; the response is 200 unless the request itself is invalid.
       tags:
       - Exercise Entries
       security:
@@ -85,6 +83,8 @@ paths:
           description: No files uploaded, or the upload exceeded size/count limits.
         '500':
           description: Failed to import FIT files.
+      operationId: postExerciseEntriesImportFit
+      x-operation-id-source: derived
 components:
   securitySchemes:
     apiKeyAuth:

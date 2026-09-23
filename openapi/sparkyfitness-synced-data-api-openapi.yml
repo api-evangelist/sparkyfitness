@@ -2,7 +2,7 @@ openapi: 3.2.0
 info:
   title: SparkyFitness Synced Data API
   version: 1.0.0
-  description: API documentation for the SparkyFitness application, providing a comprehensive guide to all available endpoints. Have caution using the API directly, as improper use may lead to data loss or corruption.  Also note that the API is subject to change without notice due to heavy development, so always refer to the latest documentation for up-to-date information. It might have flaw and due to vite/nginx internal proxy actual end point accessed via front end URL might be different than hitting them directly on the server.
+  description: API documentation for the SparkyFitness application, providing a comprehensive guide to all available endpoints.
   contact:
     name: SparkyFitness Support
 servers:
@@ -29,6 +29,8 @@ paths:
           description: An array of sources with per-table counts.
         '500':
           description: Failed to load synced sources.
+      operationId: getSyncedDataSources
+      x-operation-id-source: derived
   /synced-data/sources/{source}:
     delete:
       summary: Delete all of the current user's synced entries for one source
@@ -50,6 +52,8 @@ paths:
           description: Invalid or disallowed source.
         '500':
           description: Failed to delete synced data.
+      operationId: deleteSyncedDataSourcesBySource
+      x-operation-id-source: derived
 components:
   securitySchemes:
     apiKeyAuth:

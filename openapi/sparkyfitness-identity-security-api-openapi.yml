@@ -2,7 +2,7 @@ openapi: 3.2.0
 info:
   title: SparkyFitness Identity & Security API
   version: 1.0.0
-  description: API documentation for the SparkyFitness application, providing a comprehensive guide to all available endpoints. Have caution using the API directly, as improper use may lead to data loss or corruption.  Also note that the API is subject to change without notice due to heavy development, so always refer to the latest documentation for up-to-date information. It might have flaw and due to vite/nginx internal proxy actual end point accessed via front end URL might be different than hitting them directly on the server.
+  description: API documentation for the SparkyFitness application, providing a comprehensive guide to all available endpoints.
   contact:
     name: SparkyFitness Support
 servers:
@@ -41,6 +41,8 @@ paths:
           description: Forbidden.
         '500':
           description: Server error.
+      operationId: getAdminAuthSettingsMfaMandatory
+      x-operation-id-source: derived
     put:
       summary: Update global MFA mandatory setting
       tags:
@@ -76,6 +78,8 @@ paths:
           description: Forbidden.
         '500':
           description: Server error.
+      operationId: putAdminAuthSettingsMfaMandatory
+      x-operation-id-source: derived
   /admin/auth/users/{userId}/mfa/reset:
     post:
       summary: Reset a user's MFA
@@ -109,6 +113,8 @@ paths:
           description: User not found.
         '500':
           description: Server error.
+      operationId: postAdminAuthUsersByUserIdMfaReset
+      x-operation-id-source: derived
   /identity/user/generate-api-key:
     post:
       summary: Generate an API key for the current user
@@ -134,6 +140,8 @@ paths:
           description: API key generated successfully.
         '400':
           description: Invalid request body.
+      operationId: postIdentityUserGenerateApiKey
+      x-operation-id-source: derived
   /identity/user/api-key/{apiKeyId}:
     delete:
       summary: Delete an API key
@@ -151,6 +159,8 @@ paths:
           description: API key deleted successfully.
         '404':
           description: API key not found.
+      operationId: deleteIdentityUserApiKeyByApiKeyId
+      x-operation-id-source: derived
   /identity/user-api-keys:
     get:
       summary: Get the current user's API keys
@@ -160,6 +170,8 @@ paths:
       responses:
         '200':
           description: A list of API keys.
+      operationId: getIdentityUserApiKeys
+      x-operation-id-source: derived
   /identity/users/accessible-users:
     get:
       summary: Get accessible users
@@ -171,6 +183,8 @@ paths:
           description: A list of accessible users.
         '403':
           description: User is not authorized to access this resource.
+      operationId: getIdentityUsersAccessibleUsers
+      x-operation-id-source: derived
   /identity/access/can-access-user-data:
     get:
       summary: Check if the current user can access another user's data
@@ -194,6 +208,8 @@ paths:
           description: Access check result.
         '400':
           description: Missing targetUserId or permissionType.
+      operationId: getIdentityAccessCanAccessUserData
+      x-operation-id-source: derived
   /identity/access/check-family-access:
     get:
       summary: Check family access permissions
@@ -217,6 +233,8 @@ paths:
           description: Family access check result.
         '400':
           description: Missing ownerUserId or permission.
+      operationId: getIdentityAccessCheckFamilyAccess
+      x-operation-id-source: derived
   /identity/family-access:
     get:
       summary: Get family access entries
@@ -258,6 +276,8 @@ paths:
           description: Unauthorized, authentication token is missing or invalid.
         '500':
           description: Server error.
+      operationId: getIdentityFamilyAccess
+      x-operation-id-source: derived
     post:
       summary: Create a new family access entry
       tags:
@@ -298,6 +318,8 @@ paths:
           description: User is not authorized to create this entry.
         '500':
           description: Server error.
+      operationId: postIdentityFamilyAccess
+      x-operation-id-source: derived
   /identity/family-access/{id}:
     put:
       summary: Update a family access entry
@@ -345,6 +367,8 @@ paths:
           description: Family access entry not found or not authorized to update.
         '500':
           description: Server error.
+      operationId: putIdentityFamilyAccessById
+      x-operation-id-source: derived
     delete:
       summary: Delete a family access entry
       tags:
@@ -373,6 +397,8 @@ paths:
           description: Family access entry not found or not authorized to delete.
         '500':
           description: Server error.
+      operationId: deleteIdentityFamilyAccessById
+      x-operation-id-source: derived
   /identity/user:
     get:
       summary: Get current user's information
@@ -384,6 +410,8 @@ paths:
           description: The user's profile information.
         '404':
           description: User not found.
+      operationId: getIdentityUser
+      x-operation-id-source: derived
   /identity/switch-context:
     post:
       summary: Switch active user context
@@ -409,6 +437,8 @@ paths:
           description: Forbidden.
         '500':
           description: Internal server error.
+      operationId: postIdentitySwitchContext
+      x-operation-id-source: derived
   /identity/users/find-by-email:
     get:
       summary: Find a user by email
@@ -429,6 +459,8 @@ paths:
           description: Email parameter is missing.
         '404':
           description: User not found.
+      operationId: getIdentityUsersFindByEmail
+      x-operation-id-source: derived
   /identity/profiles:
     get:
       summary: Get the current user's profile
@@ -440,6 +472,8 @@ paths:
           description: The user's profile information.
         '403':
           description: User is not authorized to access this profile.
+      operationId: getIdentityProfiles
+      x-operation-id-source: derived
     put:
       summary: Update the current user's profile
       tags:
@@ -472,6 +506,8 @@ paths:
           description: User is not authorized to update this profile.
         '404':
           description: Profile not found or no changes made.
+      operationId: putIdentityProfiles
+      x-operation-id-source: derived
   /identity/update-password:
     post:
       summary: Update user password
@@ -504,6 +540,8 @@ paths:
           description: User not found.
         '500':
           description: Server error.
+      operationId: postIdentityUpdatePassword
+      x-operation-id-source: derived
   /identity/update-email:
     post:
       summary: Update user email
@@ -538,6 +576,8 @@ paths:
           description: Email already in use by another account.
         '500':
           description: Server error.
+      operationId: postIdentityUpdateEmail
+      x-operation-id-source: derived
   /identity/profiles/avatar:
     post:
       summary: Upload user avatar
@@ -575,6 +615,8 @@ paths:
           description: Unauthorized.
         '500':
           description: Internal server error.
+      operationId: postIdentityProfilesAvatar
+      x-operation-id-source: derived
   /identity/profiles/avatar/{filename}:
     get:
       summary: Get user avatar image
@@ -602,6 +644,8 @@ paths:
           description: Avatar not found.
         '500':
           description: Internal server error.
+      operationId: getIdentityProfilesAvatarByFilename
+      x-operation-id-source: derived
   /identity/mfa/email-toggle:
     post:
       summary: Toggle Email MFA
@@ -620,6 +664,8 @@ paths:
       responses:
         '200':
           description: MFA settings updated successfully.
+      operationId: postIdentityMfaEmailToggle
+      x-operation-id-source: derived
 components:
   securitySchemes:
     apiKeyAuth:

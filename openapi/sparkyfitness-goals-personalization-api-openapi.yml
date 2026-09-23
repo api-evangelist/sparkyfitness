@@ -2,7 +2,7 @@ openapi: 3.2.0
 info:
   title: SparkyFitness Goals & Personalization API
   version: 1.0.0
-  description: API documentation for the SparkyFitness application, providing a comprehensive guide to all available endpoints. Have caution using the API directly, as improper use may lead to data loss or corruption.  Also note that the API is subject to change without notice due to heavy development, so always refer to the latest documentation for up-to-date information. It might have flaw and due to vite/nginx internal proxy actual end point accessed via front end URL might be different than hitting them directly on the server.
+  description: API documentation for the SparkyFitness application, providing a comprehensive guide to all available endpoints.
   contact:
     name: SparkyFitness Support
 servers:
@@ -28,6 +28,8 @@ paths:
       responses:
         '200':
           description: Adaptive TDEE details.
+      operationId: getAdaptiveTdee
+      x-operation-id-source: derived
   /goal-presets:
     post:
       summary: Create a new goal preset
@@ -44,6 +46,8 @@ paths:
       responses:
         '201':
           description: Goal preset created successfully.
+      operationId: postGoalPresets
+      x-operation-id-source: derived
     get:
       summary: Get all goal presets for the user
       tags:
@@ -59,6 +63,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/GoalPreset'
+      operationId: getGoalPresets
+      x-operation-id-source: derived
   /goal-presets/{id}:
     get:
       summary: Get a specific goal preset by ID
@@ -80,6 +86,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GoalPreset'
+      operationId: getGoalPresetsById
+      x-operation-id-source: derived
     put:
       summary: Update a goal preset
       tags:
@@ -101,6 +109,8 @@ paths:
       responses:
         '200':
           description: Goal preset updated successfully.
+      operationId: putGoalPresetsById
+      x-operation-id-source: derived
     delete:
       summary: Delete a goal preset
       tags:
@@ -117,6 +127,8 @@ paths:
       responses:
         '204':
           description: Deleted successfully.
+      operationId: deleteGoalPresetsById
+      x-operation-id-source: derived
   /goals/by-date/{date}:
     get:
       summary: Get goals for a specific date
@@ -138,6 +150,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserGoal'
+      operationId: getGoalsByDateByDate
+      x-operation-id-source: derived
   /goals/for-date:
     get:
       summary: Get goals for a date (query param)
@@ -159,6 +173,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserGoal'
+      operationId: getGoalsForDate
+      x-operation-id-source: derived
   /goals/manage-timeline:
     post:
       summary: Manage goal timeline (upsert goals over a range)
@@ -188,6 +204,8 @@ paths:
       responses:
         '200':
           description: Timeline managed successfully.
+      operationId: postGoalsManageTimeline
+      x-operation-id-source: derived
   /onboarding:
     post:
       summary: Submit user onboarding data
@@ -228,6 +246,8 @@ paths:
       responses:
         '201':
           description: Onboarding completed successfully.
+      operationId: postOnboarding
+      x-operation-id-source: derived
   /onboarding/status:
     get:
       summary: Check if the current user has completed onboarding
@@ -242,6 +262,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/OnboardingStatus'
+      operationId: getOnboardingStatus
+      x-operation-id-source: derived
   /onboarding/skip:
     post:
       summary: Mark onboarding as skipped for the user
@@ -252,6 +274,8 @@ paths:
       responses:
         '200':
           description: Onboarding skipped successfully.
+      operationId: postOnboardingSkip
+      x-operation-id-source: derived
   /onboarding/reset:
     post:
       summary: Reset onboarding status for the user
@@ -262,6 +286,8 @@ paths:
       responses:
         '200':
           description: Onboarding status reset successfully.
+      operationId: postOnboardingReset
+      x-operation-id-source: derived
   /user-preferences:
     put:
       summary: Update user preferences
@@ -278,6 +304,8 @@ paths:
       responses:
         '200':
           description: Preferences updated successfully.
+      operationId: putUserPreferences
+      x-operation-id-source: derived
     delete:
       summary: Delete user preferences
       tags:
@@ -287,6 +315,8 @@ paths:
       responses:
         '200':
           description: Preferences deleted successfully.
+      operationId: deleteUserPreferences
+      x-operation-id-source: derived
     get:
       summary: Get user preferences
       tags:
@@ -300,6 +330,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserPreferences'
+      operationId: getUserPreferences
+      x-operation-id-source: derived
     post:
       summary: Upsert user preferences
       tags:
@@ -315,6 +347,8 @@ paths:
       responses:
         '200':
           description: Preferences upserted successfully.
+      operationId: postUserPreferences
+      x-operation-id-source: derived
   /v2/goal-presets:
     post:
       summary: Create a new goal preset
@@ -333,6 +367,8 @@ paths:
           description: Goal preset created successfully.
         '400':
           description: Validation error.
+      operationId: postV2GoalPresets
+      x-operation-id-source: derived
     get:
       summary: Get all goal presets for the authenticated user
       tags:
@@ -342,6 +378,8 @@ paths:
       responses:
         '200':
           description: List of goal presets.
+      operationId: getV2GoalPresets
+      x-operation-id-source: derived
   /v2/goal-presets/{id}:
     get:
       summary: Get a goal preset by ID
@@ -363,6 +401,8 @@ paths:
           description: Validation error.
         '404':
           description: Goal preset not found.
+      operationId: getV2GoalPresetsById
+      x-operation-id-source: derived
     put:
       summary: Update a goal preset
       tags:
@@ -388,6 +428,8 @@ paths:
           description: Validation error.
         '404':
           description: Goal preset not found.
+      operationId: putV2GoalPresetsById
+      x-operation-id-source: derived
     delete:
       summary: Delete a goal preset
       tags:
@@ -408,6 +450,8 @@ paths:
           description: Validation error.
         '404':
           description: Goal preset not found.
+      operationId: deleteV2GoalPresetsById
+      x-operation-id-source: derived
   /weekly-goal-plans:
     post:
       summary: Create a new weekly goal plan
@@ -433,6 +477,8 @@ paths:
           description: Unauthorized.
         '500':
           description: Internal server error.
+      operationId: postWeeklyGoalPlans
+      x-operation-id-source: derived
     get:
       summary: Get all weekly goal plans
       tags:
@@ -453,6 +499,8 @@ paths:
           description: Unauthorized.
         '500':
           description: Internal server error.
+      operationId: getWeeklyGoalPlans
+      x-operation-id-source: derived
   /weekly-goal-plans/active:
     get:
       summary: Get the active weekly goal plan for a specific date
@@ -482,6 +530,8 @@ paths:
           description: Unauthorized.
         '500':
           description: Internal server error.
+      operationId: getWeeklyGoalPlansActive
+      x-operation-id-source: derived
   /weekly-goal-plans/{id}:
     put:
       summary: Update an existing weekly goal plan
@@ -517,6 +567,8 @@ paths:
           description: Weekly goal plan not found or not authorized.
         '500':
           description: Internal server error.
+      operationId: putWeeklyGoalPlansById
+      x-operation-id-source: derived
     delete:
       summary: Delete a weekly goal plan
       tags:
@@ -541,6 +593,8 @@ paths:
           description: Weekly goal plan not found or not authorized.
         '500':
           description: Internal server error.
+      operationId: deleteWeeklyGoalPlansById
+      x-operation-id-source: derived
 components:
   schemas:
     OnboardingStatus:
@@ -550,6 +604,37 @@ components:
           type: boolean
         onboarding_skipped:
           type: boolean
+    UserPreferences:
+      type: object
+      properties:
+        user_id:
+          type: string
+          format: uuid
+        language:
+          type: string
+        theme:
+          type: string
+        timezone:
+          type: string
+        unit_system:
+          type: string
+          enum:
+          - metric
+          - imperial
+        meal_calorie_distribution:
+          type: object
+        calorie_safety_floor_mode:
+          type: string
+          enum:
+          - standard
+          - custom
+          - disabled
+          description: Controls adaptive calorie-target clamping. Standard uses the recommended RMR/clinical floor, custom uses calorie_safety_floor_value, and disabled only reports health warnings.
+        calorie_safety_floor_value:
+          type: integer
+          minimum: 800
+          maximum: 5000
+          description: Custom calorie safety floor in kcal/day. Used when calorie_safety_floor_mode is custom.
     WeeklyGoalPlan:
       type: object
       properties:
@@ -680,37 +765,6 @@ components:
       required:
       - preset_name
       - calories
-    UserPreferences:
-      type: object
-      properties:
-        user_id:
-          type: string
-          format: uuid
-        language:
-          type: string
-        theme:
-          type: string
-        timezone:
-          type: string
-        unit_system:
-          type: string
-          enum:
-          - metric
-          - imperial
-        meal_calorie_distribution:
-          type: object
-        calorie_safety_floor_mode:
-          type: string
-          enum:
-          - standard
-          - custom
-          - disabled
-          description: Controls adaptive calorie-target clamping. Standard uses the recommended RMR/clinical floor, custom uses calorie_safety_floor_value, and disabled only reports health warnings.
-        calorie_safety_floor_value:
-          type: integer
-          minimum: 800
-          maximum: 5000
-          description: Custom calorie safety floor in kcal/day. Used when calorie_safety_floor_mode is custom.
   securitySchemes:
     apiKeyAuth:
       type: apiKey

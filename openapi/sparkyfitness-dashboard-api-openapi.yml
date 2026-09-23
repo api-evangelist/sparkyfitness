@@ -2,7 +2,7 @@ openapi: 3.2.0
 info:
   title: SparkyFitness Dashboard API
   version: 1.0.0
-  description: API documentation for the SparkyFitness application, providing a comprehensive guide to all available endpoints. Have caution using the API directly, as improper use may lead to data loss or corruption.  Also note that the API is subject to change without notice due to heavy development, so always refer to the latest documentation for up-to-date information. It might have flaw and due to vite/nginx internal proxy actual end point accessed via front end URL might be different than hitting them directly on the server.
+  description: API documentation for the SparkyFitness application, providing a comprehensive guide to all available endpoints.
   contact:
     name: SparkyFitness Support
 servers:
@@ -49,14 +49,14 @@ paths:
           description: User does not have permission to access this resource
         '500':
           description: Internal server error
+      operationId: getDailySummary
+      x-operation-id-source: derived
   /daily-summary/range:
     get:
       summary: Get per-day calorie balance for a date range
       tags:
       - Dashboard
-      description: 'Returns one calorie-balance row per day, computed by the same code path as GET /daily-summary. Reports uses this instead of deriving the balance in the browser, which is what caused issue #2094.
-
-        '
+      description: 'Returns one calorie-balance row per day, computed by the same code path as GET /daily-summary. Reports uses this instead of deriving the balance in the browser, which is what caused issue #2094.'
       security:
       - apiKeyAuth: []
       parameters:
@@ -89,6 +89,8 @@ paths:
           description: User does not have permission to access this resource
         '500':
           description: Internal server error
+      operationId: getDailySummaryRange
+      x-operation-id-source: derived
   /dashboard/stats:
     get:
       summary: Get dashboard statistics for external widgets
@@ -151,6 +153,8 @@ paths:
           description: 'Family access denied — the caller lacks `diary` permission on the requested user.
 
             '
+      operationId: getDashboardStats
+      x-operation-id-source: derived
 components:
   securitySchemes:
     apiKeyAuth:

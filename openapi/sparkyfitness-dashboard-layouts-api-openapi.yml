@@ -2,7 +2,7 @@ openapi: 3.2.0
 info:
   title: SparkyFitness Dashboard Layouts API
   version: 1.0.0
-  description: API documentation for the SparkyFitness application, providing a comprehensive guide to all available endpoints. Have caution using the API directly, as improper use may lead to data loss or corruption.  Also note that the API is subject to change without notice due to heavy development, so always refer to the latest documentation for up-to-date information. It might have flaw and due to vite/nginx internal proxy actual end point accessed via front end URL might be different than hitting them directly on the server.
+  description: API documentation for the SparkyFitness application, providing a comprehensive guide to all available endpoints.
   contact:
     name: SparkyFitness Support
 servers:
@@ -42,6 +42,8 @@ paths:
           description: Unknown page key.
         '401':
           description: Unauthorized.
+      operationId: getDashboardLayoutsByPageKey
+      x-operation-id-source: derived
     put:
       summary: Create or update the widget layout for a dashboard page
       tags:
@@ -81,6 +83,8 @@ paths:
           description: Invalid payload or unknown page key.
         '401':
           description: Unauthorized.
+      operationId: putDashboardLayoutsByPageKey
+      x-operation-id-source: derived
     delete:
       summary: Reset a dashboard page layout to defaults (deletes the stored row)
       tags:
@@ -100,6 +104,8 @@ paths:
           description: Unknown page key.
         '401':
           description: Unauthorized.
+      operationId: deleteDashboardLayoutsByPageKey
+      x-operation-id-source: derived
 components:
   schemas:
     DashboardLayout:

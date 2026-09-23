@@ -2,7 +2,7 @@ openapi: 3.2.0
 info:
   title: SparkyFitness AI & Insights API
   version: 1.0.0
-  description: API documentation for the SparkyFitness application, providing a comprehensive guide to all available endpoints. Have caution using the API directly, as improper use may lead to data loss or corruption.  Also note that the API is subject to change without notice due to heavy development, so always refer to the latest documentation for up-to-date information. It might have flaw and due to vite/nginx internal proxy actual end point accessed via front end URL might be different than hitting them directly on the server.
+  description: API documentation for the SparkyFitness application, providing a comprehensive guide to all available endpoints.
   contact:
     name: SparkyFitness Support
 servers:
@@ -63,6 +63,8 @@ paths:
           description: Not found.
         '500':
           description: Server error.
+      operationId: postChat
+      x-operation-id-source: derived
   /chat/clear-old-history:
     post:
       summary: Clear old chat history for the authenticated user
@@ -75,6 +77,8 @@ paths:
           description: Confirmation of successful clearing.
         '500':
           description: Server error.
+      operationId: postChatClearOldHistory
+      x-operation-id-source: derived
   /chat/ai-service-settings:
     get:
       summary: Retrieve AI service settings for the authenticated user
@@ -89,6 +93,8 @@ paths:
           description: Forbidden.
         '500':
           description: Server error.
+      operationId: getChatAiServiceSettings
+      x-operation-id-source: derived
   /chat/ai-service-settings/active:
     get:
       summary: Retrieve the active AI service setting for the authenticated user
@@ -105,12 +111,12 @@ paths:
           description: Not found.
         '500':
           description: Server error.
+      operationId: getChatAiServiceSettingsActive
+      x-operation-id-source: derived
   /chat/ai-service-settings/test:
     post:
       summary: Test an AI service connection with a minimal live completion
-      description: 'Runs a minimal completion against the supplied provider config without persisting anything. Returns HTTP 200 for both pass (`ok: true`) and provider failure (`ok: false`, with a `category`), so the client can show a friendly, category-specific message instead of a generic API error. On edit, a blank `api_key` falls back to the stored encrypted key.
-
-        '
+      description: 'Runs a minimal completion against the supplied provider config without persisting anything. Returns HTTP 200 for both pass (`ok: true`) and provider failure (`ok: false`, with a `category`), so the client can show a friendly, category-specific message instead of a generic API error. On edit, a blank `api_key` falls back to the stored encrypted key.'
       tags:
       - AI & Insights
       security:
@@ -144,6 +150,8 @@ paths:
           description: Forbidden (per-user AI config disabled, or non-admin testing a global service).
         '500':
           description: Server error.
+      operationId: postChatAiServiceSettingsTest
+      x-operation-id-source: derived
   /chat/ai-service-settings/{id}:
     delete:
       summary: Delete an AI service setting
@@ -169,6 +177,8 @@ paths:
           description: Not found.
         '500':
           description: Server error.
+      operationId: deleteChatAiServiceSettingsById
+      x-operation-id-source: derived
   /chat/sparky-chat-history:
     get:
       summary: Retrieve Sparky chat history for the authenticated user
@@ -183,6 +193,8 @@ paths:
           description: Forbidden.
         '500':
           description: Server error.
+      operationId: getChatSparkyChatHistory
+      x-operation-id-source: derived
   /chat/sparky-chat-history/entry/{id}:
     get:
       summary: Retrieve a single Sparky chat history entry
@@ -208,6 +220,8 @@ paths:
           description: Not found.
         '500':
           description: Server error.
+      operationId: getChatSparkyChatHistoryEntryById
+      x-operation-id-source: derived
   /chat/sparky-chat-history/{id}:
     put:
       summary: Update a Sparky chat history entry
@@ -239,6 +253,8 @@ paths:
           description: Not found.
         '500':
           description: Server error.
+      operationId: putChatSparkyChatHistoryById
+      x-operation-id-source: derived
     delete:
       summary: Delete a Sparky chat history entry
       tags:
@@ -263,6 +279,8 @@ paths:
           description: Not found.
         '500':
           description: Server error.
+      operationId: deleteChatSparkyChatHistoryById
+      x-operation-id-source: derived
   /chat/clear-all-history:
     post:
       summary: Clear all Sparky chat history for the authenticated user
@@ -277,6 +295,8 @@ paths:
           description: Forbidden.
         '500':
           description: Server error.
+      operationId: postChatClearAllHistory
+      x-operation-id-source: derived
   /chat/save-history:
     post:
       summary: Save a Sparky chat history entry
@@ -306,6 +326,8 @@ paths:
           description: Forbidden.
         '500':
           description: Server error.
+      operationId: postChatSaveHistory
+      x-operation-id-source: derived
   /chat/food-options:
     post:
       summary: Generate food options for a given food name and unit
@@ -342,6 +364,8 @@ paths:
           description: Upstream AI service error.
         '504':
           description: AI service timed out.
+      operationId: postChatFoodOptions
+      x-operation-id-source: derived
   /reports:
     get:
       summary: Get comprehensive reports data
@@ -371,6 +395,8 @@ paths:
       responses:
         '200':
           description: Reports data.
+      operationId: getReports
+      x-operation-id-source: derived
   /reports/mini-nutrition-trends:
     get:
       summary: Get mini nutrition trends
@@ -400,6 +426,8 @@ paths:
       responses:
         '200':
           description: Mini nutrition trends.
+      operationId: getReportsMiniNutritionTrends
+      x-operation-id-source: derived
   /reports/nutrition-trends-with-goals:
     get:
       summary: Get nutrition trends with goals
@@ -429,6 +457,8 @@ paths:
       responses:
         '200':
           description: Nutrition trends with goals.
+      operationId: getReportsNutritionTrendsWithGoals
+      x-operation-id-source: derived
   /reports/exercise-dashboard:
     get:
       summary: Get exercise dashboard data
@@ -470,6 +500,8 @@ paths:
       responses:
         '200':
           description: Exercise dashboard data.
+      operationId: getReportsExerciseDashboard
+      x-operation-id-source: derived
 components:
   securitySchemes:
     apiKeyAuth:

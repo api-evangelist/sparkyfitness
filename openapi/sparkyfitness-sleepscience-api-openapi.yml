@@ -2,7 +2,7 @@ openapi: 3.2.0
 info:
   title: SparkyFitness Sleep Science API
   version: 1.0.0
-  description: API documentation for the SparkyFitness application, providing a comprehensive guide to all available endpoints. Have caution using the API directly, as improper use may lead to data loss or corruption.  Also note that the API is subject to change without notice due to heavy development, so always refer to the latest documentation for up-to-date information. It might have flaw and due to vite/nginx internal proxy actual end point accessed via front end URL might be different than hitting them directly on the server.
+  description: API documentation for the SparkyFitness application, providing a comprehensive guide to all available endpoints.
   contact:
     name: SparkyFitness Support
 servers:
@@ -33,6 +33,8 @@ paths:
       responses:
         '200':
           description: Sleep debt data
+      operationId: getSleepScienceSleepDebt
+      x-operation-id-source: derived
   /sleep-science/calculate-baseline:
     post:
       summary: Calculate and persist MCTQ baseline sleep need
@@ -52,6 +54,8 @@ paths:
       responses:
         '200':
           description: MCTQ calculation result
+      operationId: postSleepScienceCalculateBaseline
+      x-operation-id-source: derived
   /sleep-science/mctq-stats:
     get:
       summary: Get MCTQ statistics and calculation history
@@ -67,6 +71,8 @@ paths:
       responses:
         '200':
           description: MCTQ stats
+      operationId: getSleepScienceMctqStats
+      x-operation-id-source: derived
   /sleep-science/daily-need:
     get:
       summary: Get dynamic daily sleep need (WHOOP-style decomposition)
@@ -88,6 +94,8 @@ paths:
       responses:
         '200':
           description: Daily sleep need breakdown
+      operationId: getSleepScienceDailyNeed
+      x-operation-id-source: derived
   /sleep-science/energy-curve:
     get:
       summary: Get 24-hour energy curve (Two-Process Model)
@@ -103,6 +111,8 @@ paths:
       responses:
         '200':
           description: 96-point energy curve with zones
+      operationId: getSleepScienceEnergyCurve
+      x-operation-id-source: derived
   /sleep-science/chronotype:
     get:
       summary: Get chronotype analysis
@@ -118,6 +128,8 @@ paths:
       responses:
         '200':
           description: Chronotype classification and circadian markers
+      operationId: getSleepScienceChronotype
+      x-operation-id-source: derived
   /sleep-science/data-sufficiency:
     get:
       summary: Check if enough sleep data exists for MCTQ calculation
@@ -133,6 +145,8 @@ paths:
       responses:
         '200':
           description: Data sufficiency assessment
+      operationId: getSleepScienceDataSufficiency
+      x-operation-id-source: derived
 components:
   securitySchemes:
     apiKeyAuth:

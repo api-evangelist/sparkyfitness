@@ -2,7 +2,7 @@ openapi: 3.2.0
 info:
   title: SparkyFitness Nutrition & Meals API
   version: 1.0.0
-  description: API documentation for the SparkyFitness application, providing a comprehensive guide to all available endpoints. Have caution using the API directly, as improper use may lead to data loss or corruption.  Also note that the API is subject to change without notice due to heavy development, so always refer to the latest documentation for up-to-date information. It might have flaw and due to vite/nginx internal proxy actual end point accessed via front end URL might be different than hitting them directly on the server.
+  description: API documentation for the SparkyFitness application, providing a comprehensive guide to all available endpoints.
   contact:
     name: SparkyFitness Support
 servers:
@@ -58,6 +58,8 @@ paths:
           description: Unauthorized, authentication token is missing or invalid.
         '500':
           description: Failed to create custom nutrient.
+      operationId: postCustomNutrients
+      x-operation-id-source: derived
     get:
       summary: Retrieve all custom nutrients
       tags:
@@ -78,14 +80,14 @@ paths:
           description: Unauthorized, authentication token is missing or invalid.
         '500':
           description: Failed to fetch custom nutrients.
+      operationId: getCustomNutrients
+      x-operation-id-source: derived
   /custom-nutrients/from-catalog:
     post:
       summary: Find-or-create custom nutrients from the canonical micronutrient catalog
       tags:
       - Nutrition & Meals
-      description: 'Ensures the authenticated user has a custom nutrient for each supplied canonical catalog id, seeded with the catalog''s name, unit, aliases and Daily Value. Idempotent: ids the user already has (matched by name or alias) are skipped, as are catalog entries that are already first-class nutrient columns.
-
-        '
+      description: 'Ensures the authenticated user has a custom nutrient for each supplied canonical catalog id, seeded with the catalog''s name, unit, aliases and Daily Value. Idempotent: ids the user already has (matched by name or alias) are skipped, as are catalog entries that are already first-class nutrient columns.'
       security:
       - apiKeyAuth: []
       requestBody:
@@ -138,6 +140,8 @@ paths:
           description: Unauthorized, authentication token is missing or invalid.
         '500':
           description: Failed to seed custom nutrients.
+      operationId: postCustomNutrientsFromCatalog
+      x-operation-id-source: derived
   /custom-nutrients/{id}:
     get:
       summary: Retrieve a single custom nutrient by ID
@@ -167,6 +171,8 @@ paths:
           description: Custom nutrient not found.
         '500':
           description: Failed to fetch custom nutrient.
+      operationId: getCustomNutrientsById
+      x-operation-id-source: derived
     put:
       summary: Update a custom nutrient
       tags:
@@ -213,6 +219,8 @@ paths:
           description: Custom nutrient not found or unauthorized.
         '500':
           description: Failed to update custom nutrient.
+      operationId: putCustomNutrientsById
+      x-operation-id-source: derived
     delete:
       summary: Delete a custom nutrient
       tags:
@@ -242,6 +250,8 @@ paths:
           description: Custom nutrient not found or unauthorized.
         '500':
           description: Failed to delete custom nutrient.
+      operationId: deleteCustomNutrientsById
+      x-operation-id-source: derived
   /favorites:
     get:
       summary: List the user's favorite (starred) foods and meals
@@ -250,15 +260,21 @@ paths:
       responses:
         '200':
           description: The user's favorite foods and meals.
+      operationId: getFavorites
+      x-operation-id-source: derived
   /favorites/{type}/{id}:
     post:
       summary: Star a food or meal as a favorite
       tags:
       - Nutrition & Meals
+      operationId: postFavoritesByTypeById
+      x-operation-id-source: derived
     delete:
       summary: Remove a food or meal from favorites
       tags:
       - Nutrition & Meals
+      operationId: deleteFavoritesByTypeById
+      x-operation-id-source: derived
   /foods/search:
     get:
       summary: Search for foods (AI-dedicated)
@@ -298,6 +314,8 @@ paths:
                   $ref: '#/components/schemas/Food'
         '400':
           description: Invalid request parameters.
+      operationId: getFoodsSearch
+      x-operation-id-source: derived
   /foods:
     get:
       summary: Search for foods
@@ -346,6 +364,8 @@ paths:
                   $ref: '#/components/schemas/Food'
         '400':
           description: Invalid request parameters.
+      operationId: getFoods
+      x-operation-id-source: derived
     post:
       summary: Create a new food
       tags:
@@ -366,6 +386,8 @@ paths:
                 $ref: '#/components/schemas/Food'
         '403':
           description: User does not have permission to create a food.
+      operationId: postFoods
+      x-operation-id-source: derived
   /foods/foods-paginated:
     get:
       summary: Get foods with pagination
@@ -412,6 +434,8 @@ paths:
                       $ref: '#/components/schemas/Food'
                   totalCount:
                     type: integer
+      operationId: getFoodsFoodsPaginated
+      x-operation-id-source: derived
   /foods/food-variants:
     post:
       summary: Create a new food variant
@@ -435,6 +459,8 @@ paths:
           description: User does not have permission to create a food variant.
         '404':
           description: Food not found.
+      operationId: postFoodsFoodVariants
+      x-operation-id-source: derived
     get:
       summary: Get food variants by food ID
       tags:
@@ -459,6 +485,8 @@ paths:
                   $ref: '#/components/schemas/FoodVariant'
         '400':
           description: Food ID is required.
+      operationId: getFoodsFoodVariants
+      x-operation-id-source: derived
   /foods/food-variants/bulk:
     post:
       summary: Bulk create food variants
@@ -484,6 +512,8 @@ paths:
                   $ref: '#/components/schemas/FoodVariant'
         '403':
           description: User does not have permission to create food variants.
+      operationId: postFoodsFoodVariantsBulk
+      x-operation-id-source: derived
   /foods/food-variants/{id}:
     get:
       summary: Get a food variant by ID
@@ -511,6 +541,8 @@ paths:
           description: User does not have permission to access this resource.
         '404':
           description: Food variant not found.
+      operationId: getFoodsFoodVariantsById
+      x-operation-id-source: derived
     put:
       summary: Update a food variant
       tags:
@@ -543,6 +575,8 @@ paths:
           description: User does not have permission to update this food variant.
         '404':
           description: Food variant not found.
+      operationId: putFoodsFoodVariantsById
+      x-operation-id-source: derived
     delete:
       summary: Delete a food variant
       tags:
@@ -565,6 +599,8 @@ paths:
           description: User does not have permission to delete this food variant.
         '404':
           description: Food variant not found.
+      operationId: deleteFoodsFoodVariantsById
+      x-operation-id-source: derived
   /foods/barcode/{barcode}:
     get:
       summary: Look up a food by barcode
@@ -605,6 +641,8 @@ paths:
                     $ref: '#/components/schemas/Food'
         '400':
           description: Invalid barcode format.
+      operationId: getFoodsBarcodeByBarcode
+      x-operation-id-source: derived
   /foods/{foodId}:
     get:
       summary: Get a food by ID
@@ -632,6 +670,8 @@ paths:
           description: User does not have permission to access this resource.
         '404':
           description: Food not found.
+      operationId: getFoodsByFoodId
+      x-operation-id-source: derived
   /foods/{id}:
     put:
       summary: Update a food
@@ -665,6 +705,8 @@ paths:
           description: User does not have permission to update this food.
         '404':
           description: Food not found or not authorized to update.
+      operationId: putFoodsById
+      x-operation-id-source: derived
     delete:
       summary: Delete a food
       tags:
@@ -692,6 +734,8 @@ paths:
           description: User does not have permission to delete this food.
         '404':
           description: Food not found.
+      operationId: deleteFoodsById
+      x-operation-id-source: derived
   /foods/{id}/deletion-impact:
     get:
       summary: Get food deletion impact
@@ -715,6 +759,8 @@ paths:
           description: User does not have permission to access this resource.
         '404':
           description: Food not found.
+      operationId: getFoodsByIdDeletionImpact
+      x-operation-id-source: derived
   /foods/import-from-csv:
     post:
       summary: Import foods from CSV
@@ -737,6 +783,8 @@ paths:
           description: Food data imported successfully.
         '400':
           description: Food data is required.
+      operationId: postFoodsImportFromCsv
+      x-operation-id-source: derived
   /foods/needs-review:
     get:
       summary: Get foods needing review
@@ -752,6 +800,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Food'
+      operationId: getFoodsNeedsReview
+      x-operation-id-source: derived
   /foods/update-snapshot:
     post:
       summary: Update food entries snapshot
@@ -782,6 +832,8 @@ paths:
           description: The result of the snapshot update.
         '400':
           description: foodId is required.
+      operationId: postFoodsUpdateSnapshot
+      x-operation-id-source: derived
   /food-entry-meals:
     post:
       summary: Create a new FoodEntryMeal
@@ -803,6 +855,8 @@ paths:
                 $ref: '#/components/schemas/FoodEntryMeal'
         '403':
           description: User does not have permission to create a food entry meal.
+      operationId: postFoodEntryMeals
+      x-operation-id-source: derived
   /food-entry-meals/by-date/{date}:
     get:
       summary: Get FoodEntryMeals by date
@@ -828,6 +882,8 @@ paths:
                   $ref: '#/components/schemas/FoodEntryMeal'
         '403':
           description: User does not have permission to access this resource.
+      operationId: getFoodEntryMealsByDateByDate
+      x-operation-id-source: derived
   /food-entry-meals/{id}:
     get:
       summary: Get a specific FoodEntryMeal with its components
@@ -853,6 +909,8 @@ paths:
           description: User does not have permission to access this resource.
         '404':
           description: FoodEntryMeal not found.
+      operationId: getFoodEntryMealsById
+      x-operation-id-source: derived
     put:
       summary: Update an existing FoodEntryMeal
       tags:
@@ -883,6 +941,8 @@ paths:
           description: User does not have permission to update this food entry meal.
         '404':
           description: FoodEntryMeal not found.
+      operationId: putFoodEntryMealsById
+      x-operation-id-source: derived
     delete:
       summary: Delete a FoodEntryMeal
       tags:
@@ -903,14 +963,14 @@ paths:
           description: User does not have permission to delete this food entry meal.
         '404':
           description: FoodEntryMeal not found.
+      operationId: deleteFoodEntryMealsById
+      x-operation-id-source: derived
   /food-entry-meals/{id}/image:
     post:
       summary: Set a logged meal's override photo
       tags:
       - Nutrition & Meals
-      description: 'Attaches a photo to this diary entry only. It never modifies the meal template''s own images; entries without an override fall back to those.
-
-        '
+      description: Attaches a photo to this diary entry only. It never modifies the meal template's own images; entries without an override fall back to those.
       requestBody:
         content:
           multipart/form-data:
@@ -932,18 +992,20 @@ paths:
           description: No image supplied.
         '404':
           description: FoodEntryMeal not found.
+      operationId: postFoodEntryMealsByIdImage
+      x-operation-id-source: derived
     delete:
       summary: Clear a logged meal's override photo
       tags:
       - Nutrition & Meals
-      description: 'Removes the entry-specific photo so the entry falls back to the meal template''s own image. The template is never modified.
-
-        '
+      description: Removes the entry-specific photo so the entry falls back to the meal template's own image. The template is never modified.
       responses:
         '200':
           description: The updated logged meal.
         '404':
           description: FoodEntryMeal not found.
+      operationId: deleteFoodEntryMealsByIdImage
+      x-operation-id-source: derived
   /food-entries/export/csv:
     get:
       summary: Export all food entries as CSV
@@ -958,14 +1020,14 @@ paths:
             text/csv:
               schema:
                 type: string
+      operationId: getFoodEntriesExportCsv
+      x-operation-id-source: derived
   /food-entries/import-from-csv:
     post:
       summary: Import diary log entries from CSV
       tags:
       - Nutrition & Meals
-      description: 'Bulk-creates diary log entries (food_entries) from CSV rows, distinct from /foods/import-from-csv which only imports food-library master data. Unmatched foods are auto-created from the row''s own nutrient columns; a row with no match and no nutrients is a per-row error.
-
-        '
+      description: Bulk-creates diary log entries (food_entries) from CSV rows, distinct from /foods/import-from-csv which only imports food-library master data. Unmatched foods are auto-created from the row's own nutrient columns; a row with no match and no nutrients is a per-row error.
       requestBody:
         required: true
         content:
@@ -989,6 +1051,8 @@ paths:
           description: Per-row import results (processed/errors/skipped).
         '400':
           description: Entries are required.
+      operationId: postFoodEntriesImportFromCsv
+      x-operation-id-source: derived
   /food-entries:
     post:
       summary: Create a new food entry
@@ -1012,6 +1076,8 @@ paths:
           description: Invalid request body.
         '403':
           description: User does not have permission to create a food entry.
+      operationId: postFoodEntries
+      x-operation-id-source: derived
     get:
       summary: Get food entries by selected date
       tags:
@@ -1038,6 +1104,8 @@ paths:
           description: Selected date parameter is missing.
         '403':
           description: User does not have permission to access this resource.
+      operationId: getFoodEntries
+      x-operation-id-source: derived
   /food-entries/copy:
     post:
       summary: Copy food entries from one meal to another
@@ -1073,6 +1141,8 @@ paths:
           description: Invalid request body.
         '403':
           description: User does not have permission to copy food entries.
+      operationId: postFoodEntriesCopy
+      x-operation-id-source: derived
   /food-entries/copy-from-user:
     post:
       summary: Copy food entries from a family member's diary to the active user's diary
@@ -1111,14 +1181,14 @@ paths:
           description: Missing fields
         '403':
           description: Forbidden
+      operationId: postFoodEntriesCopyFromUser
+      x-operation-id-source: derived
   /food-entries/copy-reviewed-from-user:
     post:
       summary: Copy an unchanged reviewed family meal into the authenticated user's diary
       tags:
       - Nutrition & Meals
-      description: 'Preserves logged composite meal containers. The submitted entry IDs and source fingerprints are an optimistic-concurrency snapshot; any added, removed, or changed source row returns 409 and writes nothing.
-
-        '
+      description: Preserves logged composite meal containers. The submitted entry IDs and source fingerprints are an optimistic-concurrency snapshot; any added, removed, or changed source row returns 409 and writes nothing.
       requestBody:
         required: true
         content:
@@ -1174,6 +1244,8 @@ paths:
           description: Forbidden.
         '409':
           description: The reviewed source meal changed before it could be copied.
+      operationId: postFoodEntriesCopyReviewedFromUser
+      x-operation-id-source: derived
   /food-entries/copy-selected-from-user:
     post:
       summary: Copy selected food entries from a family member's diary
@@ -1235,6 +1307,8 @@ paths:
           description: Forbidden.
         '409':
           description: A selected source entry changed after it was reviewed.
+      operationId: postFoodEntriesCopySelectedFromUser
+      x-operation-id-source: derived
   /food-entries/copy-to-user:
     post:
       summary: Copy food entries from the active user's diary to a family member's diary
@@ -1273,6 +1347,8 @@ paths:
           description: Missing fields
         '403':
           description: Forbidden
+      operationId: postFoodEntriesCopyToUser
+      x-operation-id-source: derived
   /food-entries/copy-yesterday:
     post:
       summary: Copy food entries from yesterday's meal
@@ -1301,6 +1377,8 @@ paths:
           description: Invalid request body.
         '403':
           description: User does not have permission to copy food entries.
+      operationId: postFoodEntriesCopyYesterday
+      x-operation-id-source: derived
   /food-entries/copy-all:
     post:
       summary: Copy all food entries from one day to another
@@ -1330,6 +1408,8 @@ paths:
           description: sourceDate and targetDate are required.
         '403':
           description: User does not have permission.
+      operationId: postFoodEntriesCopyAll
+      x-operation-id-source: derived
   /food-entries/copy-all-yesterday:
     post:
       summary: Copy all food entries from yesterday
@@ -1353,6 +1433,8 @@ paths:
           description: All food entries were copied successfully.
         '400':
           description: targetDate is required.
+      operationId: postFoodEntriesCopyAllYesterday
+      x-operation-id-source: derived
   /food-entries/{id}:
     put:
       summary: Update a food entry
@@ -1386,6 +1468,8 @@ paths:
           description: User does not have permission to update this food entry.
         '404':
           description: Food entry not found.
+      operationId: putFoodEntriesById
+      x-operation-id-source: derived
     delete:
       summary: Delete a food entry
       tags:
@@ -1408,6 +1492,8 @@ paths:
           description: User does not have permission to delete this food entry.
         '404':
           description: Food entry not found.
+      operationId: deleteFoodEntriesById
+      x-operation-id-source: derived
   /food-entries/by-date/{date}:
     get:
       summary: Get all food entries for a specific date
@@ -1435,6 +1521,8 @@ paths:
           description: Date parameter is missing.
         '403':
           description: User does not have permission to access this resource.
+      operationId: getFoodEntriesByDateByDate
+      x-operation-id-source: derived
   /food-entries/range/{startDate}/{endDate}:
     get:
       summary: Get food entries within a date range
@@ -1469,6 +1557,8 @@ paths:
           description: Start or end date parameters are missing.
         '403':
           description: User does not have permission to access this resource.
+      operationId: getFoodEntriesRangeByStartDateByEndDate
+      x-operation-id-source: derived
   /food-entries/nutrition/today:
     get:
       summary: Get daily nutrition summary
@@ -1496,14 +1586,14 @@ paths:
           description: User does not have permission to access this resource.
         '404':
           description: Nutrition summary not found for this date.
+      operationId: getFoodEntriesNutritionToday
+      x-operation-id-source: derived
   /food-entries/{id}/image:
     post:
       summary: Set the per-entry override photo for a diary entry
       tags:
       - Nutrition & Meals
-      description: 'Uploads a photo that applies only to this diary entry. It never changes the underlying food''s or meal''s own images; entries without an override fall back to those at display time.
-
-        '
+      description: Uploads a photo that applies only to this diary entry. It never changes the underlying food's or meal's own images; entries without an override fall back to those at display time.
       requestBody:
         required: true
         content:
@@ -1526,16 +1616,18 @@ paths:
           description: No image supplied.
         '403':
           description: User does not have permission to manage this diary.
+      operationId: postFoodEntriesByIdImage
+      x-operation-id-source: derived
     delete:
       summary: Clear a diary entry's override photo
       tags:
       - Nutrition & Meals
-      description: 'Removes the entry-specific photo so the entry falls back to the parent food''s or meal''s own image. The parent is never modified.
-
-        '
+      description: Removes the entry-specific photo so the entry falls back to the parent food's or meal's own image. The parent is never modified.
       responses:
         '200':
           description: The updated food entry.
+      operationId: deleteFoodEntriesByIdImage
+      x-operation-id-source: derived
   /foods/food-entries/{date}:
     get:
       summary: Get food entries by date (re-routed)
@@ -1555,6 +1647,8 @@ paths:
           description: A list of food entries for the specified date.
         '400':
           description: Invalid date parameter.
+      operationId: getFoodsFoodEntriesByDate
+      x-operation-id-source: derived
   /meal-plan-templates:
     post:
       summary: Create a new meal plan template
@@ -1576,6 +1670,8 @@ paths:
                 $ref: '#/components/schemas/MealPlanTemplate'
         '403':
           description: User does not have permission to create a meal plan template.
+      operationId: postMealPlanTemplates
+      x-operation-id-source: derived
     get:
       summary: Get all meal plan templates for a user
       tags:
@@ -1592,6 +1688,8 @@ paths:
                   $ref: '#/components/schemas/MealPlanTemplate'
         '403':
           description: User does not have permission to access this resource.
+      operationId: getMealPlanTemplates
+      x-operation-id-source: derived
   /meal-plan-templates/{id}:
     put:
       summary: Update a meal plan template
@@ -1623,6 +1721,8 @@ paths:
           description: User does not have permission to update this meal plan template.
         '404':
           description: Meal plan template not found.
+      operationId: putMealPlanTemplatesById
+      x-operation-id-source: derived
     delete:
       summary: Delete a meal plan template
       tags:
@@ -1643,6 +1743,8 @@ paths:
           description: User does not have permission to delete this meal plan template.
         '404':
           description: Meal plan template not found.
+      operationId: deleteMealPlanTemplatesById
+      x-operation-id-source: derived
   /meal-plan-templates/{id}/duplicate:
     post:
       summary: Duplicate a meal plan template
@@ -1664,6 +1766,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MealPlanTemplate'
+      operationId: postMealPlanTemplatesByIdDuplicate
+      x-operation-id-source: derived
   /meals/plan:
     post:
       summary: Create a new meal plan entry
@@ -1710,6 +1814,8 @@ paths:
           description: Invalid request body.
         '403':
           description: User does not have permission to create a meal plan entry.
+      operationId: postMealsPlan
+      x-operation-id-source: derived
     get:
       summary: Get meal plan entries for a specific date or date range
       tags:
@@ -1737,6 +1843,8 @@ paths:
           description: startDate and endDate are required.
         '403':
           description: User does not have permission to access this resource.
+      operationId: getMealsPlan
+      x-operation-id-source: derived
   /meals/plan/{id}:
     put:
       summary: Update a meal plan entry
@@ -1791,6 +1899,8 @@ paths:
           description: User does not have permission to update this meal plan entry.
         '404':
           description: Meal plan entry not found.
+      operationId: putMealsPlanById
+      x-operation-id-source: derived
     delete:
       summary: Delete a meal plan entry
       tags:
@@ -1811,6 +1921,8 @@ paths:
           description: User does not have permission to delete this meal plan entry.
         '404':
           description: Meal plan entry not found.
+      operationId: deleteMealsPlanById
+      x-operation-id-source: derived
   /meals:
     post:
       summary: Create a new meal template
@@ -1882,6 +1994,8 @@ paths:
           description: Validation error (e.g. serving_size/total_servings not positive, ambiguous or inaccessible ingredient, cycle, or nesting depth exceeded).
         '403':
           description: User does not have permission to create a meal.
+      operationId: postMeals
+      x-operation-id-source: derived
     get:
       summary: Get all meal templates for the user
       tags:
@@ -1903,6 +2017,8 @@ paths:
           description: A list of meal templates.
         '403':
           description: User does not have permission to access this resource.
+      operationId: getMeals
+      x-operation-id-source: derived
   /meals/recent:
     get:
       summary: Get recently logged meal templates
@@ -1923,6 +2039,8 @@ paths:
           description: A list of recently logged meal templates.
         '403':
           description: User does not have permission to access this resource.
+      operationId: getMealsRecent
+      x-operation-id-source: derived
   /meals/top:
     get:
       summary: Get most frequently logged meal templates
@@ -1943,6 +2061,8 @@ paths:
           description: A list of the most frequently logged meal templates.
         '403':
           description: User does not have permission to access this resource.
+      operationId: getMealsTop
+      x-operation-id-source: derived
   /meals/search:
     get:
       summary: Search for meal templates
@@ -1961,6 +2081,8 @@ paths:
           description: A list of meal templates matching the search term.
         '400':
           description: Search term is required.
+      operationId: getMealsSearch
+      x-operation-id-source: derived
   /meals/{id}:
     get:
       summary: Get a specific meal template by ID
@@ -1984,6 +2106,8 @@ paths:
           description: User does not have permission to access this resource.
         '404':
           description: Meal not found.
+      operationId: getMealsById
+      x-operation-id-source: derived
     put:
       summary: Update an existing meal template
       tags:
@@ -2064,6 +2188,8 @@ paths:
           description: User does not have permission to update this meal.
         '404':
           description: Meal not found.
+      operationId: putMealsById
+      x-operation-id-source: derived
     delete:
       summary: Delete a meal template
       tags:
@@ -2084,6 +2210,8 @@ paths:
           description: User does not have permission to delete this meal.
         '404':
           description: Meal not found.
+      operationId: deleteMealsById
+      x-operation-id-source: derived
   /meals/{id}/deletion-impact:
     get:
       summary: Get the deletion impact for a meal
@@ -2105,6 +2233,8 @@ paths:
           description: User does not have permission to access this resource.
         '404':
           description: Meal not found.
+      operationId: getMealsByIdDeletionImpact
+      x-operation-id-source: derived
   /meals/plan/{id}/log-to-diary:
     post:
       summary: Log a specific meal plan entry to the food diary
@@ -2139,6 +2269,8 @@ paths:
           description: User does not have permission to perform this action.
         '404':
           description: Meal plan entry or associated meal template not found.
+      operationId: postMealsPlanByIdLogToDiary
+      x-operation-id-source: derived
   /meals/plan/log-day-to-diary:
     post:
       summary: Log all meal plan entries for a specific day to the food diary
@@ -2170,6 +2302,8 @@ paths:
           description: plan_date is required.
         '403':
           description: User does not have permission to perform this action.
+      operationId: postMealsPlanLogDayToDiary
+      x-operation-id-source: derived
   /meals/needs-review:
     get:
       summary: Get meals needing review
@@ -2181,6 +2315,8 @@ paths:
           description: A list of meals needing review.
         '403':
           description: User does not have permission to access this resource.
+      operationId: getMealsNeedsReview
+      x-operation-id-source: derived
   /meals/update-snapshot:
     post:
       summary: Update meal entries snapshot
@@ -2207,6 +2343,8 @@ paths:
           description: mealId is required.
         '403':
           description: User does not have permission to perform this action.
+      operationId: postMealsUpdateSnapshot
+      x-operation-id-source: derived
   /meals/create-meal-from-diary:
     post:
       summary: Create a meal from diary entries
@@ -2246,6 +2384,8 @@ paths:
           description: Date and mealType are required, or no food entries found, or cannot create meal.
         '403':
           description: User does not have permission to perform this action.
+      operationId: postMealsCreateMealFromDiary
+      x-operation-id-source: derived
   /meal-types:
     get:
       summary: Retrieve all meal types
@@ -2267,6 +2407,8 @@ paths:
           description: Unauthorized, authentication token is missing or invalid.
         '500':
           description: Failed to fetch meal types.
+      operationId: getMealTypes
+      x-operation-id-source: derived
     post:
       summary: Create a new custom meal type
       tags:
@@ -2311,6 +2453,8 @@ paths:
           description: A meal type with the given name already exists.
         '500':
           description: Failed to create meal type.
+      operationId: postMealTypes
+      x-operation-id-source: derived
   /meal-types/{id}:
     get:
       summary: Retrieve a single meal type by ID
@@ -2340,6 +2484,8 @@ paths:
           description: Meal type not found.
         '500':
           description: Failed to fetch meal type.
+      operationId: getMealTypesById
+      x-operation-id-source: derived
     put:
       summary: Update a meal type
       tags:
@@ -2396,6 +2542,8 @@ paths:
           description: Meal type not found.
         '500':
           description: Failed to update meal type.
+      operationId: putMealTypesById
+      x-operation-id-source: derived
     delete:
       summary: Delete a custom meal type
       tags:
@@ -2424,6 +2572,8 @@ paths:
           description: Conflict, meal type contains food entries and cannot be deleted.
         '500':
           description: Failed to delete meal type.
+      operationId: deleteMealTypesById
+      x-operation-id-source: derived
   /preferences/nutrient-display:
     get:
       summary: Get all nutrient display preferences for the logged-in user
@@ -2445,6 +2595,8 @@ paths:
           description: Unauthorized, authentication token is missing or invalid.
         '500':
           description: Failed to fetch nutrient display preferences.
+      operationId: getPreferencesNutrientDisplay
+      x-operation-id-source: derived
   /preferences/nutrient-display/{viewGroup}/{platform}:
     put:
       summary: Upsert a nutrient display preference
@@ -2491,6 +2643,8 @@ paths:
           description: Unauthorized, authentication token is missing or invalid.
         '500':
           description: Failed to upsert nutrient display preference.
+      operationId: putPreferencesNutrientDisplayByViewGroupByPlatform
+      x-operation-id-source: derived
     delete:
       summary: Reset a nutrient display preference to default
       tags:
@@ -2522,6 +2676,8 @@ paths:
           description: Unauthorized, authentication token is missing or invalid.
         '500':
           description: Failed to reset nutrient display preference.
+      operationId: deletePreferencesNutrientDisplayByViewGroupByPlatform
+      x-operation-id-source: derived
   /nutrient-goal-preferences:
     get:
       summary: Get effective goal-direction preferences for every nutrient
@@ -2541,6 +2697,8 @@ paths:
                   $ref: '#/components/schemas/NutrientGoalPreference'
         '401':
           description: Unauthorized.
+      operationId: getNutrientGoalPreferences
+      x-operation-id-source: derived
   /nutrient-goal-preferences/{nutrientKey}:
     put:
       summary: Set a nutrient's goal-direction override
@@ -2581,6 +2739,8 @@ paths:
           description: Invalid goalType or missing/invalid target band.
         '401':
           description: Unauthorized.
+      operationId: putNutrientGoalPreferencesByNutrientKey
+      x-operation-id-source: derived
     delete:
       summary: Reset a nutrient's goal direction to its built-in default
       tags:
@@ -2598,94 +2758,10 @@ paths:
           description: The resolved built-in default after resetting.
         '401':
           description: Unauthorized.
+      operationId: deleteNutrientGoalPreferencesByNutrientKey
+      x-operation-id-source: derived
 components:
   schemas:
-    FoodVariant:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-          description: The unique identifier for the food variant.
-        food_id:
-          type: string
-          format: uuid
-          description: The ID of the food this variant belongs to.
-        serving_size:
-          type: string
-          description: The serving size of the variant (e.g., "1 cup").
-        data:
-          type: object
-          description: Nutritional data for this specific variant.
-      required:
-      - id
-      - food_id
-      - serving_size
-      - data
-    MealType:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-          description: The unique identifier for the meal type.
-        user_id:
-          type: string
-          format: uuid
-          description: The ID of the user who owns the meal type (null for system defaults).
-        name:
-          type: string
-          description: The name of the meal type (e.g., "Breakfast", "Lunch").
-        sort_order:
-          type: integer
-          description: The order in which meal types should be displayed.
-        is_system_default:
-          type: boolean
-          description: Indicates if this is a system default meal type.
-        created_at:
-          type: string
-          format: date-time
-          description: The date and time when the meal type was created.
-        updated_at:
-          type: string
-          format: date-time
-          description: The date and time when the meal type was last updated.
-      required:
-      - id
-      - name
-      - sort_order
-      - is_system_default
-    NutrientDisplayPreference:
-      type: object
-      properties:
-        user_id:
-          type: string
-          format: uuid
-          description: The ID of the user who owns the preference.
-        view_group:
-          type: string
-          description: The group for which the preference applies (e.g., "daily", "meal").
-        platform:
-          type: string
-          description: The platform for which the preference applies (e.g., "web", "mobile").
-        visible_nutrients:
-          type: array
-          items:
-            type: string
-          description: An array of nutrient names that should be visible.
-        created_at:
-          type: string
-          format: date-time
-          description: The date and time when the preference was created.
-        updated_at:
-          type: string
-          format: date-time
-          description: The date and time when the preference was last updated.
-      required:
-      - user_id
-      - view_group
-      - platform
-      - visible_nutrients
     CustomNutrient:
       type: object
       properties:
@@ -2721,6 +2797,115 @@ components:
       - user_id
       - name
       - unit
+    Food:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier for the food.
+        user_id:
+          type: string
+          format: uuid
+          description: The ID of the user who owns the food.
+        name:
+          type: string
+          description: The name of the food.
+        default_variant:
+          $ref: '#/components/schemas/FoodVariant'
+          description: The default nutritional variant for this food.
+        is_public:
+          type: boolean
+          description: Indicates if the food is publicly available.
+        brand:
+          type: string
+          description: The brand name of the food.
+        barcode:
+          type: string
+          description: The barcode of the food.
+        provider_type:
+          type: string
+          description: The type of provider (e.g., "mealie").
+        provider_external_id:
+          type: string
+          description: The external ID from the provider.
+        is_custom:
+          type: boolean
+          description: Indicates if the food is a custom entry created by the user.
+        shared_with_public:
+          type: boolean
+          description: Indicates if the food is shared with the public.
+        is_quick_food:
+          type: boolean
+          description: Indicates if the food is marked for quick access.
+        created_at:
+          type: string
+          format: date-time
+          description: The date and time when the food was created.
+        updated_at:
+          type: string
+          format: date-time
+          description: The date and time when the food was last updated.
+      required:
+      - id
+      - user_id
+      - name
+    MealType:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier for the meal type.
+        user_id:
+          type: string
+          format: uuid
+          description: The ID of the user who owns the meal type (null for system defaults).
+        name:
+          type: string
+          description: The name of the meal type (e.g., "Breakfast", "Lunch").
+        sort_order:
+          type: integer
+          description: The order in which meal types should be displayed.
+        is_system_default:
+          type: boolean
+          description: Indicates if this is a system default meal type.
+        created_at:
+          type: string
+          format: date-time
+          description: The date and time when the meal type was created.
+        updated_at:
+          type: string
+          format: date-time
+          description: The date and time when the meal type was last updated.
+      required:
+      - id
+      - name
+      - sort_order
+      - is_system_default
+    NutritionSummary:
+      type: object
+      properties:
+        total_calories:
+          type: number
+          description: Total calories consumed
+        total_protein:
+          type: number
+          description: Total protein consumed in grams
+        total_carbs:
+          type: number
+          description: Total carbohydrates consumed in grams
+        total_fat:
+          type: number
+          description: Total fat consumed in grams
+        total_dietary_fiber:
+          type: number
+          description: Total dietary fiber consumed in grams
+        total_custom_nutrients:
+          type: object
+          additionalProperties:
+            type: number
+          description: Aggregated custom nutrients values
     FoodEntry:
       type: object
       required:
@@ -2825,6 +3010,132 @@ components:
         custom_nutrients:
           type: object
           description: A JSON object for storing custom nutrient data.
+    NutrientGoalPreference:
+      type: object
+      properties:
+        goalType:
+          type: string
+          enum:
+          - minimum
+          - maximum
+          - target
+          description: How progress toward this nutrient's goal should be interpreted.
+        targetMin:
+          type:
+          - number
+          - 'null'
+          description: Lower bound of the acceptable band (only when goalType is "target").
+        targetMax:
+          type:
+          - number
+          - 'null'
+          description: Upper bound of the acceptable band (only when goalType is "target").
+    FoodVariant:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier for the food variant.
+        food_id:
+          type: string
+          format: uuid
+          description: The ID of the food this variant belongs to.
+        serving_size:
+          type: string
+          description: The serving size of the variant (e.g., "1 cup").
+        data:
+          type: object
+          description: Nutritional data for this specific variant.
+      required:
+      - id
+      - food_id
+      - serving_size
+      - data
+    NutrientDisplayPreference:
+      type: object
+      properties:
+        user_id:
+          type: string
+          format: uuid
+          description: The ID of the user who owns the preference.
+        view_group:
+          type: string
+          description: The group for which the preference applies (e.g., "daily", "meal").
+        platform:
+          type: string
+          description: The platform for which the preference applies (e.g., "web", "mobile").
+        visible_nutrients:
+          type: array
+          items:
+            type: string
+          description: An array of nutrient names that should be visible.
+        created_at:
+          type: string
+          format: date-time
+          description: The date and time when the preference was created.
+        updated_at:
+          type: string
+          format: date-time
+          description: The date and time when the preference was last updated.
+      required:
+      - user_id
+      - view_group
+      - platform
+      - visible_nutrients
+    MealPlanTemplate:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier for the meal plan template.
+        user_id:
+          type: string
+          format: uuid
+          description: The ID of the user who owns the meal plan template.
+        name:
+          type: string
+          description: The name of the meal plan template.
+        description:
+          type: string
+          description: A description of the meal plan template.
+        day_presets:
+          type: array
+          items:
+            type: object
+            properties:
+              day_of_week:
+                type: string
+                enum:
+                - monday
+                - tuesday
+                - wednesday
+                - thursday
+                - friday
+                - saturday
+                - sunday
+                description: The day of the week for this preset.
+              meal_day_preset_id:
+                type: string
+                format: uuid
+                description: The ID of the meal day preset to use for this day.
+            required:
+            - day_of_week
+            - meal_day_preset_id
+          description: The meal day presets assigned to each day of the week.
+        created_at:
+          type: string
+          format: date-time
+          description: The date and time when the meal plan template was created.
+        updated_at:
+          type: string
+          format: date-time
+          description: The date and time when the meal plan template was last updated.
+      required:
+      - user_id
+      - name
+      - day_presets
     FoodEntryMeal:
       type: object
       properties:
@@ -2899,155 +3210,6 @@ components:
       - foods
       - quantity
       - unit
-    MealPlanTemplate:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-          description: The unique identifier for the meal plan template.
-        user_id:
-          type: string
-          format: uuid
-          description: The ID of the user who owns the meal plan template.
-        name:
-          type: string
-          description: The name of the meal plan template.
-        description:
-          type: string
-          description: A description of the meal plan template.
-        day_presets:
-          type: array
-          items:
-            type: object
-            properties:
-              day_of_week:
-                type: string
-                enum:
-                - monday
-                - tuesday
-                - wednesday
-                - thursday
-                - friday
-                - saturday
-                - sunday
-                description: The day of the week for this preset.
-              meal_day_preset_id:
-                type: string
-                format: uuid
-                description: The ID of the meal day preset to use for this day.
-            required:
-            - day_of_week
-            - meal_day_preset_id
-          description: The meal day presets assigned to each day of the week.
-        created_at:
-          type: string
-          format: date-time
-          description: The date and time when the meal plan template was created.
-        updated_at:
-          type: string
-          format: date-time
-          description: The date and time when the meal plan template was last updated.
-      required:
-      - user_id
-      - name
-      - day_presets
-    NutrientGoalPreference:
-      type: object
-      properties:
-        goalType:
-          type: string
-          enum:
-          - minimum
-          - maximum
-          - target
-          description: How progress toward this nutrient's goal should be interpreted.
-        targetMin:
-          type:
-          - number
-          - 'null'
-          description: Lower bound of the acceptable band (only when goalType is "target").
-        targetMax:
-          type:
-          - number
-          - 'null'
-          description: Upper bound of the acceptable band (only when goalType is "target").
-    Food:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-          description: The unique identifier for the food.
-        user_id:
-          type: string
-          format: uuid
-          description: The ID of the user who owns the food.
-        name:
-          type: string
-          description: The name of the food.
-        default_variant:
-          $ref: '#/components/schemas/FoodVariant'
-          description: The default nutritional variant for this food.
-        is_public:
-          type: boolean
-          description: Indicates if the food is publicly available.
-        brand:
-          type: string
-          description: The brand name of the food.
-        barcode:
-          type: string
-          description: The barcode of the food.
-        provider_type:
-          type: string
-          description: The type of provider (e.g., "mealie").
-        provider_external_id:
-          type: string
-          description: The external ID from the provider.
-        is_custom:
-          type: boolean
-          description: Indicates if the food is a custom entry created by the user.
-        shared_with_public:
-          type: boolean
-          description: Indicates if the food is shared with the public.
-        is_quick_food:
-          type: boolean
-          description: Indicates if the food is marked for quick access.
-        created_at:
-          type: string
-          format: date-time
-          description: The date and time when the food was created.
-        updated_at:
-          type: string
-          format: date-time
-          description: The date and time when the food was last updated.
-      required:
-      - id
-      - user_id
-      - name
-    NutritionSummary:
-      type: object
-      properties:
-        total_calories:
-          type: number
-          description: Total calories consumed
-        total_protein:
-          type: number
-          description: Total protein consumed in grams
-        total_carbs:
-          type: number
-          description: Total carbohydrates consumed in grams
-        total_fat:
-          type: number
-          description: Total fat consumed in grams
-        total_dietary_fiber:
-          type: number
-          description: Total dietary fiber consumed in grams
-        total_custom_nutrients:
-          type: object
-          additionalProperties:
-            type: number
-          description: Aggregated custom nutrients values
   securitySchemes:
     apiKeyAuth:
       type: apiKey

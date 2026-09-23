@@ -2,7 +2,7 @@ openapi: 3.2.0
 info:
   title: SparkyFitness External Integrations API
   version: 1.0.0
-  description: API documentation for the SparkyFitness application, providing a comprehensive guide to all available endpoints. Have caution using the API directly, as improper use may lead to data loss or corruption.  Also note that the API is subject to change without notice due to heavy development, so always refer to the latest documentation for up-to-date information. It might have flaw and due to vite/nginx internal proxy actual end point accessed via front end URL might be different than hitting them directly on the server.
+  description: API documentation for the SparkyFitness application, providing a comprehensive guide to all available endpoints.
   contact:
     name: SparkyFitness Support
 servers:
@@ -39,6 +39,8 @@ paths:
           description: Unauthorized, authentication token is missing or invalid.
         '500':
           description: Failed to fetch external data providers.
+      operationId: getExternalProviders
+      x-operation-id-source: derived
     post:
       summary: Create a new external data provider
       tags:
@@ -92,6 +94,8 @@ paths:
           description: Unauthorized, authentication token is missing or invalid.
         '500':
           description: Failed to create external data provider.
+      operationId: postExternalProviders
+      x-operation-id-source: derived
   /external-providers/user/{targetUserId}:
     get:
       summary: Get external data providers for a specific user
@@ -125,6 +129,8 @@ paths:
           description: Forbidden, user does not have permission to access this resource.
         '500':
           description: Failed to fetch external data providers.
+      operationId: getExternalProvidersUserByTargetUserId
+      x-operation-id-source: derived
   /external-providers/{id}:
     put:
       summary: Update an existing external data provider
@@ -190,6 +196,8 @@ paths:
           description: External data provider not found.
         '500':
           description: Failed to update external data provider.
+      operationId: putExternalProvidersById
+      x-operation-id-source: derived
     delete:
       summary: Delete an external data provider
       tags:
@@ -218,6 +226,8 @@ paths:
           description: External data provider not found.
         '500':
           description: Failed to delete external data provider.
+      operationId: deleteExternalProvidersById
+      x-operation-id-source: derived
     get:
       summary: Get details of a specific external data provider
       tags:
@@ -248,6 +258,8 @@ paths:
           description: Forbidden, user does not have permission to access this resource.
         '500':
           description: Failed to fetch external data provider details.
+      operationId: getExternalProvidersById
+      x-operation-id-source: derived
   /external-providers/garmin/activities-and-workouts:
     post:
       summary: Process Garmin activities and workouts
@@ -282,6 +294,8 @@ paths:
           description: Unauthorized, authentication token is missing or invalid.
         '500':
           description: Error processing Garmin data.
+      operationId: postExternalProvidersGarminActivitiesAndWorkouts
+      x-operation-id-source: derived
   /integrations/fitbit/authorize:
     get:
       summary: Initiate Fitbit OAuth flow
@@ -292,26 +306,36 @@ paths:
       responses:
         '200':
           description: Authorization URL.
+      operationId: getIntegrationsFitbitAuthorize
+      x-operation-id-source: derived
   /integrations/fitbit/callback:
     post:
       summary: Handle Fitbit OAuth callback
       tags:
       - External Integrations
+      operationId: postIntegrationsFitbitCallback
+      x-operation-id-source: derived
   /integrations/fitbit/sync:
     post:
       summary: Manually trigger a Fitbit data sync
       tags:
       - External Integrations
+      operationId: postIntegrationsFitbitSync
+      x-operation-id-source: derived
   /integrations/fitbit/disconnect:
     post:
       summary: Disconnect a Fitbit account
       tags:
       - External Integrations
+      operationId: postIntegrationsFitbitDisconnect
+      x-operation-id-source: derived
   /integrations/fitbit/status:
     get:
       summary: Get Fitbit connection status
       tags:
       - External Integrations
+      operationId: getIntegrationsFitbitStatus
+      x-operation-id-source: derived
   /foods/fatsecret/search:
     get:
       summary: Search for foods on FatSecret
@@ -343,6 +367,8 @@ paths:
           description: A list of foods from FatSecret with pagination metadata.
         '400':
           description: Missing search query or x-provider-id header.
+      operationId: getFoodsFatsecretSearch
+      x-operation-id-source: derived
   /foods/fatsecret/nutrients:
     get:
       summary: Get nutrient information from FatSecret
@@ -367,6 +393,8 @@ paths:
           description: Nutrient information for the specified food.
         '400':
           description: Missing foodId or x-provider-id header.
+      operationId: getFoodsFatsecretNutrients
+      x-operation-id-source: derived
   /foods/fatsecret/barcode/{barcode}:
     get:
       summary: Search for food by barcode on FatSecret
@@ -391,6 +419,8 @@ paths:
           description: Food details for the given barcode.
         '400':
           description: Missing barcode or x-provider-id header.
+      operationId: getFoodsFatsecretBarcodeByBarcode
+      x-operation-id-source: derived
   /foods/openfoodfacts/search:
     get:
       summary: Search for foods on Open Food Facts
@@ -416,6 +446,8 @@ paths:
           description: A list of foods from Open Food Facts with pagination metadata.
         '400':
           description: Missing search query.
+      operationId: getFoodsOpenfoodfactsSearch
+      x-operation-id-source: derived
   /foods/openfoodfacts/barcode/{barcode}:
     get:
       summary: Search for food by barcode on Open Food Facts
@@ -434,6 +466,8 @@ paths:
           description: Food details for the given barcode.
         '400':
           description: Missing barcode.
+      operationId: getFoodsOpenfoodfactsBarcodeByBarcode
+      x-operation-id-source: derived
   /foods/nutritionix/search:
     get:
       summary: Search for foods on Nutritionix
@@ -458,6 +492,8 @@ paths:
           description: A list of foods from Nutritionix.
         '400':
           description: Missing search query or providerId.
+      operationId: getFoodsNutritionixSearch
+      x-operation-id-source: derived
   /foods/nutritionix/nutrients:
     get:
       summary: Get nutrient information from Nutritionix
@@ -482,6 +518,8 @@ paths:
           description: Nutrient information for the specified food.
         '400':
           description: Missing search query or providerId.
+      operationId: getFoodsNutritionixNutrients
+      x-operation-id-source: derived
   /foods/nutritionix/item:
     get:
       summary: Get branded food nutrient information from Nutritionix
@@ -506,6 +544,8 @@ paths:
           description: Nutrient information for the specified branded food item.
         '400':
           description: Missing nix_item_id or providerId.
+      operationId: getFoodsNutritionixItem
+      x-operation-id-source: derived
   /foods/mealie/search:
     get:
       summary: Search for foods on Mealie
@@ -537,6 +577,8 @@ paths:
           description: A list of foods from Mealie. Returns {items, pagination} when page param is provided, or a plain array otherwise.
         '400':
           description: Missing search query or x-provider-id header.
+      operationId: getFoodsMealieSearch
+      x-operation-id-source: derived
   /foods/mealie/details:
     get:
       summary: Get food details from Mealie
@@ -561,6 +603,8 @@ paths:
           description: Details for the specified food.
         '400':
           description: Missing food slug or x-provider-id header.
+      operationId: getFoodsMealieDetails
+      x-operation-id-source: derived
   /foods/tandoor/search:
     get:
       summary: Search for foods on Tandoor
@@ -585,6 +629,8 @@ paths:
           description: A list of foods from Tandoor.
         '400':
           description: Missing search query or x-provider-id header.
+      operationId: getFoodsTandoorSearch
+      x-operation-id-source: derived
   /foods/tandoor/details:
     get:
       summary: Get food details from Tandoor
@@ -609,6 +655,8 @@ paths:
           description: Details for the specified food.
         '400':
           description: Missing food id or x-provider-id header.
+      operationId: getFoodsTandoorDetails
+      x-operation-id-source: derived
   /foods/norish/search:
     get:
       summary: Search for foods on Norish
@@ -633,6 +681,8 @@ paths:
           description: A list of foods from Norish.
         '400':
           description: Missing search query or x-provider-id header.
+      operationId: getFoodsNorishSearch
+      x-operation-id-source: derived
   /foods/norish/details:
     get:
       summary: Get food details from Norish
@@ -657,6 +707,8 @@ paths:
           description: Details for the specified food.
         '400':
           description: Missing food id or x-provider-id header.
+      operationId: getFoodsNorishDetails
+      x-operation-id-source: derived
   /foods/usda/search:
     get:
       summary: Search for foods on USDA FoodData Central
@@ -695,6 +747,8 @@ paths:
           description: A list of foods from USDA FoodData Central with pagination metadata.
         '400':
           description: Missing search query or x-provider-id header.
+      operationId: getFoodsUsdaSearch
+      x-operation-id-source: derived
   /foods/usda/details:
     get:
       summary: Get food details from USDA FoodData Central
@@ -719,6 +773,8 @@ paths:
           description: Details for the specified food.
         '400':
           description: Missing FDC ID or x-provider-id header.
+      operationId: getFoodsUsdaDetails
+      x-operation-id-source: derived
   /integrations/garmin/login:
     post:
       summary: Garmin direct login
@@ -743,6 +799,8 @@ paths:
       responses:
         '200':
           description: Login result.
+      operationId: postIntegrationsGarminLogin
+      x-operation-id-source: derived
   /integrations/garmin/resume_login:
     post:
       summary: Resume Garmin login (e.g., after MFA)
@@ -767,6 +825,8 @@ paths:
       responses:
         '200':
           description: Login result.
+      operationId: postIntegrationsGarminResumeLogin
+      x-operation-id-source: derived
   /integrations/garmin/sync/health_and_wellness:
     post:
       summary: Manually sync health and wellness data from Garmin
@@ -797,6 +857,8 @@ paths:
       responses:
         '200':
           description: Sync completed successfully.
+      operationId: postIntegrationsGarminSyncHealthAndWellness
+      x-operation-id-source: derived
   /integrations/garmin/sync/activities_and_workouts:
     post:
       summary: Manually sync activities and workouts data from Garmin
@@ -825,6 +887,8 @@ paths:
       responses:
         '200':
           description: Sync result.
+      operationId: postIntegrationsGarminSyncActivitiesAndWorkouts
+      x-operation-id-source: derived
   /integrations/garmin/sync/nutrition_diary:
     post:
       summary: Manually sync nutrition diary data from Garmin
@@ -851,6 +915,8 @@ paths:
       responses:
         '200':
           description: Nutrition sync completed successfully.
+      operationId: postIntegrationsGarminSyncNutritionDiary
+      x-operation-id-source: derived
   /integrations/garmin/sync:
     post:
       summary: Manual full sync for Garmin data
@@ -861,6 +927,8 @@ paths:
       responses:
         '200':
           description: Full sync result.
+      operationId: postIntegrationsGarminSync
+      x-operation-id-source: derived
   /integrations/garmin/status:
     get:
       summary: Get Garmin connection status
@@ -875,6 +943,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GarminStatus'
+      operationId: getIntegrationsGarminStatus
+      x-operation-id-source: derived
   /integrations/garmin/unlink:
     post:
       summary: Unlink Garmin account
@@ -885,6 +955,8 @@ paths:
       responses:
         '200':
           description: Unlinked successfully.
+      operationId: postIntegrationsGarminUnlink
+      x-operation-id-source: derived
   /integrations/garmin/sleep_data:
     post:
       summary: Process sleep data from Garmin
@@ -916,6 +988,8 @@ paths:
       responses:
         '200':
           description: Sleep data processed successfully.
+      operationId: postIntegrationsGarminSleepData
+      x-operation-id-source: derived
   /integrations/googlehealth/authorize:
     get:
       summary: Initiate Google Health OAuth flow
@@ -926,6 +1000,8 @@ paths:
       responses:
         '200':
           description: Authorization URL.
+      operationId: getIntegrationsGooglehealthAuthorize
+      x-operation-id-source: derived
   /integrations/googlehealth/callback:
     post:
       summary: Handle Google Health OAuth callback
@@ -942,6 +1018,8 @@ paths:
               properties:
                 code:
                   type: string
+      operationId: postIntegrationsGooglehealthCallback
+      x-operation-id-source: derived
   /integrations/googlehealth/sync:
     post:
       summary: Manually trigger a Google Health data sync
@@ -959,26 +1037,36 @@ paths:
                 endDate:
                   type: string
                   format: date
+      operationId: postIntegrationsGooglehealthSync
+      x-operation-id-source: derived
   /integrations/googlehealth/disconnect:
     post:
       summary: Disconnect a Google Health account
       tags:
       - External Integrations
+      operationId: postIntegrationsGooglehealthDisconnect
+      x-operation-id-source: derived
   /integrations/googlehealth/status:
     get:
       summary: Get Google Health connection status
       tags:
       - External Integrations
+      operationId: getIntegrationsGooglehealthStatus
+      x-operation-id-source: derived
   /integrations/hevy/sync:
     post:
       summary: Manually trigger a Hevy data sync
       tags:
       - External Integrations
+      operationId: postIntegrationsHevySync
+      x-operation-id-source: derived
   /integrations/hevy/status:
     get:
       summary: Get Hevy connection status
       tags:
       - External Integrations
+      operationId: getIntegrationsHevyStatus
+      x-operation-id-source: derived
   /integrations/oura/authorize:
     get:
       summary: Initiate Oura OAuth flow
@@ -989,26 +1077,36 @@ paths:
       responses:
         '200':
           description: Authorization URL.
+      operationId: getIntegrationsOuraAuthorize
+      x-operation-id-source: derived
   /integrations/oura/callback:
     post:
       summary: Handle Oura OAuth callback
       tags:
       - External Integrations
+      operationId: postIntegrationsOuraCallback
+      x-operation-id-source: derived
   /integrations/oura/sync:
     post:
       summary: Manually trigger an Oura data sync
       tags:
       - External Integrations
+      operationId: postIntegrationsOuraSync
+      x-operation-id-source: derived
   /integrations/oura/disconnect:
     post:
       summary: Disconnect an Oura account
       tags:
       - External Integrations
+      operationId: postIntegrationsOuraDisconnect
+      x-operation-id-source: derived
   /integrations/oura/status:
     get:
       summary: Get Oura connection status
       tags:
       - External Integrations
+      operationId: getIntegrationsOuraStatus
+      x-operation-id-source: derived
   /integrations/polar/authorize:
     get:
       summary: Initiate Polar OAuth flow
@@ -1031,6 +1129,8 @@ paths:
           description: Unauthorized.
         '500':
           description: Error initiating Polar authorization.
+      operationId: getIntegrationsPolarAuthorize
+      x-operation-id-source: derived
   /integrations/polar/callback:
     post:
       summary: Handle Polar OAuth callback
@@ -1059,6 +1159,8 @@ paths:
           description: Unauthorized.
         '500':
           description: Failed to connect Polar account.
+      operationId: postIntegrationsPolarCallback
+      x-operation-id-source: derived
   /integrations/polar/sync:
     post:
       summary: Manually trigger a Polar data sync
@@ -1082,6 +1184,8 @@ paths:
           description: Unauthorized.
         '500':
           description: Error initiating manual Polar sync.
+      operationId: postIntegrationsPolarSync
+      x-operation-id-source: derived
   /integrations/polar/disconnect:
     post:
       summary: Disconnect a Polar account
@@ -1105,6 +1209,8 @@ paths:
           description: Unauthorized.
         '500':
           description: Error disconnecting Polar account.
+      operationId: postIntegrationsPolarDisconnect
+      x-operation-id-source: derived
   /integrations/polar/status:
     get:
       summary: Get Polar connection status
@@ -1138,6 +1244,8 @@ paths:
           description: Unauthorized.
         '500':
           description: Error getting Polar status.
+      operationId: getIntegrationsPolarStatus
+      x-operation-id-source: derived
   /integrations/withings/data:
     get:
       summary: Get aggregated Withings data for display
@@ -1161,6 +1269,8 @@ paths:
       responses:
         '200':
           description: Aggregated Withings data.
+      operationId: getIntegrationsWithingsData
+      x-operation-id-source: derived
   /withings/authorize:
     get:
       summary: Initiate Withings OAuth flow
@@ -1178,6 +1288,8 @@ paths:
                 properties:
                   authUrl:
                     type: string
+      operationId: getWithingsAuthorize
+      x-operation-id-source: derived
   /withings/callback:
     post:
       summary: Handle Withings OAuth callback
@@ -1201,6 +1313,8 @@ paths:
       responses:
         '200':
           description: Successfully linked.
+      operationId: postWithingsCallback
+      x-operation-id-source: derived
   /withings/sync:
     post:
       summary: Manually trigger a Withings data sync
@@ -1224,6 +1338,8 @@ paths:
       responses:
         '200':
           description: Sync completed successfully.
+      operationId: postWithingsSync
+      x-operation-id-source: derived
   /withings/disconnect:
     post:
       summary: Disconnect a Withings account
@@ -1234,6 +1350,8 @@ paths:
       responses:
         '200':
           description: Disconnected successfully.
+      operationId: postWithingsDisconnect
+      x-operation-id-source: derived
   /withings/status:
     get:
       summary: Get Withings connection status and last sync time
@@ -1248,9 +1366,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WithingsStatus'
+      operationId: getWithingsStatus
+      x-operation-id-source: derived
 components:
   schemas:
-    GarminStatus:
+    WithingsStatus:
       type: object
       properties:
         is_connected:
@@ -1260,7 +1380,7 @@ components:
           - string
           - 'null'
           format: date-time
-    WithingsStatus:
+    GarminStatus:
       type: object
       properties:
         is_connected:

@@ -2,7 +2,7 @@ openapi: 3.2.0
 info:
   title: SparkyFitness Allergen Preferences API
   version: 1.0.0
-  description: API documentation for the SparkyFitness application, providing a comprehensive guide to all available endpoints. Have caution using the API directly, as improper use may lead to data loss or corruption.  Also note that the API is subject to change without notice due to heavy development, so always refer to the latest documentation for up-to-date information. It might have flaw and due to vite/nginx internal proxy actual end point accessed via front end URL might be different than hitting them directly on the server.
+  description: API documentation for the SparkyFitness application, providing a comprehensive guide to all available endpoints.
   contact:
     name: SparkyFitness Support
 servers:
@@ -29,6 +29,8 @@ paths:
           description: List of allergen preferences.
         '401':
           description: Unauthorized.
+      operationId: getAllergenPreferences
+      x-operation-id-source: derived
     post:
       summary: Add an allergen preference
       tags:
@@ -51,6 +53,8 @@ paths:
           description: Allergen preference added.
         '401':
           description: Unauthorized.
+      operationId: postAllergenPreferences
+      x-operation-id-source: derived
   /allergen-preferences/{id}:
     delete:
       summary: Remove an allergen preference
@@ -72,6 +76,8 @@ paths:
           description: Not found.
         '401':
           description: Unauthorized.
+      operationId: deleteAllergenPreferencesById
+      x-operation-id-source: derived
 components:
   securitySchemes:
     apiKeyAuth:

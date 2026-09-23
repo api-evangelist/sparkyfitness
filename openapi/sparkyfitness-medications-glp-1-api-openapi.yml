@@ -2,7 +2,7 @@ openapi: 3.2.0
 info:
   title: SparkyFitness Medications & GLP-1 API
   version: 1.0.0
-  description: API documentation for the SparkyFitness application, providing a comprehensive guide to all available endpoints. Have caution using the API directly, as improper use may lead to data loss or corruption.  Also note that the API is subject to change without notice due to heavy development, so always refer to the latest documentation for up-to-date information. It might have flaw and due to vite/nginx internal proxy actual end point accessed via front end URL might be different than hitting them directly on the server.
+  description: API documentation for the SparkyFitness application, providing a comprehensive guide to all available endpoints.
   contact:
     name: SparkyFitness Support
 servers:
@@ -37,6 +37,8 @@ paths:
       responses:
         '200':
           description: A list of medications.
+      operationId: getV2Medications
+      x-operation-id-source: derived
     post:
       summary: Create a medication
       tags:
@@ -72,6 +74,8 @@ paths:
           description: Created.
         '400':
           description: Invalid request.
+      operationId: postV2Medications
+      x-operation-id-source: derived
   /v2/medications/{id}:
     get:
       summary: Get a medication (with schedules)
@@ -91,6 +95,8 @@ paths:
           description: The medication.
         '404':
           description: Not found.
+      operationId: getV2MedicationsById
+      x-operation-id-source: derived
     put:
       summary: Update a medication (partial)
       tags:
@@ -109,6 +115,8 @@ paths:
           description: Updated.
         '404':
           description: Not found.
+      operationId: putV2MedicationsById
+      x-operation-id-source: derived
     delete:
       summary: Delete a medication (cascades)
       tags:
@@ -127,6 +135,8 @@ paths:
           description: Deleted.
         '404':
           description: Not found.
+      operationId: deleteV2MedicationsById
+      x-operation-id-source: derived
   /v2/medications/{medicationId}/schedules:
     post:
       summary: Add a schedule rule to a medication
@@ -148,6 +158,8 @@ paths:
           description: Invalid request.
         '403':
           description: Supplement doses require food diary access for this profile.
+      operationId: postV2MedicationsByMedicationIdSchedules
+      x-operation-id-source: derived
   /v2/medications/schedules/{id}:
     put:
       summary: Update a schedule rule (partial)
@@ -169,6 +181,8 @@ paths:
           description: Invalid request.
         '404':
           description: Not found.
+      operationId: putV2MedicationsSchedulesById
+      x-operation-id-source: derived
     delete:
       summary: Delete a schedule rule
       tags:
@@ -187,6 +201,8 @@ paths:
           description: Deleted.
         '404':
           description: Not found.
+      operationId: deleteV2MedicationsSchedulesById
+      x-operation-id-source: derived
   /v2/medications/{medicationId}/pens:
     get:
       summary: List pens/vials for a medication
@@ -204,6 +220,8 @@ paths:
       responses:
         '200':
           description: Pen/vial inventory.
+      operationId: getV2MedicationsByMedicationIdPens
+      x-operation-id-source: derived
     post:
       summary: Add a pen/vial (concentration, volume, BUD, doses)
       tags:
@@ -222,6 +240,8 @@ paths:
           description: Created.
         '400':
           description: Invalid request.
+      operationId: postV2MedicationsByMedicationIdPens
+      x-operation-id-source: derived
   /v2/medications/pens/{id}:
     put:
       summary: Update a pen/vial
@@ -241,6 +261,8 @@ paths:
           description: Updated.
         '404':
           description: Not found.
+      operationId: putV2MedicationsPensById
+      x-operation-id-source: derived
     delete:
       summary: Delete a pen/vial
       tags:
@@ -259,6 +281,8 @@ paths:
           description: Deleted.
         '404':
           description: Not found.
+      operationId: deleteV2MedicationsPensById
+      x-operation-id-source: derived
   /v2/medications/{medicationId}/injections:
     get:
       summary: List injections for a medication
@@ -276,9 +300,11 @@ paths:
       responses:
         '200':
           description: Injection history.
+      operationId: getV2MedicationsByMedicationIdInjections
+      x-operation-id-source: derived
   /v2/medications/injections:
     post:
-      summary: Log an injection (optionally deduct from a pen/vial; auto-picks the pen when deduct_pen is set without pen_id)
+      summary: Log an injection (optionally deduct from a pen/vial; auto-picks the pen when…
       tags:
       - Medications & GLP-1
       security:
@@ -309,6 +335,8 @@ paths:
           description: Created (returns injection + updated pen).
         '400':
           description: Invalid request.
+      operationId: postV2MedicationsInjections
+      x-operation-id-source: derived
   /v2/medications/injections/{id}:
     put:
       summary: Update an injection (timing, site, dose, notes — not pen deduction)
@@ -328,6 +356,8 @@ paths:
           description: Updated.
         '404':
           description: Not found.
+      operationId: putV2MedicationsInjectionsById
+      x-operation-id-source: derived
     delete:
       summary: Delete an injection (credits the dose back to its pen when one was deducted)
       tags:
@@ -346,6 +376,8 @@ paths:
           description: Deleted.
         '404':
           description: Not found.
+      operationId: deleteV2MedicationsInjectionsById
+      x-operation-id-source: derived
   /v2/medications/{medicationId}/titration:
     get:
       summary: List titration/taper steps
@@ -363,6 +395,8 @@ paths:
       responses:
         '200':
           description: Titration plan steps.
+      operationId: getV2MedicationsByMedicationIdTitration
+      x-operation-id-source: derived
     post:
       summary: Add a titration/taper step
       tags:
@@ -381,6 +415,8 @@ paths:
           description: Created.
         '400':
           description: Invalid request.
+      operationId: postV2MedicationsByMedicationIdTitration
+      x-operation-id-source: derived
   /v2/medications/titration/{id}:
     put:
       summary: Update a titration step
@@ -400,6 +436,8 @@ paths:
           description: Updated.
         '404':
           description: Not found.
+      operationId: putV2MedicationsTitrationById
+      x-operation-id-source: derived
     delete:
       summary: Delete a titration step
       tags:
@@ -418,6 +456,8 @@ paths:
           description: Deleted.
         '404':
           description: Not found.
+      operationId: deleteV2MedicationsTitrationById
+      x-operation-id-source: derived
   /v2/medications/{medicationId}/glp1/serum-curve:
     get:
       summary: Modeled GLP-1 serum-level curve (PK model, not measured)
@@ -449,6 +489,8 @@ paths:
           description: Sampled curve + current modeled level + disclaimer.
         '404':
           description: Medication not found.
+      operationId: getV2MedicationsByMedicationIdGlp1SerumCurve
+      x-operation-id-source: derived
   /v2/medications/{medicationId}/glp1/site-suggestion:
     get:
       summary: Suggest the next injection site (rotation + lipo rest window)
@@ -466,6 +508,8 @@ paths:
       responses:
         '200':
           description: Suggested site + resting sites + zone map.
+      operationId: getV2MedicationsByMedicationIdGlp1SiteSuggestion
+      x-operation-id-source: derived
   /v2/medications/entries:
     get:
       summary: List logged adherence doses, merged with GLP-1 injection logs
@@ -493,6 +537,8 @@ paths:
       responses:
         '200':
           description: Logged doses (adherence entries + injections).
+      operationId: getV2MedicationsEntries
+      x-operation-id-source: derived
     post:
       summary: Log an adherence dose (taken/skipped/snoozed/prn_taken)
       tags:
@@ -536,6 +582,8 @@ paths:
           description: Invalid request.
         '403':
           description: Supplement doses require food diary access for this profile.
+      operationId: postV2MedicationsEntries
+      x-operation-id-source: derived
   /v2/medications/entries/{id}:
     put:
       summary: Update a logged dose (e.g. correct the taken-at time or notes)
@@ -581,6 +629,8 @@ paths:
           description: Not found.
         '403':
           description: Supplement doses require food diary access for this profile.
+      operationId: putV2MedicationsEntriesById
+      x-operation-id-source: derived
     delete:
       summary: Delete a logged dose
       tags:
@@ -601,6 +651,8 @@ paths:
           description: Not found.
         '403':
           description: Supplement doses require food diary access for this profile.
+      operationId: deleteV2MedicationsEntriesById
+      x-operation-id-source: derived
   /v2/medications/display-preferences:
     get:
       summary: List the user's medication display preferences
@@ -611,6 +663,8 @@ paths:
       responses:
         '200':
           description: Display preferences per view group and platform.
+      operationId: getV2MedicationsDisplayPreferences
+      x-operation-id-source: derived
   /v2/medications/display-preferences/{viewGroup}/{platform}:
     put:
       summary: Upsert the visible items for a view group and platform
@@ -647,6 +701,8 @@ paths:
           description: Upserted preference.
         '400':
           description: Invalid request.
+      operationId: putV2MedicationsDisplayPreferencesByViewGroupByPlatform
+      x-operation-id-source: derived
     delete:
       summary: Delete a display preference for a view group and platform
       tags:
@@ -669,6 +725,8 @@ paths:
           description: Deleted.
         '404':
           description: Not found.
+      operationId: deleteV2MedicationsDisplayPreferencesByViewGroupByPlatform
+      x-operation-id-source: derived
 components:
   securitySchemes:
     apiKeyAuth:

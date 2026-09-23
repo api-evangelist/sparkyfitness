@@ -2,7 +2,7 @@ openapi: 3.2.0
 info:
   title: SparkyFitness Authentication API
   version: 1.0.0
-  description: API documentation for the SparkyFitness application, providing a comprehensive guide to all available endpoints. Have caution using the API directly, as improper use may lead to data loss or corruption.  Also note that the API is subject to change without notice due to heavy development, so always refer to the latest documentation for up-to-date information. It might have flaw and due to vite/nginx internal proxy actual end point accessed via front end URL might be different than hitting them directly on the server.
+  description: API documentation for the SparkyFitness application, providing a comprehensive guide to all available endpoints.
   contact:
     name: SparkyFitness Support
 servers:
@@ -25,6 +25,8 @@ paths:
       responses:
         '200':
           description: Login settings and OIDC providers
+      operationId: getAuthSettings
+      x-operation-id-source: derived
   /auth/mfa-factors:
     get:
       summary: Get enabled MFA factors for a user by email
@@ -41,12 +43,12 @@ paths:
           description: Enabled MFA factors
         '400':
           description: Email is required
+      operationId: getAuthMfaFactors
+      x-operation-id-source: derived
   /auth/web-login/register-ticket:
     post:
       summary: Mint a single-use, short-lived passkey registration ticket
-      description: 'Authenticated with the caller''s Bearer session token. Requires a fresh session (recent login); returns 403 SESSION_NOT_FRESH otherwise so the client can re-authenticate. The returned ticket is handed to the browser registration page so the raw session token never appears in a URL.
-
-        '
+      description: Authenticated with the caller's Bearer session token. Requires a fresh session (recent login); returns 403 SESSION_NOT_FRESH otherwise so the client can re-authenticate. The returned ticket is handed to the browser registration page so the raw session token never appears in a URL.
       tags:
       - Authentication
       responses:
@@ -56,12 +58,12 @@ paths:
           description: Missing or invalid session
         '403':
           description: Session not fresh; re-authentication required
+      operationId: postAuthWebLoginRegisterTicket
+      x-operation-id-source: derived
   /auth/web-login/redeem-ticket:
     post:
       summary: Redeem a single-use passkey registration ticket
-      description: 'Public (the ticket is the credential) and rate-limited. Returns the session token in the JSON body exactly once; the ticket is then consumed.
-
-        '
+      description: Public (the ticket is the credential) and rate-limited. Returns the session token in the JSON body exactly once; the ticket is then consumed.
       tags:
       - Authentication
       responses:
@@ -69,6 +71,8 @@ paths:
           description: Session token returned
         '400':
           description: Invalid, used, or expired ticket
+      operationId: postAuthWebLoginRedeemTicket
+      x-operation-id-source: derived
 components:
   securitySchemes:
     apiKeyAuth:
