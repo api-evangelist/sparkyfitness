@@ -2762,94 +2762,153 @@ paths:
       x-operation-id-source: derived
 components:
   schemas:
-    CustomNutrient:
+    FoodEntryMeal:
       type: object
       properties:
         id:
           type: string
           format: uuid
-          description: The unique identifier for the custom nutrient.
+          description: The unique identifier for the food entry meal.
         user_id:
           type: string
           format: uuid
-          description: The ID of the user who owns the custom nutrient.
+          description: The ID of the user who owns the food entry meal.
+        meal_template_id:
+          type: string
+          format: uuid
+          description: The ID of the meal template used for this entry, if any.
+        meal_type:
+          type: string
+          description: The type of meal (e.g., "Breakfast", "Lunch", "Dinner").
+        meal_type_id:
+          type: string
+          format: uuid
+          description: The ID of the meal type.
+        entry_date:
+          type: string
+          format: date
+          description: The date of the food entry meal (YYYY-MM-DD).
         name:
           type: string
-          description: The name of the custom nutrient.
-        unit:
+          description: The name of the food entry meal.
+        description:
           type: string
-          description: The unit of measurement for the custom nutrient.
-        aliases:
+          description: A description of the food entry meal.
+        foods:
           type: array
           items:
-            type: string
-          description: Alternate nutrient names online food providers may use, matched (case-insensitively) on import.
+            type: object
+            properties:
+              food_id:
+                type: string
+                format: uuid
+                description: The ID of the food item.
+              quantity:
+                type: number
+                description: The quantity of the food item.
+              unit:
+                type: string
+                description: The unit of measurement for the food item.
+            required:
+            - food_id
+            - quantity
+            - unit
+          description: A list of food items included in the meal.
+        quantity:
+          type: number
+          description: The total quantity of the meal.
+        unit:
+          type: string
+          description: The unit of measurement for the meal.
         created_at:
           type: string
           format: date-time
-          description: The date and time when the custom nutrient was created.
+          description: The date and time when the food entry meal was created.
         updated_at:
           type: string
           format: date-time
-          description: The date and time when the custom nutrient was last updated.
+          description: The date and time when the food entry meal was last updated.
       required:
-      - id
       - user_id
+      - meal_type
+      - entry_date
       - name
+      - foods
+      - quantity
       - unit
-    Food:
+    MealPlanTemplate:
       type: object
       properties:
         id:
           type: string
           format: uuid
-          description: The unique identifier for the food.
+          description: The unique identifier for the meal plan template.
         user_id:
           type: string
           format: uuid
-          description: The ID of the user who owns the food.
+          description: The ID of the user who owns the meal plan template.
         name:
           type: string
-          description: The name of the food.
-        default_variant:
-          $ref: '#/components/schemas/FoodVariant'
-          description: The default nutritional variant for this food.
-        is_public:
-          type: boolean
-          description: Indicates if the food is publicly available.
-        brand:
+          description: The name of the meal plan template.
+        description:
           type: string
-          description: The brand name of the food.
-        barcode:
-          type: string
-          description: The barcode of the food.
-        provider_type:
-          type: string
-          description: The type of provider (e.g., "mealie").
-        provider_external_id:
-          type: string
-          description: The external ID from the provider.
-        is_custom:
-          type: boolean
-          description: Indicates if the food is a custom entry created by the user.
-        shared_with_public:
-          type: boolean
-          description: Indicates if the food is shared with the public.
-        is_quick_food:
-          type: boolean
-          description: Indicates if the food is marked for quick access.
+          description: A description of the meal plan template.
+        day_presets:
+          type: array
+          items:
+            type: object
+            properties:
+              day_of_week:
+                type: string
+                enum:
+                - monday
+                - tuesday
+                - wednesday
+                - thursday
+                - friday
+                - saturday
+                - sunday
+                description: The day of the week for this preset.
+              meal_day_preset_id:
+                type: string
+                format: uuid
+                description: The ID of the meal day preset to use for this day.
+            required:
+            - day_of_week
+            - meal_day_preset_id
+          description: The meal day presets assigned to each day of the week.
         created_at:
           type: string
           format: date-time
-          description: The date and time when the food was created.
+          description: The date and time when the meal plan template was created.
         updated_at:
           type: string
           format: date-time
-          description: The date and time when the food was last updated.
+          description: The date and time when the meal plan template was last updated.
       required:
-      - id
       - user_id
       - name
+      - day_presets
+    NutrientGoalPreference:
+      type: object
+      properties:
+        goalType:
+          type: string
+          enum:
+          - minimum
+          - maximum
+          - target
+          description: How progress toward this nutrient's goal should be interpreted.
+        targetMin:
+          type:
+          - number
+          - 'null'
+          description: Lower bound of the acceptable band (only when goalType is "target").
+        targetMax:
+          type:
+          - number
+          - 'null'
+          description: Upper bound of the acceptable band (only when goalType is "target").
     MealType:
       type: object
       properties:
@@ -2883,6 +2942,37 @@ components:
       - name
       - sort_order
       - is_system_default
+    NutrientDisplayPreference:
+      type: object
+      properties:
+        user_id:
+          type: string
+          format: uuid
+          description: The ID of the user who owns the preference.
+        view_group:
+          type: string
+          description: The group for which the preference applies (e.g., "daily", "meal").
+        platform:
+          type: string
+          description: The platform for which the preference applies (e.g., "web", "mobile").
+        visible_nutrients:
+          type: array
+          items:
+            type: string
+          description: An array of nutrient names that should be visible.
+        created_at:
+          type: string
+          format: date-time
+          description: The date and time when the preference was created.
+        updated_at:
+          type: string
+          format: date-time
+          description: The date and time when the preference was last updated.
+      required:
+      - user_id
+      - view_group
+      - platform
+      - visible_nutrients
     NutritionSummary:
       type: object
       properties:
@@ -3010,26 +3100,6 @@ components:
         custom_nutrients:
           type: object
           description: A JSON object for storing custom nutrient data.
-    NutrientGoalPreference:
-      type: object
-      properties:
-        goalType:
-          type: string
-          enum:
-          - minimum
-          - maximum
-          - target
-          description: How progress toward this nutrient's goal should be interpreted.
-        targetMin:
-          type:
-          - number
-          - 'null'
-          description: Lower bound of the acceptable band (only when goalType is "target").
-        targetMax:
-          type:
-          - number
-          - 'null'
-          description: Upper bound of the acceptable band (only when goalType is "target").
     FoodVariant:
       type: object
       properties:
@@ -3052,164 +3122,94 @@ components:
       - food_id
       - serving_size
       - data
-    NutrientDisplayPreference:
+    CustomNutrient:
       type: object
       properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier for the custom nutrient.
         user_id:
           type: string
           format: uuid
-          description: The ID of the user who owns the preference.
-        view_group:
+          description: The ID of the user who owns the custom nutrient.
+        name:
           type: string
-          description: The group for which the preference applies (e.g., "daily", "meal").
-        platform:
+          description: The name of the custom nutrient.
+        unit:
           type: string
-          description: The platform for which the preference applies (e.g., "web", "mobile").
-        visible_nutrients:
+          description: The unit of measurement for the custom nutrient.
+        aliases:
           type: array
           items:
             type: string
-          description: An array of nutrient names that should be visible.
+          description: Alternate nutrient names online food providers may use, matched (case-insensitively) on import.
         created_at:
           type: string
           format: date-time
-          description: The date and time when the preference was created.
+          description: The date and time when the custom nutrient was created.
         updated_at:
           type: string
           format: date-time
-          description: The date and time when the preference was last updated.
+          description: The date and time when the custom nutrient was last updated.
       required:
-      - user_id
-      - view_group
-      - platform
-      - visible_nutrients
-    MealPlanTemplate:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-          description: The unique identifier for the meal plan template.
-        user_id:
-          type: string
-          format: uuid
-          description: The ID of the user who owns the meal plan template.
-        name:
-          type: string
-          description: The name of the meal plan template.
-        description:
-          type: string
-          description: A description of the meal plan template.
-        day_presets:
-          type: array
-          items:
-            type: object
-            properties:
-              day_of_week:
-                type: string
-                enum:
-                - monday
-                - tuesday
-                - wednesday
-                - thursday
-                - friday
-                - saturday
-                - sunday
-                description: The day of the week for this preset.
-              meal_day_preset_id:
-                type: string
-                format: uuid
-                description: The ID of the meal day preset to use for this day.
-            required:
-            - day_of_week
-            - meal_day_preset_id
-          description: The meal day presets assigned to each day of the week.
-        created_at:
-          type: string
-          format: date-time
-          description: The date and time when the meal plan template was created.
-        updated_at:
-          type: string
-          format: date-time
-          description: The date and time when the meal plan template was last updated.
-      required:
+      - id
       - user_id
       - name
-      - day_presets
-    FoodEntryMeal:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-          description: The unique identifier for the food entry meal.
-        user_id:
-          type: string
-          format: uuid
-          description: The ID of the user who owns the food entry meal.
-        meal_template_id:
-          type: string
-          format: uuid
-          description: The ID of the meal template used for this entry, if any.
-        meal_type:
-          type: string
-          description: The type of meal (e.g., "Breakfast", "Lunch", "Dinner").
-        meal_type_id:
-          type: string
-          format: uuid
-          description: The ID of the meal type.
-        entry_date:
-          type: string
-          format: date
-          description: The date of the food entry meal (YYYY-MM-DD).
-        name:
-          type: string
-          description: The name of the food entry meal.
-        description:
-          type: string
-          description: A description of the food entry meal.
-        foods:
-          type: array
-          items:
-            type: object
-            properties:
-              food_id:
-                type: string
-                format: uuid
-                description: The ID of the food item.
-              quantity:
-                type: number
-                description: The quantity of the food item.
-              unit:
-                type: string
-                description: The unit of measurement for the food item.
-            required:
-            - food_id
-            - quantity
-            - unit
-          description: A list of food items included in the meal.
-        quantity:
-          type: number
-          description: The total quantity of the meal.
-        unit:
-          type: string
-          description: The unit of measurement for the meal.
-        created_at:
-          type: string
-          format: date-time
-          description: The date and time when the food entry meal was created.
-        updated_at:
-          type: string
-          format: date-time
-          description: The date and time when the food entry meal was last updated.
-      required:
-      - user_id
-      - meal_type
-      - entry_date
-      - name
-      - foods
-      - quantity
       - unit
+    Food:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier for the food.
+        user_id:
+          type: string
+          format: uuid
+          description: The ID of the user who owns the food.
+        name:
+          type: string
+          description: The name of the food.
+        default_variant:
+          $ref: '#/components/schemas/FoodVariant'
+          description: The default nutritional variant for this food.
+        is_public:
+          type: boolean
+          description: Indicates if the food is publicly available.
+        brand:
+          type: string
+          description: The brand name of the food.
+        barcode:
+          type: string
+          description: The barcode of the food.
+        provider_type:
+          type: string
+          description: The type of provider (e.g., "mealie").
+        provider_external_id:
+          type: string
+          description: The external ID from the provider.
+        is_custom:
+          type: boolean
+          description: Indicates if the food is a custom entry created by the user.
+        shared_with_public:
+          type: boolean
+          description: Indicates if the food is shared with the public.
+        is_quick_food:
+          type: boolean
+          description: Indicates if the food is marked for quick access.
+        created_at:
+          type: string
+          format: date-time
+          description: The date and time when the food was created.
+        updated_at:
+          type: string
+          format: date-time
+          description: The date and time when the food was last updated.
+      required:
+      - id
+      - user_id
+      - name
   securitySchemes:
     apiKeyAuth:
       type: apiKey

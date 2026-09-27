@@ -187,6 +187,29 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/MatchedCourseGroup'
+    ExercisePRMatrixResponse:
+      type: object
+      properties:
+        cardioPRs:
+          type: array
+          description: One entry per (sportGroup, distance standard) pair, ordered by sport group then distance.
+          items:
+            $ref: '#/components/schemas/ExercisePersonalRecordItem'
+        strength1RMs:
+          type: array
+          items:
+            type: object
+            properties:
+              exerciseName:
+                type: string
+              estimatedOneRMKg:
+                type: number
+              weightKg:
+                type: number
+              reps:
+                type: number
+              achievedAt:
+                type: string
     MatchedCourseGroup:
       type: object
       description: A repeated route, grouped by activity name, with its recent runs of that course.
@@ -240,29 +263,6 @@ components:
                 type:
                 - number
                 - 'null'
-    ExercisePRMatrixResponse:
-      type: object
-      properties:
-        cardioPRs:
-          type: array
-          description: One entry per (sportGroup, distance standard) pair, ordered by sport group then distance.
-          items:
-            $ref: '#/components/schemas/ExercisePersonalRecordItem'
-        strength1RMs:
-          type: array
-          items:
-            type: object
-            properties:
-              exerciseName:
-                type: string
-              estimatedOneRMKg:
-                type: number
-              weightKg:
-                type: number
-              reps:
-                type: number
-              achievedAt:
-                type: string
   securitySchemes:
     apiKeyAuth:
       type: apiKey

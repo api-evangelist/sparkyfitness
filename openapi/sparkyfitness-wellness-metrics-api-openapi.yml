@@ -2097,34 +2097,6 @@ paths:
       x-operation-id-source: derived
 components:
   schemas:
-    MoodEntry:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        user_id:
-          type: string
-          format: uuid
-        mood_value:
-          type: integer
-          description: Mood value (e.g., 1-5 or 0-10)
-        notes:
-          type:
-          - string
-          - 'null'
-        entry_date:
-          type: string
-          format: date
-        created_at:
-          type: string
-          format: date-time
-        updated_at:
-          type: string
-          format: date-time
-      required:
-      - mood_value
-      - entry_date
     FastingLog:
       type: object
       properties:
@@ -2174,80 +2146,6 @@ components:
       - start_time
       - fasting_type
       - status
-    SleepAnalytics:
-      type: object
-      properties:
-        date:
-          type: string
-          format: date
-        totalSleepDuration:
-          type: integer
-        timeAsleep:
-          type: integer
-        sleepScore:
-          type: number
-        earliestBedtime:
-          type:
-          - string
-          - 'null'
-          format: date-time
-        latestWakeTime:
-          type:
-          - string
-          - 'null'
-          format: date-time
-        sleepEfficiency:
-          type: number
-        sleepDebt:
-          type: number
-        stagePercentages:
-          type: object
-          additionalProperties:
-            type: number
-        awakePeriods:
-          type: integer
-        totalAwakeDuration:
-          type: integer
-    CustomMeasurementCategory:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        user_id:
-          type:
-          - string
-          - 'null'
-          format: uuid
-        name:
-          type: string
-        display_name:
-          type:
-          - string
-          - 'null'
-        frequency:
-          type: string
-        measurement_type:
-          type:
-          - string
-          - 'null'
-        data_type:
-          type:
-          - string
-          - 'null'
-          enum:
-          - numeric
-          - boolean
-          - text
-        created_at:
-          type: string
-          format: date-time
-        updated_at:
-          type: string
-          format: date-time
-      required:
-      - name
-      - frequency
     SleepEntry:
       type: object
       properties:
@@ -2325,6 +2223,108 @@ components:
       - name
       - volume
       - unit
+    SleepAnalytics:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        totalSleepDuration:
+          type: integer
+        timeAsleep:
+          type: integer
+        sleepScore:
+          type: number
+        earliestBedtime:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        latestWakeTime:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        sleepEfficiency:
+          type: number
+        sleepDebt:
+          type: number
+        stagePercentages:
+          type: object
+          additionalProperties:
+            type: number
+        awakePeriods:
+          type: integer
+        totalAwakeDuration:
+          type: integer
+    CustomMeasurementCategory:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+        name:
+          type: string
+        display_name:
+          type:
+          - string
+          - 'null'
+        frequency:
+          type: string
+        measurement_type:
+          type:
+          - string
+          - 'null'
+        data_type:
+          type:
+          - string
+          - 'null'
+          enum:
+          - numeric
+          - boolean
+          - text
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required:
+      - name
+      - frequency
+    MoodEntry:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        mood_value:
+          type: integer
+          description: Mood value (e.g., 1-5 or 0-10)
+        notes:
+          type:
+          - string
+          - 'null'
+        entry_date:
+          type: string
+          format: date
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required:
+      - mood_value
+      - entry_date
   securitySchemes:
     apiKeyAuth:
       type: apiKey

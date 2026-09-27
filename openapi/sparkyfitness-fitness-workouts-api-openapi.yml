@@ -1084,160 +1084,6 @@ paths:
       x-operation-id-source: derived
 components:
   schemas:
-    WorkoutSet:
-      type: object
-      properties:
-        id:
-          type: integer
-          description: Internal ID of the set
-        set_number:
-          type: integer
-        set_type:
-          type: string
-          description: e.g., "Normal", "Warmup", "Dropset"
-        reps:
-          type:
-          - integer
-          - 'null'
-        weight:
-          type:
-          - number
-          - 'null'
-        duration:
-          type:
-          - integer
-          - 'null'
-          description: Duration in seconds
-        distance:
-          type:
-          - number
-          - 'null'
-          description: Distance in km (cardio sets)
-        rest_time:
-          type:
-          - integer
-          - 'null'
-          description: Rest time in seconds
-        notes:
-          type:
-          - string
-          - 'null'
-      required:
-      - set_number
-      - set_type
-    WorkoutPreset:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        user_id:
-          type: string
-          format: uuid
-        name:
-          type: string
-        description:
-          type: string
-        is_public:
-          type: boolean
-        exercises:
-          type: array
-          items:
-            type: object
-            properties:
-              id:
-                type: integer
-              exercise_id:
-                type: string
-                format: uuid
-              exercise_name:
-                type: string
-              image_url:
-                type:
-                - string
-                - 'null'
-              superset_group:
-                type:
-                - integer
-                - 'null'
-              sets:
-                type: array
-                items:
-                  $ref: '#/components/schemas/WorkoutSet'
-        created_at:
-          type: string
-          format: date-time
-        updated_at:
-          type: string
-          format: date-time
-      required:
-      - id
-      - user_id
-      - name
-    Exercise:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-          description: The unique identifier for the exercise.
-        user_id:
-          type: string
-          format: uuid
-          description: The ID of the user who owns the exercise.
-        name:
-          type: string
-          description: The name of the exercise.
-        category:
-          type: string
-          description: The category of the exercise (e.g., "Strength", "Cardio").
-        modality:
-          type: string
-          enum:
-          - weight_reps
-          - reps_only
-          - duration
-          - duration_distance
-          description: Which per-set editor clients render for the exercise. Derived from the category when not supplied on create.
-        equipment:
-          type: array
-          items:
-            type: string
-          description: A list of equipment required for the exercise.
-        muscle_groups:
-          type: array
-          items:
-            type: string
-          description: A list of muscle groups targeted by the exercise.
-        description:
-          type: string
-          description: A detailed description of the exercise.
-        instructions:
-          type: array
-          items:
-            type: string
-          description: Step-by-step instructions for performing the exercise.
-        images:
-          type: array
-          items:
-            type: string
-          description: URLs or paths to images demonstrating the exercise.
-        is_public:
-          type: boolean
-          description: Indicates if the exercise is publicly available.
-        created_at:
-          type: string
-          format: date-time
-          description: The date and time when the exercise was created.
-        updated_at:
-          type: string
-          format: date-time
-          description: The date and time when the exercise was last updated.
-      required:
-      - id
-      - user_id
-      - name
-      - category
     ExerciseEntry:
       type: object
       properties:
@@ -1317,6 +1163,55 @@ components:
       - user_id
       - exercise_id
       - entry_date
+    WorkoutPreset:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        is_public:
+          type: boolean
+        exercises:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+              exercise_id:
+                type: string
+                format: uuid
+              exercise_name:
+                type: string
+              image_url:
+                type:
+                - string
+                - 'null'
+              superset_group:
+                type:
+                - integer
+                - 'null'
+              sets:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WorkoutSet'
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required:
+      - id
+      - user_id
+      - name
     WorkoutPlanTemplate:
       type: object
       properties:
@@ -1384,6 +1279,111 @@ components:
       - plan_name
       - start_date
       - is_active
+    Exercise:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier for the exercise.
+        user_id:
+          type: string
+          format: uuid
+          description: The ID of the user who owns the exercise.
+        name:
+          type: string
+          description: The name of the exercise.
+        category:
+          type: string
+          description: The category of the exercise (e.g., "Strength", "Cardio").
+        modality:
+          type: string
+          enum:
+          - weight_reps
+          - reps_only
+          - duration
+          - duration_distance
+          description: Which per-set editor clients render for the exercise. Derived from the category when not supplied on create.
+        equipment:
+          type: array
+          items:
+            type: string
+          description: A list of equipment required for the exercise.
+        muscle_groups:
+          type: array
+          items:
+            type: string
+          description: A list of muscle groups targeted by the exercise.
+        description:
+          type: string
+          description: A detailed description of the exercise.
+        instructions:
+          type: array
+          items:
+            type: string
+          description: Step-by-step instructions for performing the exercise.
+        images:
+          type: array
+          items:
+            type: string
+          description: URLs or paths to images demonstrating the exercise.
+        is_public:
+          type: boolean
+          description: Indicates if the exercise is publicly available.
+        created_at:
+          type: string
+          format: date-time
+          description: The date and time when the exercise was created.
+        updated_at:
+          type: string
+          format: date-time
+          description: The date and time when the exercise was last updated.
+      required:
+      - id
+      - user_id
+      - name
+      - category
+    WorkoutSet:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Internal ID of the set
+        set_number:
+          type: integer
+        set_type:
+          type: string
+          description: e.g., "Normal", "Warmup", "Dropset"
+        reps:
+          type:
+          - integer
+          - 'null'
+        weight:
+          type:
+          - number
+          - 'null'
+        duration:
+          type:
+          - integer
+          - 'null'
+          description: Duration in seconds
+        distance:
+          type:
+          - number
+          - 'null'
+          description: Distance in km (cardio sets)
+        rest_time:
+          type:
+          - integer
+          - 'null'
+          description: Rest time in seconds
+        notes:
+          type:
+          - string
+          - 'null'
+      required:
+      - set_number
+      - set_type
   securitySchemes:
     apiKeyAuth:
       type: apiKey

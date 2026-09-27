@@ -1370,26 +1370,6 @@ paths:
       x-operation-id-source: derived
 components:
   schemas:
-    WithingsStatus:
-      type: object
-      properties:
-        is_connected:
-          type: boolean
-        last_sync_at:
-          type:
-          - string
-          - 'null'
-          format: date-time
-    GarminStatus:
-      type: object
-      properties:
-        is_connected:
-          type: boolean
-        last_sync_at:
-          type:
-          - string
-          - 'null'
-          format: date-time
     ExternalProvider:
       type: object
       properties:
@@ -1438,6 +1418,26 @@ components:
       - user_id
       - provider_name
       - provider_type
+    WithingsStatus:
+      type: object
+      properties:
+        is_connected:
+          type: boolean
+        last_sync_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+    GarminStatus:
+      type: object
+      properties:
+        is_connected:
+          type: boolean
+        last_sync_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
   securitySchemes:
     apiKeyAuth:
       type: apiKey

@@ -896,21 +896,26 @@ paths:
       x-operation-id-source: derived
 components:
   schemas:
-    GlobalSettings:
+    BackupSettings:
       type: object
       properties:
-        enable_email_password_login:
+        backupEnabled:
           type: boolean
-        is_oidc_active:
-          type: boolean
-        is_mfa_mandatory:
-          type: boolean
-        default_vision_ai_service_id:
-          type:
-          - string
-          - 'null'
-          format: uuid
-          description: Global default AI service used for vision tasks (food-photo, label scan) by users on the global default. Null clears it.
+        backupDays:
+          type: array
+          items:
+            type: string
+        backupTime:
+          type: string
+        retentionDays:
+          type: integer
+        lastBackupStatus:
+          type: string
+        lastBackupTimestamp:
+          type: string
+          format: date-time
+        backupLocation:
+          type: string
     User:
       type: object
       properties:
@@ -951,26 +956,21 @@ components:
       - email
       - role
       - is_active
-    BackupSettings:
+    GlobalSettings:
       type: object
       properties:
-        backupEnabled:
+        enable_email_password_login:
           type: boolean
-        backupDays:
-          type: array
-          items:
-            type: string
-        backupTime:
-          type: string
-        retentionDays:
-          type: integer
-        lastBackupStatus:
-          type: string
-        lastBackupTimestamp:
-          type: string
-          format: date-time
-        backupLocation:
-          type: string
+        is_oidc_active:
+          type: boolean
+        is_mfa_mandatory:
+          type: boolean
+        default_vision_ai_service_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: Global default AI service used for vision tasks (food-photo, label scan) by users on the global default. Null clears it.
   securitySchemes:
     apiKeyAuth:
       type: apiKey

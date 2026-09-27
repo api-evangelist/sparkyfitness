@@ -19,15 +19,20 @@ x-type: company
 x-source: harvest:health-device-stack
 deliveryModel:
   model: unknown
+  license_evidence:
+    repo: codewithcj/sparkyfitness
+    spdx: NOASSERTION
+    stars: 6117
   open_source: unknown
   commercial: true
   callable_host: false
   label: Delivery model not determined — needs a product licence on record
   confidence: low
   source:
+  - openapi
   - pricing
   - repository-unlicensed
-  generated: '2026-08-28'
+  generated: '2026-09-25'
   method: derived
 accessModel:
   pricing: unknown
@@ -53,7 +58,7 @@ tags:
 - Fitness
 - Nutrition
 - Self-Hosted
-- Open-Source
+- Open Source
 - Wearables
 - MCP
 - AI Assistant
@@ -69,6 +74,7 @@ tags_raw:
 - MCP
 - AI Assistant
 - Quantified Self
+- Open-Source
 apis:
 - name: SparkyFitness MCP Server
   description: >-
