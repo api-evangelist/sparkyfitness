@@ -1084,85 +1084,111 @@ paths:
       x-operation-id-source: derived
 components:
   schemas:
-    ExerciseEntry:
+    WorkoutSet:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Internal ID of the set
+        set_number:
+          type: integer
+        set_type:
+          type: string
+          description: e.g., "Normal", "Warmup", "Dropset"
+        reps:
+          type:
+          - integer
+          - 'null'
+        weight:
+          type:
+          - number
+          - 'null'
+        duration:
+          type:
+          - integer
+          - 'null'
+          description: Duration in seconds
+        distance:
+          type:
+          - number
+          - 'null'
+          description: Distance in km (cardio sets)
+        rest_time:
+          type:
+          - integer
+          - 'null'
+          description: Rest time in seconds
+        notes:
+          type:
+          - string
+          - 'null'
+      required:
+      - set_number
+      - set_type
+    Exercise:
       type: object
       properties:
         id:
           type: string
           format: uuid
-          description: The unique identifier for the exercise entry.
+          description: The unique identifier for the exercise.
         user_id:
           type: string
           format: uuid
-          description: The ID of the user who owns the exercise entry.
-        exercise_id:
+          description: The ID of the user who owns the exercise.
+        name:
           type: string
-          format: uuid
-          description: The ID of the exercise performed.
-        duration_minutes:
-          type: number
-          description: The duration of the exercise in minutes.
-        calories_burned:
-          type: number
-          description: The number of calories burned during the exercise.
-        entry_date:
+          description: The name of the exercise.
+        category:
           type: string
-          format: date
-          description: The date of the exercise entry (YYYY-MM-DD).
-        entry_time:
+          description: The category of the exercise (e.g., "Strength", "Cardio").
+        modality:
           type: string
-          description: The wall-clock local start time of the exercise session (e.g., HH:MM). Nullable.
-        notes:
-          type: string
-          description: Any additional notes for the exercise entry.
-        sets:
+          enum:
+          - weight_reps
+          - reps_only
+          - duration
+          - duration_distance
+          description: Which per-set editor clients render for the exercise. Derived from the category when not supplied on create.
+        equipment:
           type: array
           items:
-            type: object
-            properties:
-              reps:
-                type: number
-              weight:
-                type: number
-              duration:
-                type: integer
-                description: Duration in seconds.
-          description: Details of sets performed (reps, weight, duration in seconds).
-        reps:
-          type: number
-          description: Total repetitions (if not detailed in sets).
-        weight:
-          type: number
-          description: Weight used (if not detailed in sets).
-        workout_plan_assignment_id:
+            type: string
+          description: A list of equipment required for the exercise.
+        muscle_groups:
+          type: array
+          items:
+            type: string
+          description: A list of muscle groups targeted by the exercise.
+        description:
           type: string
-          format: uuid
-          description: The ID of the workout plan assignment this entry belongs to.
-        image_url:
-          type: string
-          format: url
-          description: URL to an image associated with the exercise entry.
-        distance:
-          type: number
-          description: Distance covered for cardio exercises.
-        avg_heart_rate:
-          type: number
-          description: Average heart rate during the exercise.
-        activity_details:
-          type: object
-          description: Additional activity-specific details (JSONB).
+          description: A detailed description of the exercise.
+        instructions:
+          type: array
+          items:
+            type: string
+          description: Step-by-step instructions for performing the exercise.
+        images:
+          type: array
+          items:
+            type: string
+          description: URLs or paths to images demonstrating the exercise.
+        is_public:
+          type: boolean
+          description: Indicates if the exercise is publicly available.
         created_at:
           type: string
           format: date-time
-          description: The date and time when the exercise entry was created.
+          description: The date and time when the exercise was created.
         updated_at:
           type: string
           format: date-time
-          description: The date and time when the exercise entry was last updated.
+          description: The date and time when the exercise was last updated.
       required:
+      - id
       - user_id
-      - exercise_id
-      - entry_date
+      - name
+      - category
     WorkoutPreset:
       type: object
       properties:
@@ -1279,111 +1305,85 @@ components:
       - plan_name
       - start_date
       - is_active
-    Exercise:
+    ExerciseEntry:
       type: object
       properties:
         id:
           type: string
           format: uuid
-          description: The unique identifier for the exercise.
+          description: The unique identifier for the exercise entry.
         user_id:
           type: string
           format: uuid
-          description: The ID of the user who owns the exercise.
-        name:
+          description: The ID of the user who owns the exercise entry.
+        exercise_id:
           type: string
-          description: The name of the exercise.
-        category:
+          format: uuid
+          description: The ID of the exercise performed.
+        duration_minutes:
+          type: number
+          description: The duration of the exercise in minutes.
+        calories_burned:
+          type: number
+          description: The number of calories burned during the exercise.
+        entry_date:
           type: string
-          description: The category of the exercise (e.g., "Strength", "Cardio").
-        modality:
+          format: date
+          description: The date of the exercise entry (YYYY-MM-DD).
+        entry_time:
           type: string
-          enum:
-          - weight_reps
-          - reps_only
-          - duration
-          - duration_distance
-          description: Which per-set editor clients render for the exercise. Derived from the category when not supplied on create.
-        equipment:
+          description: The wall-clock local start time of the exercise session (e.g., HH:MM). Nullable.
+        notes:
+          type: string
+          description: Any additional notes for the exercise entry.
+        sets:
           type: array
           items:
-            type: string
-          description: A list of equipment required for the exercise.
-        muscle_groups:
-          type: array
-          items:
-            type: string
-          description: A list of muscle groups targeted by the exercise.
-        description:
+            type: object
+            properties:
+              reps:
+                type: number
+              weight:
+                type: number
+              duration:
+                type: integer
+                description: Duration in seconds.
+          description: Details of sets performed (reps, weight, duration in seconds).
+        reps:
+          type: number
+          description: Total repetitions (if not detailed in sets).
+        weight:
+          type: number
+          description: Weight used (if not detailed in sets).
+        workout_plan_assignment_id:
           type: string
-          description: A detailed description of the exercise.
-        instructions:
-          type: array
-          items:
-            type: string
-          description: Step-by-step instructions for performing the exercise.
-        images:
-          type: array
-          items:
-            type: string
-          description: URLs or paths to images demonstrating the exercise.
-        is_public:
-          type: boolean
-          description: Indicates if the exercise is publicly available.
+          format: uuid
+          description: The ID of the workout plan assignment this entry belongs to.
+        image_url:
+          type: string
+          format: url
+          description: URL to an image associated with the exercise entry.
+        distance:
+          type: number
+          description: Distance covered for cardio exercises.
+        avg_heart_rate:
+          type: number
+          description: Average heart rate during the exercise.
+        activity_details:
+          type: object
+          description: Additional activity-specific details (JSONB).
         created_at:
           type: string
           format: date-time
-          description: The date and time when the exercise was created.
+          description: The date and time when the exercise entry was created.
         updated_at:
           type: string
           format: date-time
-          description: The date and time when the exercise was last updated.
+          description: The date and time when the exercise entry was last updated.
       required:
-      - id
       - user_id
-      - name
-      - category
-    WorkoutSet:
-      type: object
-      properties:
-        id:
-          type: integer
-          description: Internal ID of the set
-        set_number:
-          type: integer
-        set_type:
-          type: string
-          description: e.g., "Normal", "Warmup", "Dropset"
-        reps:
-          type:
-          - integer
-          - 'null'
-        weight:
-          type:
-          - number
-          - 'null'
-        duration:
-          type:
-          - integer
-          - 'null'
-          description: Duration in seconds
-        distance:
-          type:
-          - number
-          - 'null'
-          description: Distance in km (cardio sets)
-        rest_time:
-          type:
-          - integer
-          - 'null'
-          description: Rest time in seconds
-        notes:
-          type:
-          - string
-          - 'null'
-      required:
-      - set_number
-      - set_type
+      - exercise_id
+      - entry_date
   securitySchemes:
     apiKeyAuth:
       type: apiKey

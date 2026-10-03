@@ -2097,166 +2097,6 @@ paths:
       x-operation-id-source: derived
 components:
   schemas:
-    FastingLog:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-          description: The unique identifier for the fasting log.
-        user_id:
-          type: string
-          format: uuid
-          description: The ID of the user who owns the fasting log.
-        start_time:
-          type: string
-          format: date-time
-          description: The date and time when the fast started.
-        target_end_time:
-          type: string
-          format: date-time
-          description: The scheduled or target end time for the fast.
-        end_time:
-          type: string
-          format: date-time
-          description: The date and time when the fast ended (null for active fasts).
-        duration_minutes:
-          type: integer
-          description: The total duration of the fast in minutes.
-        fasting_type:
-          type: string
-          description: The type of fast (e.g., "16:8", "20:4", "OMAD").
-        status:
-          type: string
-          enum:
-          - ACTIVE
-          - COMPLETED
-          description: The status of the fasting log.
-        created_at:
-          type: string
-          format: date-time
-          description: The date and time when the log was created.
-        updated_at:
-          type: string
-          format: date-time
-          description: The date and time when the log was last updated.
-      required:
-      - id
-      - user_id
-      - start_time
-      - fasting_type
-      - status
-    SleepEntry:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        user_id:
-          type: string
-          format: uuid
-        entry_date:
-          type: string
-          format: date
-        bedtime:
-          type: string
-          format: date-time
-        wake_time:
-          type: string
-          format: date-time
-        duration_in_seconds:
-          type: integer
-        source:
-          type: string
-        sleep_score:
-          type:
-          - integer
-          - 'null'
-        record_timezone:
-          type:
-          - string
-          - 'null'
-          description: IANA timezone the entry was recorded in. NULL falls back to record_utc_offset_minutes, then the profile timezone.
-        record_utc_offset_minutes:
-          type:
-          - integer
-          - 'null'
-          description: UTC offset in minutes at recording time; used when record_timezone is absent.
-        created_at:
-          type: string
-          format: date-time
-        updated_at:
-          type: string
-          format: date-time
-      required:
-      - entry_date
-      - bedtime
-      - wake_time
-      - duration_in_seconds
-    WaterContainer:
-      type: object
-      properties:
-        id:
-          type: integer
-        user_id:
-          type: string
-          format: uuid
-        name:
-          type: string
-        volume:
-          type: number
-          description: Volume in specified unit
-        unit:
-          type: string
-          description: ml, oz, etc.
-        is_primary:
-          type: boolean
-        servings_per_container:
-          type: number
-        created_at:
-          type: string
-          format: date-time
-        updated_at:
-          type: string
-          format: date-time
-      required:
-      - name
-      - volume
-      - unit
-    SleepAnalytics:
-      type: object
-      properties:
-        date:
-          type: string
-          format: date
-        totalSleepDuration:
-          type: integer
-        timeAsleep:
-          type: integer
-        sleepScore:
-          type: number
-        earliestBedtime:
-          type:
-          - string
-          - 'null'
-          format: date-time
-        latestWakeTime:
-          type:
-          - string
-          - 'null'
-          format: date-time
-        sleepEfficiency:
-          type: number
-        sleepDebt:
-          type: number
-        stagePercentages:
-          type: object
-          additionalProperties:
-            type: number
-        awakePeriods:
-          type: integer
-        totalAwakeDuration:
-          type: integer
     CustomMeasurementCategory:
       type: object
       properties:
@@ -2325,6 +2165,166 @@ components:
       required:
       - mood_value
       - entry_date
+    SleepAnalytics:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        totalSleepDuration:
+          type: integer
+        timeAsleep:
+          type: integer
+        sleepScore:
+          type: number
+        earliestBedtime:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        latestWakeTime:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        sleepEfficiency:
+          type: number
+        sleepDebt:
+          type: number
+        stagePercentages:
+          type: object
+          additionalProperties:
+            type: number
+        awakePeriods:
+          type: integer
+        totalAwakeDuration:
+          type: integer
+    FastingLog:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier for the fasting log.
+        user_id:
+          type: string
+          format: uuid
+          description: The ID of the user who owns the fasting log.
+        start_time:
+          type: string
+          format: date-time
+          description: The date and time when the fast started.
+        target_end_time:
+          type: string
+          format: date-time
+          description: The scheduled or target end time for the fast.
+        end_time:
+          type: string
+          format: date-time
+          description: The date and time when the fast ended (null for active fasts).
+        duration_minutes:
+          type: integer
+          description: The total duration of the fast in minutes.
+        fasting_type:
+          type: string
+          description: The type of fast (e.g., "16:8", "20:4", "OMAD").
+        status:
+          type: string
+          enum:
+          - ACTIVE
+          - COMPLETED
+          description: The status of the fasting log.
+        created_at:
+          type: string
+          format: date-time
+          description: The date and time when the log was created.
+        updated_at:
+          type: string
+          format: date-time
+          description: The date and time when the log was last updated.
+      required:
+      - id
+      - user_id
+      - start_time
+      - fasting_type
+      - status
+    WaterContainer:
+      type: object
+      properties:
+        id:
+          type: integer
+        user_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        volume:
+          type: number
+          description: Volume in specified unit
+        unit:
+          type: string
+          description: ml, oz, etc.
+        is_primary:
+          type: boolean
+        servings_per_container:
+          type: number
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required:
+      - name
+      - volume
+      - unit
+    SleepEntry:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        entry_date:
+          type: string
+          format: date
+        bedtime:
+          type: string
+          format: date-time
+        wake_time:
+          type: string
+          format: date-time
+        duration_in_seconds:
+          type: integer
+        source:
+          type: string
+        sleep_score:
+          type:
+          - integer
+          - 'null'
+        record_timezone:
+          type:
+          - string
+          - 'null'
+          description: IANA timezone the entry was recorded in. NULL falls back to record_utc_offset_minutes, then the profile timezone.
+        record_utc_offset_minutes:
+          type:
+          - integer
+          - 'null'
+          description: UTC offset in minutes at recording time; used when record_timezone is absent.
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required:
+      - entry_date
+      - bedtime
+      - wake_time
+      - duration_in_seconds
   securitySchemes:
     apiKeyAuth:
       type: apiKey

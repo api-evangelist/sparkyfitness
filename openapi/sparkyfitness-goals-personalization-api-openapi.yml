@@ -597,6 +597,13 @@ paths:
       x-operation-id-source: derived
 components:
   schemas:
+    OnboardingStatus:
+      type: object
+      properties:
+        onboarding_complete:
+          type: boolean
+        onboarding_skipped:
+          type: boolean
     GoalPreset:
       type: object
       properties:
@@ -659,44 +666,6 @@ components:
           type:
           - integer
           - 'null'
-    OnboardingStatus:
-      type: object
-      properties:
-        onboarding_complete:
-          type: boolean
-        onboarding_skipped:
-          type: boolean
-    UserPreferences:
-      type: object
-      properties:
-        user_id:
-          type: string
-          format: uuid
-        language:
-          type: string
-        theme:
-          type: string
-        timezone:
-          type: string
-        unit_system:
-          type: string
-          enum:
-          - metric
-          - imperial
-        meal_calorie_distribution:
-          type: object
-        calorie_safety_floor_mode:
-          type: string
-          enum:
-          - standard
-          - custom
-          - disabled
-          description: Controls adaptive calorie-target clamping. Standard uses the recommended RMR/clinical floor, custom uses calorie_safety_floor_value, and disabled only reports health warnings.
-        calorie_safety_floor_value:
-          type: integer
-          minimum: 800
-          maximum: 5000
-          description: Custom calorie safety floor in kcal/day. Used when calorie_safety_floor_mode is custom.
     WeeklyGoalPlan:
       type: object
       properties:
@@ -765,6 +734,37 @@ components:
       - plan_name
       - start_date
       - is_active
+    UserPreferences:
+      type: object
+      properties:
+        user_id:
+          type: string
+          format: uuid
+        language:
+          type: string
+        theme:
+          type: string
+        timezone:
+          type: string
+        unit_system:
+          type: string
+          enum:
+          - metric
+          - imperial
+        meal_calorie_distribution:
+          type: object
+        calorie_safety_floor_mode:
+          type: string
+          enum:
+          - standard
+          - custom
+          - disabled
+          description: Controls adaptive calorie-target clamping. Standard uses the recommended RMR/clinical floor, custom uses calorie_safety_floor_value, and disabled only reports health warnings.
+        calorie_safety_floor_value:
+          type: integer
+          minimum: 800
+          maximum: 5000
+          description: Custom calorie safety floor in kcal/day. Used when calorie_safety_floor_mode is custom.
   securitySchemes:
     apiKeyAuth:
       type: apiKey

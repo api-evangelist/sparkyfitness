@@ -896,26 +896,6 @@ paths:
       x-operation-id-source: derived
 components:
   schemas:
-    BackupSettings:
-      type: object
-      properties:
-        backupEnabled:
-          type: boolean
-        backupDays:
-          type: array
-          items:
-            type: string
-        backupTime:
-          type: string
-        retentionDays:
-          type: integer
-        lastBackupStatus:
-          type: string
-        lastBackupTimestamp:
-          type: string
-          format: date-time
-        backupLocation:
-          type: string
     User:
       type: object
       properties:
@@ -971,6 +951,26 @@ components:
           - 'null'
           format: uuid
           description: Global default AI service used for vision tasks (food-photo, label scan) by users on the global default. Null clears it.
+    BackupSettings:
+      type: object
+      properties:
+        backupEnabled:
+          type: boolean
+        backupDays:
+          type: array
+          items:
+            type: string
+        backupTime:
+          type: string
+        retentionDays:
+          type: integer
+        lastBackupStatus:
+          type: string
+        lastBackupTimestamp:
+          type: string
+          format: date-time
+        backupLocation:
+          type: string
   securitySchemes:
     apiKeyAuth:
       type: apiKey
