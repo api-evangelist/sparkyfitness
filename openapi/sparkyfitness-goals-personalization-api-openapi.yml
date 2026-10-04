@@ -634,38 +634,6 @@ components:
       required:
       - preset_name
       - calories
-    UserGoal:
-      type: object
-      properties:
-        goal_date:
-          type:
-          - string
-          - 'null'
-          format: date
-        calories:
-          type: number
-        protein:
-          type: number
-        carbs:
-          type: number
-        fat:
-          type: number
-        water_goal_ml:
-          type: number
-        protein_percentage:
-          type: number
-        carbs_percentage:
-          type: number
-        fat_percentage:
-          type: number
-        target_exercise_calories_burned:
-          type:
-          - number
-          - 'null'
-        target_exercise_duration_minutes:
-          type:
-          - integer
-          - 'null'
     WeeklyGoalPlan:
       type: object
       properties:
@@ -734,6 +702,38 @@ components:
       - plan_name
       - start_date
       - is_active
+    UserGoal:
+      type: object
+      properties:
+        goal_date:
+          type:
+          - string
+          - 'null'
+          format: date
+        calories:
+          type: number
+        protein:
+          type: number
+        carbs:
+          type: number
+        fat:
+          type: number
+        water_goal_ml:
+          type: number
+        protein_percentage:
+          type: number
+        carbs_percentage:
+          type: number
+        fat_percentage:
+          type: number
+        target_exercise_calories_burned:
+          type:
+          - number
+          - 'null'
+        target_exercise_duration_minutes:
+          type:
+          - integer
+          - 'null'
     UserPreferences:
       type: object
       properties:

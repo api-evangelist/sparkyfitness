@@ -936,21 +936,6 @@ components:
       - email
       - role
       - is_active
-    GlobalSettings:
-      type: object
-      properties:
-        enable_email_password_login:
-          type: boolean
-        is_oidc_active:
-          type: boolean
-        is_mfa_mandatory:
-          type: boolean
-        default_vision_ai_service_id:
-          type:
-          - string
-          - 'null'
-          format: uuid
-          description: Global default AI service used for vision tasks (food-photo, label scan) by users on the global default. Null clears it.
     BackupSettings:
       type: object
       properties:
@@ -971,6 +956,21 @@ components:
           format: date-time
         backupLocation:
           type: string
+    GlobalSettings:
+      type: object
+      properties:
+        enable_email_password_login:
+          type: boolean
+        is_oidc_active:
+          type: boolean
+        is_mfa_mandatory:
+          type: boolean
+        default_vision_ai_service_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: Global default AI service used for vision tasks (food-photo, label scan) by users on the global default. Null clears it.
   securitySchemes:
     apiKeyAuth:
       type: apiKey
