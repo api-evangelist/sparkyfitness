@@ -613,6 +613,8 @@ maintainers:
 - FN: APIs.json
   email: info@apis.io
 common:
+- type: RateLimits
+  url: rate-limits/sparkyfitness-rate-limits.yml
 - type: CapabilityMap
   url: capabilities/sparkyfitness-capability-edges.yml
   name: SparkyFitness Business Capability Map
