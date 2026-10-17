@@ -2762,100 +2762,37 @@ paths:
       x-operation-id-source: derived
 components:
   schemas:
-    NutrientGoalPreference:
+    NutrientDisplayPreference:
       type: object
       properties:
-        goalType:
-          type: string
-          enum:
-          - minimum
-          - maximum
-          - target
-          description: How progress toward this nutrient's goal should be interpreted.
-        targetMin:
-          type:
-          - number
-          - 'null'
-          description: Lower bound of the acceptable band (only when goalType is "target").
-        targetMax:
-          type:
-          - number
-          - 'null'
-          description: Upper bound of the acceptable band (only when goalType is "target").
-    FoodEntryMeal:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-          description: The unique identifier for the food entry meal.
         user_id:
           type: string
           format: uuid
-          description: The ID of the user who owns the food entry meal.
-        meal_template_id:
+          description: The ID of the user who owns the preference.
+        view_group:
           type: string
-          format: uuid
-          description: The ID of the meal template used for this entry, if any.
-        meal_type:
+          description: The group for which the preference applies (e.g., "daily", "meal").
+        platform:
           type: string
-          description: The type of meal (e.g., "Breakfast", "Lunch", "Dinner").
-        meal_type_id:
-          type: string
-          format: uuid
-          description: The ID of the meal type.
-        entry_date:
-          type: string
-          format: date
-          description: The date of the food entry meal (YYYY-MM-DD).
-        name:
-          type: string
-          description: The name of the food entry meal.
-        description:
-          type: string
-          description: A description of the food entry meal.
-        foods:
+          description: The platform for which the preference applies (e.g., "web", "mobile").
+        visible_nutrients:
           type: array
           items:
-            type: object
-            properties:
-              food_id:
-                type: string
-                format: uuid
-                description: The ID of the food item.
-              quantity:
-                type: number
-                description: The quantity of the food item.
-              unit:
-                type: string
-                description: The unit of measurement for the food item.
-            required:
-            - food_id
-            - quantity
-            - unit
-          description: A list of food items included in the meal.
-        quantity:
-          type: number
-          description: The total quantity of the meal.
-        unit:
-          type: string
-          description: The unit of measurement for the meal.
+            type: string
+          description: An array of nutrient names that should be visible.
         created_at:
           type: string
           format: date-time
-          description: The date and time when the food entry meal was created.
+          description: The date and time when the preference was created.
         updated_at:
           type: string
           format: date-time
-          description: The date and time when the food entry meal was last updated.
+          description: The date and time when the preference was last updated.
       required:
       - user_id
-      - meal_type
-      - entry_date
-      - name
-      - foods
-      - quantity
-      - unit
+      - view_group
+      - platform
+      - visible_nutrients
     MealPlanTemplate:
       type: object
       properties:
@@ -2909,29 +2846,6 @@ components:
       - user_id
       - name
       - day_presets
-    NutritionSummary:
-      type: object
-      properties:
-        total_calories:
-          type: number
-          description: Total calories consumed
-        total_protein:
-          type: number
-          description: Total protein consumed in grams
-        total_carbs:
-          type: number
-          description: Total carbohydrates consumed in grams
-        total_fat:
-          type: number
-          description: Total fat consumed in grams
-        total_dietary_fiber:
-          type: number
-          description: Total dietary fiber consumed in grams
-        total_custom_nutrients:
-          type: object
-          additionalProperties:
-            type: number
-          description: Aggregated custom nutrients values
     CustomNutrient:
       type: object
       properties:
@@ -2967,6 +2881,130 @@ components:
       - user_id
       - name
       - unit
+    NutrientGoalPreference:
+      type: object
+      properties:
+        goalType:
+          type: string
+          enum:
+          - minimum
+          - maximum
+          - target
+          description: How progress toward this nutrient's goal should be interpreted.
+        targetMin:
+          type:
+          - number
+          - 'null'
+          description: Lower bound of the acceptable band (only when goalType is "target").
+        targetMax:
+          type:
+          - number
+          - 'null'
+          description: Upper bound of the acceptable band (only when goalType is "target").
+    FoodEntry:
+      type: object
+      required:
+      - user_id
+      - meal_type_id
+      - quantity
+      - unit
+      - entry_date
+      - food_name
+      - calories
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier for the food entry.
+        user_id:
+          type: string
+          format: uuid
+          description: The ID of the user who owns this food entry.
+        food_id:
+          type: string
+          format: uuid
+          description: The ID of the food, if this entry is linked to a food in the database.
+        meal_id:
+          type: string
+          format: uuid
+          description: The ID of the meal, if this entry is part of a meal.
+        meal_type_id:
+          type: string
+          format: uuid
+          description: The ID of the meal type (e.g., breakfast, lunch, dinner).
+        quantity:
+          type: number
+          description: The quantity of the food consumed.
+        unit:
+          type: string
+          description: The unit of measurement for the quantity (e.g., grams, oz, serving).
+        entry_date:
+          type: string
+          format: date
+          description: The date the food was consumed.
+        entry_time:
+          type: string
+          description: The wall-clock local time of day the food was eaten (e.g., HH:MM). Nullable.
+        variant_id:
+          type: string
+          format: uuid
+          description: The ID of the food variant, if applicable.
+        food_entry_meal_id:
+          type: string
+          format: uuid
+          description: The ID of the food entry meal, if this entry is part of a larger meal entry.
+        food_name:
+          type: string
+          description: The name of the food.
+        brand_name:
+          type: string
+          description: The brand name of the food.
+        serving_size:
+          type: number
+          description: The size of a single serving.
+        serving_unit:
+          type: string
+          description: The unit for the serving size.
+        calories:
+          type: number
+          description: The number of calories.
+        protein:
+          type: number
+        carbs:
+          type: number
+        fat:
+          type: number
+        saturated_fat:
+          type: number
+        polyunsaturated_fat:
+          type: number
+        monounsaturated_fat:
+          type: number
+        trans_fat:
+          type: number
+        cholesterol:
+          type: number
+        sodium:
+          type: number
+        potassium:
+          type: number
+        dietary_fiber:
+          type: number
+        sugars:
+          type: number
+        vitamin_a:
+          type: number
+        vitamin_c:
+          type: number
+        calcium:
+          type: number
+        iron:
+          type: number
+        glycemic_index:
+          type: number
+        custom_nutrients:
+          type: object
+          description: A JSON object for storing custom nutrient data.
     Food:
       type: object
       properties:
@@ -3075,141 +3113,103 @@ components:
       - food_id
       - serving_size
       - data
-    FoodEntry:
+    NutritionSummary:
       type: object
-      required:
-      - user_id
-      - meal_type_id
-      - quantity
-      - unit
-      - entry_date
-      - food_name
-      - calories
+      properties:
+        total_calories:
+          type: number
+          description: Total calories consumed
+        total_protein:
+          type: number
+          description: Total protein consumed in grams
+        total_carbs:
+          type: number
+          description: Total carbohydrates consumed in grams
+        total_fat:
+          type: number
+          description: Total fat consumed in grams
+        total_dietary_fiber:
+          type: number
+          description: Total dietary fiber consumed in grams
+        total_custom_nutrients:
+          type: object
+          additionalProperties:
+            type: number
+          description: Aggregated custom nutrients values
+    FoodEntryMeal:
+      type: object
       properties:
         id:
           type: string
           format: uuid
-          description: The unique identifier for the food entry.
+          description: The unique identifier for the food entry meal.
         user_id:
           type: string
           format: uuid
-          description: The ID of the user who owns this food entry.
-        food_id:
+          description: The ID of the user who owns the food entry meal.
+        meal_template_id:
           type: string
           format: uuid
-          description: The ID of the food, if this entry is linked to a food in the database.
-        meal_id:
+          description: The ID of the meal template used for this entry, if any.
+        meal_type:
           type: string
-          format: uuid
-          description: The ID of the meal, if this entry is part of a meal.
+          description: The type of meal (e.g., "Breakfast", "Lunch", "Dinner").
         meal_type_id:
           type: string
           format: uuid
-          description: The ID of the meal type (e.g., breakfast, lunch, dinner).
-        quantity:
-          type: number
-          description: The quantity of the food consumed.
-        unit:
-          type: string
-          description: The unit of measurement for the quantity (e.g., grams, oz, serving).
+          description: The ID of the meal type.
         entry_date:
           type: string
           format: date
-          description: The date the food was consumed.
-        entry_time:
+          description: The date of the food entry meal (YYYY-MM-DD).
+        name:
           type: string
-          description: The wall-clock local time of day the food was eaten (e.g., HH:MM). Nullable.
-        variant_id:
+          description: The name of the food entry meal.
+        description:
           type: string
-          format: uuid
-          description: The ID of the food variant, if applicable.
-        food_entry_meal_id:
-          type: string
-          format: uuid
-          description: The ID of the food entry meal, if this entry is part of a larger meal entry.
-        food_name:
-          type: string
-          description: The name of the food.
-        brand_name:
-          type: string
-          description: The brand name of the food.
-        serving_size:
-          type: number
-          description: The size of a single serving.
-        serving_unit:
-          type: string
-          description: The unit for the serving size.
-        calories:
-          type: number
-          description: The number of calories.
-        protein:
-          type: number
-        carbs:
-          type: number
-        fat:
-          type: number
-        saturated_fat:
-          type: number
-        polyunsaturated_fat:
-          type: number
-        monounsaturated_fat:
-          type: number
-        trans_fat:
-          type: number
-        cholesterol:
-          type: number
-        sodium:
-          type: number
-        potassium:
-          type: number
-        dietary_fiber:
-          type: number
-        sugars:
-          type: number
-        vitamin_a:
-          type: number
-        vitamin_c:
-          type: number
-        calcium:
-          type: number
-        iron:
-          type: number
-        glycemic_index:
-          type: number
-        custom_nutrients:
-          type: object
-          description: A JSON object for storing custom nutrient data.
-    NutrientDisplayPreference:
-      type: object
-      properties:
-        user_id:
-          type: string
-          format: uuid
-          description: The ID of the user who owns the preference.
-        view_group:
-          type: string
-          description: The group for which the preference applies (e.g., "daily", "meal").
-        platform:
-          type: string
-          description: The platform for which the preference applies (e.g., "web", "mobile").
-        visible_nutrients:
+          description: A description of the food entry meal.
+        foods:
           type: array
           items:
-            type: string
-          description: An array of nutrient names that should be visible.
+            type: object
+            properties:
+              food_id:
+                type: string
+                format: uuid
+                description: The ID of the food item.
+              quantity:
+                type: number
+                description: The quantity of the food item.
+              unit:
+                type: string
+                description: The unit of measurement for the food item.
+            required:
+            - food_id
+            - quantity
+            - unit
+          description: A list of food items included in the meal.
+        quantity:
+          type: number
+          description: The total quantity of the meal.
+        unit:
+          type: string
+          description: The unit of measurement for the meal.
         created_at:
           type: string
           format: date-time
-          description: The date and time when the preference was created.
+          description: The date and time when the food entry meal was created.
         updated_at:
           type: string
           format: date-time
-          description: The date and time when the preference was last updated.
+          description: The date and time when the food entry meal was last updated.
       required:
       - user_id
-      - view_group
-      - platform
-      - visible_nutrients
+      - meal_type
+      - entry_date
+      - name
+      - foods
+      - quantity
+      - unit
   securitySchemes:
     apiKeyAuth:
       type: apiKey

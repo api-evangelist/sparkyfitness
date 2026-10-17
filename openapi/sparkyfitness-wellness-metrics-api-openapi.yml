@@ -2097,6 +2097,70 @@ paths:
       x-operation-id-source: derived
 components:
   schemas:
+    SleepAnalytics:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        totalSleepDuration:
+          type: integer
+        timeAsleep:
+          type: integer
+        sleepScore:
+          type: number
+        earliestBedtime:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        latestWakeTime:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        sleepEfficiency:
+          type: number
+        sleepDebt:
+          type: number
+        stagePercentages:
+          type: object
+          additionalProperties:
+            type: number
+        awakePeriods:
+          type: integer
+        totalAwakeDuration:
+          type: integer
+    WaterContainer:
+      type: object
+      properties:
+        id:
+          type: integer
+        user_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        volume:
+          type: number
+          description: Volume in specified unit
+        unit:
+          type: string
+          description: ml, oz, etc.
+        is_primary:
+          type: boolean
+        servings_per_container:
+          type: number
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required:
+      - name
+      - volume
+      - unit
     FastingLog:
       type: object
       properties:
@@ -2146,36 +2210,6 @@ components:
       - start_time
       - fasting_type
       - status
-    WaterContainer:
-      type: object
-      properties:
-        id:
-          type: integer
-        user_id:
-          type: string
-          format: uuid
-        name:
-          type: string
-        volume:
-          type: number
-          description: Volume in specified unit
-        unit:
-          type: string
-          description: ml, oz, etc.
-        is_primary:
-          type: boolean
-        servings_per_container:
-          type: number
-        created_at:
-          type: string
-          format: date-time
-        updated_at:
-          type: string
-          format: date-time
-      required:
-      - name
-      - volume
-      - unit
     SleepEntry:
       type: object
       properties:
@@ -2223,6 +2257,34 @@ components:
       - bedtime
       - wake_time
       - duration_in_seconds
+    MoodEntry:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        mood_value:
+          type: integer
+          description: Mood value (e.g., 1-5 or 0-10)
+        notes:
+          type:
+          - string
+          - 'null'
+        entry_date:
+          type: string
+          format: date
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required:
+      - mood_value
+      - entry_date
     CustomMeasurementCategory:
       type: object
       properties:
@@ -2263,68 +2325,6 @@ components:
       required:
       - name
       - frequency
-    SleepAnalytics:
-      type: object
-      properties:
-        date:
-          type: string
-          format: date
-        totalSleepDuration:
-          type: integer
-        timeAsleep:
-          type: integer
-        sleepScore:
-          type: number
-        earliestBedtime:
-          type:
-          - string
-          - 'null'
-          format: date-time
-        latestWakeTime:
-          type:
-          - string
-          - 'null'
-          format: date-time
-        sleepEfficiency:
-          type: number
-        sleepDebt:
-          type: number
-        stagePercentages:
-          type: object
-          additionalProperties:
-            type: number
-        awakePeriods:
-          type: integer
-        totalAwakeDuration:
-          type: integer
-    MoodEntry:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        user_id:
-          type: string
-          format: uuid
-        mood_value:
-          type: integer
-          description: Mood value (e.g., 1-5 or 0-10)
-        notes:
-          type:
-          - string
-          - 'null'
-        entry_date:
-          type: string
-          format: date
-        created_at:
-          type: string
-          format: date-time
-        updated_at:
-          type: string
-          format: date-time
-      required:
-      - mood_value
-      - entry_date
   securitySchemes:
     apiKeyAuth:
       type: apiKey
